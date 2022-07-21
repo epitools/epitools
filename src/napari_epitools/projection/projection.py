@@ -3,7 +3,7 @@ import numpy as np
 from skimage.filters import gaussian
 from skimage.io import imread
 
-from napari_epitools._gridfit import gridfit
+from napari_epitools.projection._gridfit import gridfit
 
 
 def _smooth(img, smoothing_radius=0.3):
