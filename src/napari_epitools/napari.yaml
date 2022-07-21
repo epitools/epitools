@@ -14,15 +14,12 @@ contributions:
     - id: napari-epitools.make_sample_data
       python_name: napari_epitools._sample_data:make_sample_data
       title: Load sample data from napari EpiTools
-    - id: napari-epitools.make_qwidget
-      python_name: napari_epitools._widget:ExampleQWidget
-      title: Make example QWidget
-    - id: napari-epitools.make_magic_widget
-      python_name: napari_epitools._widget:example_magic_widget
-      title: Make example magic widget
-    - id: napari-epitools.make_func_widget
-      python_name: napari_epitools._widget:example_function_widget
-      title: Make example function widget
+    - id: napari-epitools.projection
+      python_name: napari_epitools._widgets:projection
+      title: Epitools Projection Widget
+    - id: napari-epitools.segmentation
+      python_name: napari_epitools._widgets:segmentation
+      title: Epitools Segmentation Widget
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
@@ -39,10 +36,7 @@ contributions:
       display_name: napari EpiTools
       key: unique_id.1
   widgets:
-    - command: napari-epitools.make_qwidget
-      display_name: Example QWidget
-    - command: napari-epitools.make_magic_widget
-      display_name: Example Magic Widget
-    - command: napari-epitools.make_func_widget
-      autogenerate: true
-      display_name: Example Function Widget
+    - command: napari-epitools.projection
+      display_name: Epitools Projection Widget
+    - command: napari-epitools.segmentation
+      display_name: Epitools Segmentation Widget
