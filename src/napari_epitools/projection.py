@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.interpolate import griddata
 from skimage.filters import gaussian
 from skimage.io import imread
+
+from napari_epitools._gridfit import gridfit
 
 
 def _smooth(img, smoothing_radius=0.3):
@@ -23,11 +24,9 @@ def _interpolate(depthmap, imsize):
     xnodes, ynodes = imsize[2], imsize[1]
     X, Y = np.meshgrid(np.arange(0, xnodes, 1), np.arange(0, ynodes, 1))
 
-    return (
-        X,
-        Y,
-        griddata(indices, vals, (X, Y), method="nearest", fill_value=0.0),
-    )
+    # return X, Y, griddata(indices, vals, (X, Y), method="nearest", fill_value=0.0)
+    smoothness = 50  # <- needs to be an input
+    return gridfit(indices[1], indices[0], vals, xnodes, ynodes, smoothness)
 
 
 def _plot_surface(x, y, z):
