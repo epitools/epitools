@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import sparse
+from scipy.sparse import linalg
 
 
 # function [zgrid,xgrid,ygrid] = gridfit(x,y,z,xnodes,ynodes,varargin)
@@ -63,7 +64,6 @@ def gridfit(x, y, z, xnodes, ynodes, smoothness):
     indy[k] = indy[k] - 1
     ind = indy + ny * indx
 
-    print(f"{dx[indx]=}")
     # interpolation equations for each point
     tx = np.minimum(1, np.maximum(0, (x - xnodes[indx]) / dx[indx]))
     ty = np.minimum(1, np.maximum(0, (y - ynodes[indy]) / dy[indy]))
@@ -74,8 +74,9 @@ def gridfit(x, y, z, xnodes, ynodes, smoothness):
     data = np.stack(
         ((1 - tx) * (1 - ty), (1 - tx) * ty, tx * (1 - ty), tx * ty), axis=1
     )
-    A = sparse.coo_array((data, (row, col)), shape=(n, ngrid))
-    print(f"{np.max(A.data)=}")
+    A = sparse.csr_matrix(
+        (data.flatten(), (row.flatten(), col.flatten())), shape=(n, ngrid)
+    )
     rhs = z
 
     # do we have relative smoothing parameters?
@@ -83,58 +84,76 @@ def gridfit(x, y, z, xnodes, ynodes, smoothness):
 
     # Build regularizer. Add del^4 regularizer one day.
     # zero "rest length" springs
-    i, j = np.mgrid[0:nx, 0 : (ny - 1)]
-    ind = j.flatten() + ny * (i.flatten() - 1)
+    i, j = np.meshgrid(np.r_[0:nx], np.r_[0 : ny - 1])
+    ind = j.flatten() + ny * i.flatten()
     m = nx * (ny - 1)
     stiffness = 1 / (dy / yscale)
-    Ireg = np.tile(np.arange(m)[:, np.newaxis], (1, 2))
-    Jreg = np.array([ind, ind + 1])
-    Vreg = xyRelativeStiffness[1] * stiffness[j.flatten()] * np.array([-1, 1])
-    Areg = sparse.coo_array(Ireg, (Jreg, Vreg), shape=(m, ngrid))
+    row = np.tile(np.arange(m)[:, np.newaxis], (1, 2))
+    col = np.stack((ind, ind + 1), axis=1)
+    data = (
+        np.reshape(
+            xyRelativeStiffness[1] * stiffness[j.flatten()],
+            (j.flatten().shape[0], 1),
+        )
+        * np.array([-1, 1]).reshape((2, 1)).T
+    )
+    Areg = sparse.csr_matrix(
+        (data.flatten(), (row.flatten(), col.flatten())), shape=(m, ngrid)
+    )
 
-    i, j = np.mgrid[0 : (nx - 1), 0:ny]
-    ind = j.flatten() + ny * (i.flatten() - 1)
+    i, j = np.meshgrid(np.r_[0 : nx - 1], np.r_[0:ny])
+    ind = j.flatten() + ny * i.flatten()
     m = (nx - 1) * ny
     stiffness = 1 / dx / xscale
     row = np.tile(np.arange(m)[:, np.newaxis], (1, 2))
-    col = np.array([ind, ind + ny])
-    data = xyRelativeStiffness[0] * stiffness[i.flatten()] * np.array([-1, 1])
-    temp = sparse.coo_array((data, (row, col)), shape=(m, ngrid))
-    Areg = np.vstack((Areg, temp))
+    col = np.stack((ind, ind + ny), axis=1)
+    data = np.reshape(
+        xyRelativeStiffness[0] * stiffness[i.flatten()],
+        (i.flatten().shape[0], 1),
+    ) * np.array([-1, 1])
+    Atemp = sparse.csr_matrix(
+        (data.flatten(), (row.flatten(), col.flatten())), shape=(m, ngrid)
+    )
+    Areg = sparse.vstack((Areg, Atemp))
 
-    i, j = np.mgrid[0 : (nx - 1), 1 : (ny - 1)]
-    ind = j.flatten() + ny * (i.flatten() - 1)
+    i, j = np.meshgrid(np.r_[0 : nx - 1], np.r_[0 : ny - 1])
+    ind = j.flatten() + ny * i.flatten()
     m = (nx - 1) * (ny - 1)
     stiffness = 1 / np.sqrt(
         np.square(dx[i.flatten()] / xscale / xyRelativeStiffness[0])
-        + np.squre(dy[j.flatten()] / yscale / xyRelativeStiffness[1])
+        + np.square(dy[j.flatten()] / yscale / xyRelativeStiffness[1])
     )
 
-    Itemp = np.tile(np.arange(m)[:, np.newaxis], (1, 2))
-    Jtemp = np.array([ind, ind + ny + 1])
-    Vtemp = stiffness * np.array([-1, 1])
-    temp = sparse.coo_array(Itemp, (Jtemp, Vtemp), shape=(m, ngrid))
-    Areg = np.vstack((Areg, temp))
+    row = np.tile(np.arange(m)[:, np.newaxis], (1, 2))
+    col = np.stack((ind, ind + ny + 1), axis=1)
+    data = np.reshape(stiffness, (stiffness.shape[0], 1)) * np.array([-1, 1])
+    Atemp = sparse.csr_matrix(
+        (data.flatten(), (row.flatten(), col.flatten())), shape=(m, ngrid)
+    )
+    Areg = sparse.vstack((Areg, Atemp))
 
-    Itemp = np.tile(np.arange(m)[:, np.newaxis], (1, 2))
-    Jtemp = np.array([ind + 1, ind + ny])
-    Vtemp = stiffness * np.array([-1, 1])
-    temp = sparse.coo_array(Itemp, (Jtemp, Vtemp), shape=(m, ngrid))
-    Areg = np.vstack((Areg, temp))
+    row = np.tile(np.arange(m)[:, np.newaxis], (1, 2))
+    col = np.stack((ind + 1, ind + ny), axis=1)
+    data = stiffness.reshape((stiffness.shape[0], 1)) * np.array([-1, 1])
+    Atemp = sparse.csr_matrix(
+        (data.flatten(), (row.flatten(), col.flatten())), shape=(m, ngrid)
+    )
+    Areg = sparse.vstack((Areg, Atemp))
 
     nreg = Areg.shape[0]
 
     # Append the regularizer to the interpolation equations,
     # scaling the problem first. Use the 1-norm for speed.
-    NA = sparse.linalg.norm(A, 1)
-    NR = sparse.linalg.norm(Areg, 1)
-    A = np.vstack((A, Areg * (smoothness * NA / NR)))
-    rhs = np.vstack((rhs, np.zeros((nreg, 1))))
+    NA = linalg.norm(A, np.inf)
+    NR = linalg.norm(Areg, np.inf)
+    A = sparse.vstack((A, Areg * (smoothness * NA / NR)))
+    rhs = np.vstack((rhs[:, np.newaxis], np.zeros((nreg, 1))))
 
     # solve the full system, with regularizer attached
-    zgrid = np.reshape(sparse.linalg.lstsq(A, rhs), (ny, nx))
+    solution = linalg.lsqr(A, rhs)
+    zgrid = np.reshape(solution[0], (ny, nx))
 
     # only generate xgrid and ygrid if requested.
-    xgrid, ygrid = np.meshgrid(np.arange(xnodes), np.arange(ynodes))
+    xgrid, ygrid = np.meshgrid(np.r_[xnodes], np.r_[ynodes])
 
     return xgrid, ygrid, zgrid
