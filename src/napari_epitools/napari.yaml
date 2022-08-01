@@ -15,7 +15,7 @@ contributions:
       python_name: napari_epitools._sample_data:make_sample_data
       title: Load sample data from napari EpiTools
     - id: napari-epitools.projection_widget
-      python_name: napari_epitools.analysis:projection_widget
+      python_name: napari_epitools.projection:projection_widget
       title: Epitools Projection Widget
   readers:
     - command: napari-epitools.get_reader
