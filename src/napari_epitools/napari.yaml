@@ -14,29 +14,24 @@ contributions:
     - id: napari-epitools.make_sample_data
       python_name: napari_epitools._sample_data:make_sample_data
       title: Load sample data from napari EpiTools
-    - id: napari-epitools.projection
-      python_name: napari_epitools._widgets:projection
+    - id: napari-epitools.projection_widget
+      python_name: napari_epitools.analysis:projection_widget
       title: Epitools Projection Widget
-    - id: napari-epitools.segmentation
-      python_name: napari_epitools._widgets:segmentation
-      title: Epitools Segmentation Widget
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
-      filename_patterns: ['*.npy']
+      filename_patterns: ["*.npy"]
   writers:
     - command: napari-epitools.write_multiple
-      layer_types: ['image*','labels*']
+      layer_types: ["image*", "labels*"]
       filename_extensions: []
     - command: napari-epitools.write_single_image
-      layer_types: ['image']
-      filename_extensions: ['.npy']
+      layer_types: ["image"]
+      filename_extensions: [".npy"]
   sample_data:
     - command: napari-epitools.make_sample_data
       display_name: napari EpiTools
       key: unique_id.1
   widgets:
-    - command: napari-epitools.projection
+    - command: napari-epitools.projection_widget
       display_name: Epitools Projection Widget
-    - command: napari-epitools.segmentation
-      display_name: Epitools Segmentation Widget
