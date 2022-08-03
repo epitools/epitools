@@ -29,9 +29,9 @@ contributions:
       layer_types: ["image"]
       filename_extensions: [".npy"]
   sample_data:
-    - command: napari-epitools.make_sample_data
+    - command: napari-epitools.load_sample_data
       display_name: napari EpiTools
-      key: unique_id.1
+      key: test_image
   widgets:
     - command: napari-epitools.projection_widget
       display_name: Epitools Projection Widget
