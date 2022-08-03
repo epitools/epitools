@@ -87,7 +87,7 @@ def _calculate_projected_image(imstack, z_interpolation):
 @magic_factory(pbar={"visible": False, "max": 0, "label": "working..."})
 def projection_widget(
     pbar: widgets.ProgressBar,
-    imstack: ImageData,
+    input_image: ImageData,
     smoothing_radius: Annotated[
         float, {"min": 0.0, "max": 2.0, "step": 0.1}
     ] = 0.2,
@@ -123,8 +123,12 @@ def projection_widget(
     @thread_worker(connect={"returned": pbar.hide})
     def calculate_projection() -> ImageData:
         # image dimensions are z, y, x
-        imsize = imstack.shape
-        I1 = _smooth(imstack, smoothing_radius)
+        if input_image is None:
+            pbar.hide()
+            raise ValueError("Load an image first")
+
+        imsize = input_image.shape
+        I1 = _smooth(input_image, smoothing_radius)
 
         vm1 = I1.max(axis=0)
         depthmap = I1.argmax(axis=0)
@@ -157,7 +161,7 @@ def projection_widget(
         zg2 = _interpolate(depthmap4, imsize, surface_smoothness_2)
 
         # creating projected image from interpolated surface estimation
-        projected_image = _calculate_projected_image(imstack, zg2)
+        projected_image = _calculate_projected_image(input_image, zg2)
 
         return projected_image
 
