@@ -40,7 +40,7 @@ def _interpolate(depthmap, imsize, smoothness):
         z coordinate map
     imsize : tuple
         Input image dimensions
-    smoothness : float
+    smoothness : int
         How much to smooth the interpolation - lower numbers indicate more smoothing
 
     Returns
@@ -50,9 +50,7 @@ def _interpolate(depthmap, imsize, smoothness):
     """
     indices = np.nonzero(depthmap)
     vals = depthmap[indices]
-
     xnodes, ynodes = imsize[2], imsize[1]
-    X, Y = np.meshgrid(np.arange(0, xnodes, 1), np.arange(0, ynodes, 1))
 
     return gridfit(indices[1], indices[0], vals, xnodes, ynodes, smoothness)
 
@@ -139,7 +137,7 @@ def projection_widget(
         # assumed to be the surface of interest
         mask = confidencemap > confthres
         depthmap2 = depthmap * mask
-        _, _, zg1 = _interpolate(depthmap2, imsize, surface_smoothness_1)
+        zg1 = _interpolate(depthmap2, imsize, surface_smoothness_1)
 
         # given the hight locations of the surface (zg1) compute the difference
         # towards the 1st quartile location (depthmap2), ignore the rest (==0);
@@ -156,7 +154,7 @@ def projection_widget(
         # this is to make sure that the highest intensity points will be
         # selected from the correct surface (The coarse grained estimate could
         # potentially approximate the origin of the point to another plane)
-        _, _, zg2 = _interpolate(depthmap4, imsize, surface_smoothness_2)
+        zg2 = _interpolate(depthmap4, imsize, surface_smoothness_2)
 
         # creating projected image from interpolated surface estimation
         projected_image = _calculate_projected_image(imstack, zg2)
