@@ -154,7 +154,6 @@ def _least_squares_solver(A, Areg, rhs, num_nodes_x, num_nodes_y, smoothness):
     return np.reshape(solution[0], (num_nodes_y, num_nodes_x))
 
 
-# function [zgrid,xgrid,ygrid] = gridfit(x,y,z,xnodes,ynodes,varargin)
 def gridfit(x_indices, y_indices, z_values, xnodes, ynodes, smoothness):
     """Interpolation using curve fitting. This is a port of the parts of
     https://www.mathworks.com/matlabcentral/fileexchange/8998-surface-fitting-using-gridfit
