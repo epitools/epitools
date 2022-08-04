@@ -1,7 +1,8 @@
 import numpy as np
+from numpy import ndarray
 
 
-def skeletonize(cell_labels: np.ndarray) -> np.ndarray:
+def skeletonize(cell_labels: ndarray) -> ndarray:
     """Skeletonize a labelled image by calculating the gradient.
 
     Parameters
