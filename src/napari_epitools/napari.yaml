@@ -11,10 +11,10 @@ contributions:
     - id: napari-epitools.write_single_image
       python_name: napari_epitools._writer:write_single_image
       title: Save image data with napari EpiTools
-    - id: napari-epitools.make_sample_data
-      python_name: napari_epitools._sample_data:make_sample_data
+    - id: napari-epitools.load_sample_data
+      python_name: napari_epitools._sample_data:load_sample_data
       title: Load sample data from napari EpiTools
-    - id: napari-epitools.projection_widget
+    - id: napari-epitools.projection
       python_name: napari_epitools.projection:projection_widget
       title: Epitools Projection Widget
   readers:
@@ -33,5 +33,5 @@ contributions:
       display_name: napari EpiTools
       key: test_image
   widgets:
-    - command: napari-epitools.projection_widget
+    - command: napari-epitools.projection
       display_name: Epitools Projection Widget
