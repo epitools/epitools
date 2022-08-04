@@ -1,1 +1,1 @@
-from .projection import projection_widget  # noqa F401
+from .projection import calculate_projection, projection_widget  # noqa F401
