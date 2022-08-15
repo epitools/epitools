@@ -1,9 +1,25 @@
+from typing import Tuple
+
 import numpy as np
+import numpy.typing as npt
+import scipy
 from scipy import sparse
 from scipy.sparse import linalg
 
+SparseMatrix = scipy.sparse.base.spmatrix
 
-def _calculate_interpolation_equations(x_indices, y_indices, xnodes, ynodes):
+
+def _calculate_interpolation_equations(
+    x_indices: npt.NDArray[np.int64],
+    y_indices: npt.NDArray[np.int64],
+    xnodes: npt.NDArray[np.float64],
+    ynodes: npt.NDArray[np.float64],
+) -> Tuple[
+    npt.NDArray[np.float64],
+    npt.NDArray[np.float64],
+    npt.NDArray[np.int64],
+    npt.NDArray[np.int64],
+]:
 
     # determine which cell in the array each point lies in
     indx = np.digitize(x_indices, xnodes) - 1
@@ -30,7 +46,14 @@ def _calculate_interpolation_equations(x_indices, y_indices, xnodes, ynodes):
     return tx, ty, indx, indy
 
 
-def _bilinear_interpolation(n, num_nodes_x, num_nodes_y, tx, ty, ind):
+def _bilinear_interpolation(
+    n: int,
+    num_nodes_x: int,
+    num_nodes_y: int,
+    tx: npt.NDArray[np.float64],
+    ty: npt.NDArray[np.float64],
+    ind: npt.NDArray[np.int64],
+) -> SparseMatrix:
 
     row = np.tile(np.arange(n)[:, np.newaxis], (1, 4))
     col = np.stack(
@@ -46,14 +69,26 @@ def _bilinear_interpolation(n, num_nodes_x, num_nodes_y, tx, ty, ind):
     return A
 
 
-def _make_flattened_indices(nrows, ncols):
+def _make_flattened_indices(
+    nrows: int, ncols: int
+) -> Tuple[
+    npt.NDArray[np.int64], npt.NDArray[np.int64], npt.NDArray[np.int64]
+]:
     i, j = np.meshgrid(np.r_[0:ncols], np.r_[0:nrows])
     col_ind, row_ind = i.flatten(), j.flatten()
     ind = row_ind + nrows * col_ind
     return col_ind, row_ind, ind
 
 
-def _create_sparse_matrix(A, B, m, ngrid, data_rows, stiffness):
+def _create_sparse_matrix(
+    A: npt.NDArray[np.int64],
+    B: npt.NDArray[np.int64],
+    m: int,
+    ngrid: int,
+    data_rows: int,
+    stiffness: npt.NDArray[np.float64],
+) -> SparseMatrix:
+
     row = np.tile(np.arange(m)[:, np.newaxis], (1, 2))
     col = np.stack((A, B), axis=1)
     data = np.reshape(stiffness, (data_rows, 1)) * np.array([-1, 1])
@@ -63,8 +98,12 @@ def _create_sparse_matrix(A, B, m, ngrid, data_rows, stiffness):
 
 
 def _build_springs_regularizer(
-    num_nodes_x, num_nodes_y, difference_x, difference_y
-):
+    num_nodes_x: int,
+    num_nodes_y: int,
+    difference_x: npt.NDArray[np.float64],
+    difference_y: npt.NDArray[np.float64],
+) -> SparseMatrix:
+
     ngrid = num_nodes_x * num_nodes_y
     xscale = np.mean(difference_x)
     yscale = np.mean(difference_y)
@@ -120,7 +159,14 @@ def _build_springs_regularizer(
     return sparse.vstack((Areg, Atemp))
 
 
-def _least_squares_solver(A, Areg, rhs, num_nodes_x, num_nodes_y, smoothness):
+def _least_squares_solver(
+    A: SparseMatrix,
+    Areg: SparseMatrix,
+    rhs: npt.NDArray[np.int64],
+    num_nodes_x: int,
+    num_nodes_y: int,
+    smoothness: int,
+) -> npt.NDArray[np.float64]:
     """Solve full system including regularizer using least squares.
 
     Parameters
@@ -154,7 +200,14 @@ def _least_squares_solver(A, Areg, rhs, num_nodes_x, num_nodes_y, smoothness):
     return np.reshape(solution[0], (num_nodes_y, num_nodes_x))
 
 
-def gridfit(x_indices, y_indices, z_values, xnodes, ynodes, smoothness):
+def gridfit(
+    x_indices: npt.NDArray[np.int64],
+    y_indices: npt.NDArray[np.int64],
+    z_values: npt.NDArray[np.int64],
+    xnodes: npt.NDArray[np.float64],
+    ynodes: npt.NDArray[np.float64],
+    smoothness: int,
+) -> npt.NDArray[np.float64]:
     """Interpolation using curve fitting. This is a port of the parts of
     https://www.mathworks.com/matlabcentral/fileexchange/8998-surface-fitting-using-gridfit
     which are relevant to this application (i.e. not all the options have been ported).
