@@ -49,11 +49,11 @@ def test_calculate_projection(sample_data):
     surface_smoothness_2 = 50
     cut_off_distance = 20
 
-    with patch("napari_epitools.projection.projection.gridfit") as gridfit:
+    with patch("napari_epitools.projection.projection._interpolate") as interp:
         mock_interpolation = np.zeros(
             (sample_data.shape[1], sample_data.shape[2])
         )
-        gridfit.return_value = mock_interpolation
+        interp.return_value = mock_interpolation
         projection = calculate_projection(
             sample_data,
             smoothing_radius,
@@ -61,6 +61,5 @@ def test_calculate_projection(sample_data):
             surface_smoothness_2,
             cut_off_distance,
         )
-        assert gridfit.called
         assert projection.ndim == 2
         assert projection.shape == (sample_data.shape[1], sample_data.shape[2])
