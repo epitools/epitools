@@ -86,13 +86,11 @@ def _calculate_projected_image(
     # make a container for the projected image
     imsize = imstack.shape
     projected_image = np.zeros((imsize[1], imsize[2]), dtype=imstack.dtype)
-    z_map = np.zeros((imsize[1], imsize[2]), dtype=imstack.dtype)
+
     # take the non-zero elements of the interpolation and round
     mask = (z_interpolation > 0.0) & (z_interpolation < float(imsize[0] - 1))
-    # mask = z_interpolation > 0.0
     z_coordinates = np.round(z_interpolation[mask]).astype(np.int64)
     projected_image[mask] = imstack[z_coordinates, mask]
-    z_map[mask] = z_coordinates
     return projected_image
 
 
