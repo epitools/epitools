@@ -1,14 +1,16 @@
 import numpy as np
+import numpy.typing as npt
 from magicgui import magic_factory, widgets
 from napari.qt.threading import FunctionWorker, thread_worker
 from napari.types import ImageData
 from skimage.filters import gaussian
+from scipy.interpolate import griddata
 from typing_extensions import Annotated
 
-from napari_epitools.projection._gridfit import gridfit
 
-
-def _smooth(img, smoothing_radius=0.3):
+def _smooth(
+    img: npt.NDArray[np.float64], smoothing_radius: float = 0.3
+) -> npt.NDArray[np.float64]:
     """Gaussian smoothing of each z plane in the image stack
 
     Parameters
@@ -26,12 +28,18 @@ def _smooth(img, smoothing_radius=0.3):
     zsize = img.shape[0]
     smoothed = np.zeros(img.shape)
     for z in range(zsize):
-        smoothed[z, :, :] = gaussian(img[z, :, :], sigma=smoothing_radius)
+        smoothed[z, :, :] = gaussian(
+            img[z, :, :], sigma=smoothing_radius, preserve_range=True
+        )
 
     return smoothed
 
 
-def _interpolate(depthmap, imsize, smoothness):
+def _interpolate(
+    depthmap: npt.NDArray[np.float64],
+    imsize: npt.NDArray[np.float64],
+    smoothness: int,
+) -> npt.NDArray[np.float64]:
     """Interpolate the z coordinate map using gridfit
 
     Parameters
@@ -49,13 +57,16 @@ def _interpolate(depthmap, imsize, smoothness):
         Interpolated z coordinates
     """
     indices = np.nonzero(depthmap)
-    vals = depthmap[indices]
+    vals = depthmap[indices].astype(np.float64)
     xnodes, ynodes = imsize[2], imsize[1]
+    X, Y = np.meshgrid(np.arange(xnodes), np.arange(ynodes))
+    interp_vals = griddata(indices, vals, (Y, X), method="nearest")
+    return gaussian(interp_vals, sigma=smoothness)
 
-    return gridfit(indices[1], indices[0], vals, xnodes, ynodes, smoothness)
 
-
-def _calculate_projected_image(imstack, z_interpolation):
+def _calculate_projected_image(
+    imstack: npt.NDArray[np.float64], z_interpolation: npt.NDArray[np.float64]
+) -> npt.NDArray[np.float64]:
     """Create the projected image from the non-zero elements
     of the interpolated z coordinates.
 
@@ -75,22 +86,23 @@ def _calculate_projected_image(imstack, z_interpolation):
     # make a container for the projected image
     imsize = imstack.shape
     projected_image = np.zeros((imsize[1], imsize[2]), dtype=imstack.dtype)
-
+    z_map = np.zeros((imsize[1], imsize[2]), dtype=imstack.dtype)
     # take the non-zero elements of the interpolation and round
-    mask = z_interpolation > 0
-    z_coordinates = np.round(z_interpolation[mask]).astype("int")
+    mask = (z_interpolation > 0.0) & (z_interpolation < float(imsize[0] - 1))
+    # mask = z_interpolation > 0.0
+    z_coordinates = np.round(z_interpolation[mask]).astype(np.int64)
     projected_image[mask] = imstack[z_coordinates, mask]
-
+    z_map[mask] = z_coordinates
     return projected_image
 
 
 def calculate_projection(
-    input_image,
-    smoothing_radius,
-    surface_smoothness_1,
-    surface_smoothness_2,
-    cut_off_distance,
-) -> np.ndarray:
+    input_image: npt.NDArray[np.float64],
+    smoothing_radius: float,
+    surface_smoothness_1: int,
+    surface_smoothness_2: int,
+    cut_off_distance: int,
+) -> npt.NDArray[np.float64]:
     """Z projection using image interpolation.
 
     Parameters
@@ -141,7 +153,6 @@ def calculate_projection(
     # selected from the correct surface (The coarse grained estimate could
     # potentially approximate the origin of the point to another plane)
     zg2 = _interpolate(depthmap4, imsize, surface_smoothness_2)
-
     return _calculate_projected_image(input_image, zg2)
 
 
@@ -152,12 +163,8 @@ def projection_widget(
     smoothing_radius: Annotated[
         float, {"min": 0.0, "max": 2.0, "step": 0.1}
     ] = 0.2,
-    surface_smoothness_1: Annotated[
-        int, {"min": 0, "max": 100, "step": 1}
-    ] = 50,
-    surface_smoothness_2: Annotated[
-        int, {"min": 0, "max": 100, "step": 1}
-    ] = 50,
+    surface_smoothness_1: Annotated[int, {"min": 0, "max": 10, "step": 1}] = 5,
+    surface_smoothness_2: Annotated[int, {"min": 0, "max": 10, "step": 1}] = 5,
     cut_off_distance: Annotated[int, {"min": 0, "max": 5, "step": 1}] = 2,
 ) -> FunctionWorker[ImageData]:
     """Z projection using image interpolation.
