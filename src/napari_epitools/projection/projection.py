@@ -23,8 +23,8 @@ def _smooth(
     zsize = img.shape[0]
     smoothed = np.zeros(img.shape)
     for z in range(zsize):
-        smoothed[z, :, :] = gaussian(
-            img[z, :, :], sigma=smoothing_radius, preserve_range=True
+        smoothed[z] = gaussian(
+            img[z], sigma=smoothing_radius, preserve_range=True
         )
 
     return smoothed
