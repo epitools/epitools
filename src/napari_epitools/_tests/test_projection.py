@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -10,7 +11,9 @@ from napari_epitools.projection import calculate_projection, projection_widget
 
 @pytest.fixture
 def sample_data():
-    img_path = "sample_data/8bitDataset/test_image.tif"
+    img_path = img_path = (
+        Path("sample_data") / "8bitDataset" / "test_image.tif"
+    )
     return imread(img_path)
 
 
