@@ -10,7 +10,7 @@ from napari_epitools.projection import calculate_projection, projection_widget
 
 SMOOTHING_RADIUS = 0.2
 SURFACE_SMOOTHNESS_1 = 50
-SURFACE_SMOOTHNESS_1 = 50
+SURFACE_SMOOTHNESS_2 = 50
 CUT_OFF_DISTANCE = 20
 
 
@@ -52,10 +52,6 @@ def test_projection_widget_run_button(projection_widget_fixture, sample_data):
 
 
 def test_calculate_projection(sample_data):
-    smoothing_radius = SMOOTHING_RADIUS
-    surface_smoothness_1 = SURFACE_SMOOTHNESS_1
-    surface_smoothness_2 = SURFACE_SMOOTHNESS_1
-    cut_off_distance = CUT_OFF_DISTANCE
 
     with patch("napari_epitools.projection.projection._interpolate") as interp:
         mock_interpolation = np.zeros(
@@ -64,10 +60,10 @@ def test_calculate_projection(sample_data):
         interp.return_value = mock_interpolation
         projection = calculate_projection(
             sample_data,
-            smoothing_radius,
-            surface_smoothness_1,
-            surface_smoothness_2,
-            cut_off_distance,
+            SMOOTHING_RADIUS,
+            SURFACE_SMOOTHNESS_1,
+            SURFACE_SMOOTHNESS_2,
+            CUT_OFF_DISTANCE,
         )
         assert projection.ndim == 2
         assert projection.shape == (sample_data.shape[1], sample_data.shape[2])
