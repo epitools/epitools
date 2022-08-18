@@ -8,6 +8,11 @@ from skimage.io import imread
 
 from napari_epitools.projection import calculate_projection, projection_widget
 
+SMOOTHING_RADIUS = 0.2
+SURFACE_SMOOTHNESS_1 = 50
+SURFACE_SMOOTHNESS_1 = 50
+CUT_OFF_DISTANCE = 20
+
 
 @pytest.fixture
 def sample_data():
@@ -47,10 +52,10 @@ def test_projection_widget_run_button(projection_widget_fixture, sample_data):
 
 
 def test_calculate_projection(sample_data):
-    smoothing_radius = 0.2
-    surface_smoothness_1 = 50
-    surface_smoothness_2 = 50
-    cut_off_distance = 20
+    smoothing_radius = SMOOTHING_RADIUS
+    surface_smoothness_1 = SURFACE_SMOOTHNESS_1
+    surface_smoothness_2 = SURFACE_SMOOTHNESS_1
+    cut_off_distance = CUT_OFF_DISTANCE
 
     with patch("napari_epitools.projection.projection._interpolate") as interp:
         mock_interpolation = np.zeros(
