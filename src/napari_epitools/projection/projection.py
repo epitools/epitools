@@ -114,8 +114,9 @@ def calculate_projection(
     depthmap = I1.argmax(axis=0)
 
     confidencemap = imsize[0] * vm1 / sum(I1, 0)
-    c = confidencemap[:]
-    confthres = np.median(c[c > np.median(c)])
+    confthres = np.median(
+        confidencemap[confidencemap > np.median(confidencemap)]
+    )
 
     # keep only the brightest surface points (intensity in 1 quartile)
     # assumed to be the surface of interest
