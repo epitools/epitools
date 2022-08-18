@@ -3,8 +3,8 @@ import numpy.typing as npt
 from magicgui import magic_factory, widgets
 from napari.qt.threading import FunctionWorker, thread_worker
 from napari.types import ImageData
-from skimage.filters import gaussian
 from scipy.interpolate import griddata
+from skimage.filters import gaussian
 from typing_extensions import Annotated
 
 
