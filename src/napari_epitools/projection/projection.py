@@ -13,17 +13,12 @@ def _smooth(
 ) -> npt.NDArray[np.float64]:
     """Gaussian smoothing of each z plane in the image stack
 
-    Parameters
-    ----------
-    img : ndarray
-        The input image stack
-    smoothing_radius : float, optional
-        Standard deviation passed to gaussian function, by default 0.3
+    Args:
+        img: The input image stack.
+        smoothing_radius: Standard deviation passed to gaussian function.
 
-    Returns
-    -------
-    ndarray
-        The smoothed image stack
+    Returns:
+        The smoothed image stack.
     """
     zsize = img.shape[0]
     smoothed = np.zeros(img.shape)
@@ -42,19 +37,16 @@ def _interpolate(
 ) -> npt.NDArray[np.float64]:
     """Interpolate the z coordinate map using gridfit
 
-    Parameters
-    ----------
-    depthmap : ndarray
-        z coordinate map
-    imsize : tuple
-        Input image dimensions
-    smoothness : int
-        How much to smooth the interpolation - lower numbers indicate more smoothing
+    Args:
+        depthmap:
+            z coordinate map.
+        imsize:
+            Input image dimensions.
+        smoothness:
+            How much to smooth the interpolation.
 
-    Returns
-    -------
-    ndarray
-        Interpolated z coordinates
+    Returns:
+        Interpolated z coordinates.
     """
     indices = np.nonzero(depthmap)
     vals = depthmap[indices].astype(np.float64)
@@ -70,17 +62,14 @@ def _calculate_projected_image(
     """Create the projected image from the non-zero elements
     of the interpolated z coordinates.
 
-    Parameters
-    ----------
-    imstack : ndarray
-        The input image z stack
-    z_interpolation : ndarray
-        Output from gridfit function
+    Args:
+        imstack:
+            The input image z stack.
+        z_interpolation:
+            Output from griddata function.
 
-    Returns
-    -------
-    ndarray
-        The final projected image
+    Returns:
+        The final projected image.
     """
 
     # make a container for the projected image
@@ -103,21 +92,20 @@ def calculate_projection(
 ) -> npt.NDArray[np.float64]:
     """Z projection using image interpolation.
 
-    Parameters
-    ----------
-    imstack : ndarray
-        numpy ndarray representation of 3D image stack
-    smoothing_radius : float
-        kernel radius for gaussian blur to apply before estimating the surface
-    [0.1 - 5]
-    surface_smoothness_1: int
-        Surface smoothness for 1st gridFit(c) estimation, the smaller the smoother
-        [30 - 100]
-    surface_smoothness_2: int
-        Surface smoothness for 3nd gridFit(c) estimation, the smaller the smoother
-        [20 - 50]
-    cut_off_distance : int
-        Cutoff distance in z-planes from the 1st estimated surface [1 - 3]
+    Args:
+        input_image:
+            Numpy ndarray representation of 3D image stack.
+        smoothing_radius:
+            Kernel radius for gaussian blur to apply before estimating the surface.
+        surface_smoothness_1:
+            Surface smoothness for 1st griddata estimation, larger means smoother.
+        surface_smoothness_2:
+            Surface smoothness for 3nd gridFit(c) estimation, larger means smoother.
+        cut_off_distance:
+            Cutoff distance in z-planes from the 1st estimated surface.
+
+    Returns:
+        Stack projected onto a single plane.
     """
     imsize = input_image.shape
     I1 = _smooth(input_image, smoothing_radius)
@@ -167,23 +155,25 @@ def projection_widget(
 ) -> FunctionWorker[ImageData]:
     """Z projection using image interpolation.
 
-    Parameters
-    ----------
-    pbar: magicgui.widget
-        Progressbar widget
-    input_image : ndarray
-        numpy ndarray representation of 3D image stack
-    smoothing_radius : float
-        kernel radius for gaussian blur to apply before estimating the surface
-    [0.1 - 5]
-    surface_smoothness_1: int
-        Surface smoothness for 1st gridFit(c) estimation, the smaller the smoother
-        [30 - 100]
-    surface_smoothness_2: int
-        Surface smoothness for 3nd gridFit(c) estimation, the smaller the smoother
-        [20 - 50]
-    cut_off_distance : int
-        Cutoff distance in z-planes from the 1st estimated surface [1 - 3]
+    Args:
+        pbar:
+            Progressbar widget
+        input_image:
+            Numpy ndarray representation of 3D image stack
+        smoothing_radius:
+            Kernel radius for gaussian blur to apply before estimating the surface.
+        surface_smoothness_1:
+            Surface smoothness for 1st griddata estimation, larger means smoother.
+        surface_smoothness_2:
+            Surface smoothness for 3nd griddata estimation, larger means smoother.
+        cut_off_distance:
+            Cutoff distance in z-planes from the 1st estimated surface.
+
+    Raises:
+        ValueError: When no image is loaded.
+
+    Returns:
+        Projected image as napari Image layer.
     """
 
     @thread_worker(connect={"returned": pbar.hide})
