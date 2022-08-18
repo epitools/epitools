@@ -8,9 +8,13 @@ Replace code below according to your needs.
 """
 from __future__ import annotations
 
-import numpy
+from pathlib import Path
+
+from skimage.io import imread
 
 
-def make_sample_data():
+def load_sample_data():
     """Generates an image"""
-    return numpy.random.rand(512, 512)
+    img_path = Path("sample_data") / "8bitDataset" / "test_image.tif"
+    data = imread(img_path)
+    return [(data, {"name": "Epitools test data"})]
