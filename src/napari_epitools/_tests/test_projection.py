@@ -6,7 +6,7 @@ import pytest
 from magicgui import widgets
 from skimage.io import imread
 
-from napari_epitools.projection import calculate_projection, projection_widget
+from napari_epitools.analysis import calculate_projection, projection_widget
 
 SMOOTHING_RADIUS = 0.2
 SURFACE_SMOOTHNESS_1 = 50
