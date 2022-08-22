@@ -14,11 +14,11 @@ contributions:
     - id: napari-epitools.load_sample_data
       python_name: napari_epitools._sample_data:load_sample_data
       title: Load sample data from napari EpiTools
-    - id: napari-epitools.projection
-      python_name: napari_epitools.projection:projection_widget
+    - id: napari-epitools.epitools_widget
+      python_name: napari_epitools._widget:epitools_widget
       title: Epitools Projection Widget
     - id: napari-epitools.segmentation
-      python_name: napari_epitools.projection:segmentation_widget
+      python_name: napari_epitools._widget:segmentation_widget
       title: Epitools Segmentation Widget
   readers:
     - command: napari-epitools.get_reader
@@ -36,7 +36,7 @@ contributions:
       display_name: napari EpiTools
       key: test_image
   widgets:
-    - command: napari-epitools.projection
-      display_name: Epitools Projection Widget
+    - command: napari-epitools.epitools_widget
+      display_name: Epitools Widget
     - command: napari-epitools.segmentation
       display_name: Epitools Segmentation Widget
