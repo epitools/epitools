@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import ndarray
+import numpy.typing as npt
 
 
 def _get_lines(cell_labels):
@@ -9,23 +9,21 @@ def _get_lines(cell_labels):
     ).astype(int)
 
 
-def skeletonize(cell_labels: ndarray) -> ndarray:
+def skeletonize(
+    cell_labels: npt.NDArray[np.float64],
+) -> npt.NDArray[np.int64]:
     """Skeletonize a labelled image by calculating the gradient.
 
-    Parameters
-    ----------
-    cell_labels : np.ndarray
-        Labelled (possibly time series) image
+    Args:
+        cell_labels:
+            Labelled (possibly time series) image.
 
-    Returns
-    -------
-    np.ndarray
-        The skeletonized labelled image
+    Raises:
+        ValueError:
+            If the input data has more than 3 dimensions.
 
-    Raises
-    ------
-    ValueError
-        If the input data has more than 3 dimensions.
+    Returns:
+        The skeletonized labelled image.
     """
     if cell_labels.ndim == 2:
         return _get_lines(cell_labels)
