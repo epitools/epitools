@@ -6,7 +6,8 @@ import pytest
 from magicgui import widgets
 from skimage.io import imread
 
-from napari_epitools.analysis import calculate_projection, projection_widget
+from napari_epitools._widget import projection_widget
+from napari_epitools.analysis import calculate_projection
 
 SMOOTHING_RADIUS = 0.2
 SURFACE_SMOOTHNESS_1 = 50
@@ -40,7 +41,7 @@ def test_add_projection_widget(make_napari_viewer):
 def test_projection_widget_run_button(projection_widget_fixture, sample_data):
     pbar = widgets.ProgressBar()
     with patch(
-        "napari_epitools.projection.projection.calculate_projection"
+        "napari_epitools.projection.analysis.calculate_projection"
     ) as calculate_projection:
         mock_projection = np.zeros(
             (sample_data.shape[1], sample_data.shape[1])
@@ -53,7 +54,7 @@ def test_projection_widget_run_button(projection_widget_fixture, sample_data):
 
 def test_calculate_projection(sample_data):
 
-    with patch("napari_epitools.projection.projection._interpolate") as interp:
+    with patch("napari_epitools.analysis.projection._interpolate") as interp:
         mock_interpolation = np.zeros(
             (sample_data.shape[1], sample_data.shape[2])
         )
