@@ -2,7 +2,10 @@ import numpy as np
 import numpy.typing as npt
 from magicgui import magic_factory, widgets
 from napari.qt.threading import FunctionWorker, thread_worker
-from napari.types import ImageData
+from napari.types import ImageData, LabelsData
+from napari_segment_blobs_and_things_with_membranes import (
+    thresholded_local_minima_seeded_watershed,
+)
 from scipy.interpolate import griddata
 from skimage.filters import gaussian
 from typing_extensions import Annotated
@@ -202,3 +205,16 @@ def projection_widget(
 
     pbar.show()
     return projection()
+
+
+@magic_factory
+def segmentation_widget(
+    input_image: ImageData,
+    spot_sigma: Annotated[float, {"min": 0, "max": 20, "step": 0.1}] = 3,
+    outline_sigma: Annotated[float, {"min": 0, "max": 20, "step": 0.1}] = 0,
+    threshold: Annotated[float, {"min": 0, "max": 100, "step": 1}] = 20,
+) -> LabelsData:
+
+    return thresholded_local_minima_seeded_watershed(
+        input_image, spot_sigma, outline_sigma, threshold
+    )

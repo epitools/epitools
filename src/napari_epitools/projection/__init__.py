@@ -1,1 +1,5 @@
-from .projection import calculate_projection, projection_widget  # noqa F401
+from .projection import (  # noqa F401
+    calculate_projection,
+    projection_widget,
+    segmentation_widget,
+)

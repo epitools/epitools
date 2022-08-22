@@ -17,6 +17,9 @@ contributions:
     - id: napari-epitools.projection
       python_name: napari_epitools.projection:projection_widget
       title: Epitools Projection Widget
+    - id: napari-epitools.segmentation
+      python_name: napari_epitools.projection:segmentation_widget
+      title: Epitools Segmentation Widget
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
@@ -35,3 +38,5 @@ contributions:
   widgets:
     - command: napari-epitools.projection
       display_name: Epitools Projection Widget
+    - command: napari-epitools.segmentation
+      display_name: Epitools Segmentation Widget
