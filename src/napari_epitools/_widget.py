@@ -2,7 +2,7 @@ from typing import List
 
 from magicgui import magic_factory, widgets
 from napari.qt.threading import FunctionWorker, thread_worker
-from napari.types import ImageData, LayerDataTuple
+from napari.types import ImageData, LabelsData, LayerDataTuple
 from napari.utils.notifications import show_info
 
 from napari_epitools.analysis import (
@@ -43,36 +43,15 @@ SEED_FACE_COLOR = "red"
         "max": 5,
         "step": 1,
     },
-    spot_sigma={
-        "widget_type": "FloatSlider",
-        "min": 0,
-        "max": 20,
-        "step": 0.1,
-    },
-    outline_sigma={
-        "widget_type": "FloatSlider",
-        "min": 0,
-        "max": 20,
-        "step": 0.1,
-    },
-    threshold={
-        "widget_type": "FloatSlider",
-        "min": 0,
-        "max": 100,
-        "step": 1,
-    },
 )
-def epitools_widget(
+def projection_widget(
     pbar: widgets.ProgressBar,
     input_image: ImageData,
     smoothing_radius: float = 0.2,
     surface_smoothness_1: int = 5,
     surface_smoothness_2: int = 5,
     cut_off_distance: int = 2,
-    spot_sigma: float = 3,
-    outline_sigma: float = 0,
-    threshold: float = 20,
-) -> FunctionWorker[List[LayerDataTuple]]:
+) -> FunctionWorker[LayerDataTuple]:
     """Z projection using image interpolation.
     Args:
         pbar:
@@ -98,7 +77,7 @@ def epitools_widget(
         return
 
     @thread_worker(connect={"returned": pbar.hide})
-    def run() -> List[LayerDataTuple]:
+    def run() -> LayerDataTuple:
         proj = calculate_projection(
             input_image,
             smoothing_radius,
@@ -106,12 +85,51 @@ def epitools_widget(
             surface_smoothness_2,
             cut_off_distance,
         )
-        proj_layer = (proj, {"name": "Projection"}, "image")
+        return (proj, {"name": "Projection"}, "image")
 
+    pbar.show()
+    return run()
+
+
+@magic_factory(
+    pbar={"visible": False, "max": 0, "label": "working..."},
+    spot_sigma={
+        "widget_type": "FloatSlider",
+        "min": 0,
+        "max": 20,
+        "step": 0.1,
+    },
+    outline_sigma={
+        "widget_type": "FloatSlider",
+        "min": 0,
+        "max": 20,
+        "step": 0.1,
+    },
+    threshold={
+        "widget_type": "FloatSlider",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+    },
+)
+def segmentation_widget(
+    pbar: widgets.ProgressBar,
+    input_image: ImageData,
+    spot_sigma: float = 3,
+    outline_sigma: float = 0,
+    threshold: float = 20,
+) -> FunctionWorker[List[LayerDataTuple]]:
+
+    if input_image is None or input_image.data.ndim > 2:
+        pbar.hide()
+        show_info("Load a 2D image first")
+        return
+
+    @thread_worker(connect={"returned": pbar.hide})
+    def run() -> List[LayerDataTuple]:
         seeds, labels = thresholded_local_minima_seeded_watershed(
-            proj, spot_sigma, outline_sigma, threshold
+            input_image, spot_sigma, outline_sigma, threshold
         )
-        lines = skeletonize(labels)
         seeds_layer = (
             seeds,
             {
@@ -123,21 +141,27 @@ def epitools_widget(
             "points",
         )
         labels_layer = (labels, {"name": "Segmentation"}, "labels")
-        lines_layer = (lines, {"name": "Skeletonize"}, "labels")
-        return [proj_layer, seeds_layer, labels_layer, lines_layer]
+        return [seeds_layer, labels_layer]
 
     pbar.show()
     return run()
 
 
-# @magic_factory
-# def segmentation_widget(
-#     input_image: ImageData,
-#     spot_sigma: Annotated[float, {"min": 0, "max": 20, "step": 0.1}] = 3,
-#     outline_sigma: Annotated[float, {"min": 0, "max": 20, "step": 0.1}] = 0,
-#     threshold: Annotated[float, {"min": 0, "max": 100, "step": 1}] = 20,
-# ) -> LabelsData:
+@magic_factory
+def outlines_widget(
+    labels: LabelsData,
+) -> FunctionWorker[LayerDataTuple]:
 
-#     return thresholded_local_minima_seeded_watershed(
-#         input_image, spot_sigma, outline_sigma, threshold
-#     )
+    if labels is None or labels.data.ndim > 2:
+        show_info("Outlines only works for labels")
+        return
+
+    def on_returned():
+        print("Finished")
+
+    @thread_worker(connect={"returned": on_returned})
+    def run() -> LayerDataTuple:
+        lines = skeletonize(labels)
+        return (lines, {"name": "Skeletonize"}, "labels")
+
+    return run()
