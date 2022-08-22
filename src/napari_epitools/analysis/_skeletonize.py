@@ -43,18 +43,3 @@ def skeletonize(cell_labels: ndarray) -> ndarray:
         raise ValueError(
             "Input data should be a time series with a single z plane"
         )
-
-
-if __name__ == "__main__":
-    import h5py
-
-    f = h5py.File("sample_data/8bitDataset/Benchmark/SegResults.mat")
-    cell_labels = f.get("CLabels")
-
-    skels = skeletonize(cell_labels)
-    print(f"{skels.shape=}")
-    from matplotlib import pyplot as plt
-
-    plt.figure()
-    plt.imshow(skels[5])
-    plt.show()
