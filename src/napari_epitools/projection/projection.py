@@ -1,148 +1,155 @@
 import numpy as np
+import numpy.typing as npt
 from magicgui import magic_factory, widgets
 from napari.qt.threading import FunctionWorker, thread_worker
 from napari.types import ImageData
+from scipy.interpolate import griddata
 from skimage.filters import gaussian
 from typing_extensions import Annotated
 
-from napari_epitools.projection._gridfit import gridfit
 
-
-def _smooth(img, smoothing_radius=0.3):
+def _smooth(
+    img: npt.NDArray[np.float64], smoothing_radius: float = 0.3
+) -> npt.NDArray[np.float64]:
     """Gaussian smoothing of each z plane in the image stack
 
-    Parameters
-    ----------
-    img : ndarray
-        The input image stack
-    smoothing_radius : float, optional
-        Standard deviation passed to gaussian function, by default 0.3
+    Args:
+        img: The input image stack.
+        smoothing_radius: Standard deviation passed to gaussian function.
 
-    Returns
-    -------
-    ndarray
-        The smoothed image stack
+    Returns:
+        The smoothed image stack.
     """
     zsize = img.shape[0]
     smoothed = np.zeros(img.shape)
     for z in range(zsize):
-        smoothed[z, :, :] = gaussian(img[z, :, :], sigma=smoothing_radius)
+        smoothed[z] = gaussian(
+            img[z], sigma=smoothing_radius, preserve_range=True
+        )
 
     return smoothed
 
 
-def _interpolate(depthmap, imsize, smoothness):
+def _interpolate(
+    max_indices: npt.NDArray[np.float64],
+    x_size: int,
+    y_size: int,
+    smoothness: int,
+) -> npt.NDArray[np.float64]:
     """Interpolate the z coordinate map using gridfit
 
-    Parameters
-    ----------
-    depthmap : ndarray
-        z coordinate map
-    imsize : tuple
-        Input image dimensions
-    smoothness : int
-        How much to smooth the interpolation - lower numbers indicate more smoothing
+    Args:
+        max_indices:
+            z coordinate map.
+        x_size:
+            Image size in x dimension (number of columns)
+        y_size:
+            Image size in y dimension (number of rows)
+        smoothness:
+            How much to smooth the interpolation.
 
-    Returns
-    -------
-    ndarray
-        Interpolated z coordinates
+    Returns:
+        Interpolated z coordinates.
     """
-    indices = np.nonzero(depthmap)
-    vals = depthmap[indices]
-    xnodes, ynodes = imsize[2], imsize[1]
+    indices = np.nonzero(max_indices)
+    vals = max_indices[indices].astype(np.float64)
+    xnodes, ynodes = x_size, y_size
+    X, Y = np.meshgrid(np.arange(xnodes), np.arange(ynodes))
+    interp_vals = griddata(indices, vals, (Y, X), method="nearest")
+    return gaussian(interp_vals, sigma=smoothness)
 
-    return gridfit(indices[1], indices[0], vals, xnodes, ynodes, smoothness)
 
-
-def _calculate_projected_image(imstack, z_interpolation):
+def _calculate_projected_image(
+    imstack: npt.NDArray[np.float64], z_interp: npt.NDArray[np.float64]
+) -> npt.NDArray[np.float64]:
     """Create the projected image from the non-zero elements
     of the interpolated z coordinates.
 
-    Parameters
-    ----------
-    imstack : ndarray
-        The input image z stack
-    z_interpolation : ndarray
-        Output from gridfit function
+    Args:
+        imstack:
+            The input image z stack.
+        z_interp:
+            Output from griddata function.
 
-    Returns
-    -------
-    ndarray
-        The final projected image
+    Returns:
+        The final projected image.
     """
 
     # make a container for the projected image
     imsize = imstack.shape
-    projected_image = np.zeros((imsize[1], imsize[2]), dtype=imstack.dtype)
+    projected_image = np.zeros((imsize[-2:]), dtype=imstack.dtype)
 
     # take the non-zero elements of the interpolation and round
-    mask = z_interpolation > 0
-    z_coordinates = np.round(z_interpolation[mask]).astype("int")
+    mask = (z_interp > 0) & (z_interp < imsize[0] - 1)
+    z_coordinates = np.round(z_interp[mask]).astype(np.int64)
     projected_image[mask] = imstack[z_coordinates, mask]
-
     return projected_image
 
 
 def calculate_projection(
-    input_image,
-    smoothing_radius,
-    surface_smoothness_1,
-    surface_smoothness_2,
-    cut_off_distance,
-) -> np.ndarray:
+    input_image: npt.NDArray[np.float64],
+    smoothing_radius: float,
+    surface_smoothness_1: int,
+    surface_smoothness_2: int,
+    cut_off_distance: int,
+) -> npt.NDArray[np.float64]:
     """Z projection using image interpolation.
 
-    Parameters
-    ----------
-    imstack : ndarray
-        numpy ndarray representation of 3D image stack
-    smoothing_radius : float
-        kernel radius for gaussian blur to apply before estimating the surface
-    [0.1 - 5]
-    surface_smoothness_1: int
-        Surface smoothness for 1st gridFit(c) estimation, the smaller the smoother
-        [30 - 100]
-    surface_smoothness_2: int
-        Surface smoothness for 3nd gridFit(c) estimation, the smaller the smoother
-        [20 - 50]
-    cut_off_distance : int
-        Cutoff distance in z-planes from the 1st estimated surface [1 - 3]
+    Args:
+        input_image:
+            Numpy ndarray representation of 3D image stack.
+        smoothing_radius:
+            Kernel radius for gaussian blur to apply before estimating the surface.
+        surface_smoothness_1:
+            Surface smoothness for 1st griddata estimation, larger means smoother.
+        surface_smoothness_2:
+            Surface smoothness for 3nd gridFit(c) estimation, larger means smoother.
+        cut_off_distance:
+            Cutoff distance in z-planes from the 1st estimated surface.
+
+    Returns:
+        Stack projected onto a single plane.
     """
-    imsize = input_image.shape
-    I1 = _smooth(input_image, smoothing_radius)
+    z_planes, y_size, x_size = input_image.shape
+    smoothed_imstack = _smooth(input_image, smoothing_radius)
 
-    vm1 = I1.max(axis=0)
-    depthmap = I1.argmax(axis=0)
+    max_intensity = smoothed_imstack.max(axis=0)
+    max_indices = smoothed_imstack.argmax(axis=0)
 
-    confidencemap = imsize[0] * vm1 / sum(I1, 0)
-    c = confidencemap[:]
-    confthres = np.median(c[c > np.median(c)])
+    confidencemap = z_planes * max_intensity / sum(smoothed_imstack, 0)
+    confthres = np.median(
+        confidencemap[confidencemap > np.median(confidencemap)]
+    )
 
     # keep only the brightest surface points (intensity in 1 quartile)
     # assumed to be the surface of interest
     mask = confidencemap > confthres
-    depthmap2 = depthmap * mask
-    zg1 = _interpolate(depthmap2, imsize, surface_smoothness_1)
+    max_indices_confthres = max_indices * mask
+    z_interp = _interpolate(
+        max_indices_confthres, x_size, y_size, surface_smoothness_1
+    )
 
-    # given the hight locations of the surface (zg1) compute the difference
-    # towards the 1st quartile location (depthmap2), ignore the rest (==0);
+    # given the hight locations of the surface (z_interp) compute the difference
+    # towards the 1st quartile location (max_indices_confthres), ignore the rest (==0);
     # the result reflects the distance (abs) between estimate and points.
-    depthmap3 = np.abs(zg1 - depthmap2.astype("float64"))
-    depthmap3[np.where(depthmap2 == 0)] = 0
+    max_indices_diff = np.abs(
+        z_interp - max_indices_confthres.astype("float64")
+    )
+    max_indices_diff[np.where(max_indices_confthres == 0)] = 0
 
     # only keep points which are relatively close to our first estimate
-    mask = depthmap3 < cut_off_distance
-    depthmap4 = depthmap2 * mask
+    mask = max_indices_diff < cut_off_distance
+    max_indices_cut = max_indices_confthres * mask
 
     # --- 2nd iteration -
-    # compute a better more detailed estimate with the filtered list (depthmap4)
+    # compute a better more detailed estimate with the filtered list (max_indices_cut)
     # this is to make sure that the highest intensity points will be
     # selected from the correct surface (The coarse grained estimate could
     # potentially approximate the origin of the point to another plane)
-    zg2 = _interpolate(depthmap4, imsize, surface_smoothness_2)
-
-    return _calculate_projected_image(input_image, zg2)
+    z_interp = _interpolate(
+        max_indices_cut, x_size, y_size, surface_smoothness_2
+    )
+    return _calculate_projected_image(input_image, z_interp)
 
 
 @magic_factory(pbar={"visible": False, "max": 0, "label": "working..."})
@@ -152,33 +159,31 @@ def projection_widget(
     smoothing_radius: Annotated[
         float, {"min": 0.0, "max": 2.0, "step": 0.1}
     ] = 0.2,
-    surface_smoothness_1: Annotated[
-        int, {"min": 0, "max": 100, "step": 1}
-    ] = 50,
-    surface_smoothness_2: Annotated[
-        int, {"min": 0, "max": 100, "step": 1}
-    ] = 50,
+    surface_smoothness_1: Annotated[int, {"min": 0, "max": 10, "step": 1}] = 5,
+    surface_smoothness_2: Annotated[int, {"min": 0, "max": 10, "step": 1}] = 5,
     cut_off_distance: Annotated[int, {"min": 0, "max": 5, "step": 1}] = 2,
 ) -> FunctionWorker[ImageData]:
     """Z projection using image interpolation.
 
-    Parameters
-    ----------
-    pbar: magicgui.widget
-        Progressbar widget
-    input_image : ndarray
-        numpy ndarray representation of 3D image stack
-    smoothing_radius : float
-        kernel radius for gaussian blur to apply before estimating the surface
-    [0.1 - 5]
-    surface_smoothness_1: int
-        Surface smoothness for 1st gridFit(c) estimation, the smaller the smoother
-        [30 - 100]
-    surface_smoothness_2: int
-        Surface smoothness for 3nd gridFit(c) estimation, the smaller the smoother
-        [20 - 50]
-    cut_off_distance : int
-        Cutoff distance in z-planes from the 1st estimated surface [1 - 3]
+    Args:
+        pbar:
+            Progressbar widget
+        input_image:
+            Numpy ndarray representation of 3D image stack
+        smoothing_radius:
+            Kernel radius for gaussian blur to apply before estimating the surface.
+        surface_smoothness_1:
+            Surface smoothness for 1st griddata estimation, larger means smoother.
+        surface_smoothness_2:
+            Surface smoothness for 3nd griddata estimation, larger means smoother.
+        cut_off_distance:
+            Cutoff distance in z-planes from the 1st estimated surface.
+
+    Raises:
+        ValueError: When no image is loaded.
+
+    Returns:
+        Projected image as napari Image layer.
     """
 
     @thread_worker(connect={"returned": pbar.hide})

@@ -1,3 +1,4 @@
+from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -7,10 +8,17 @@ from skimage.io import imread
 
 from napari_epitools.projection import calculate_projection, projection_widget
 
+SMOOTHING_RADIUS = 0.2
+SURFACE_SMOOTHNESS_1 = 50
+SURFACE_SMOOTHNESS_2 = 50
+CUT_OFF_DISTANCE = 20
+
 
 @pytest.fixture
 def sample_data():
-    img_path = "sample_data/8bitDataset/test_image.tif"
+    img_path = img_path = (
+        Path("sample_data") / "8bitDataset" / "test_image.tif"
+    )
     return imread(img_path)
 
 
@@ -44,23 +52,18 @@ def test_projection_widget_run_button(projection_widget_fixture, sample_data):
 
 
 def test_calculate_projection(sample_data):
-    smoothing_radius = 0.2
-    surface_smoothness_1 = 50
-    surface_smoothness_2 = 50
-    cut_off_distance = 20
 
-    with patch("napari_epitools.projection.projection.gridfit") as gridfit:
+    with patch("napari_epitools.projection.projection._interpolate") as interp:
         mock_interpolation = np.zeros(
             (sample_data.shape[1], sample_data.shape[2])
         )
-        gridfit.return_value = mock_interpolation
+        interp.return_value = mock_interpolation
         projection = calculate_projection(
             sample_data,
-            smoothing_radius,
-            surface_smoothness_1,
-            surface_smoothness_2,
-            cut_off_distance,
+            SMOOTHING_RADIUS,
+            SURFACE_SMOOTHNESS_1,
+            SURFACE_SMOOTHNESS_2,
+            CUT_OFF_DISTANCE,
         )
-        assert gridfit.called
         assert projection.ndim == 2
         assert projection.shape == (sample_data.shape[1], sample_data.shape[2])
