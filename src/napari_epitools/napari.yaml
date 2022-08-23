@@ -23,6 +23,9 @@ contributions:
     - id: napari-epitools.outlines
       python_name: napari_epitools._widget:outlines_widget
       title: Epitools Cell Outlines Widget
+    - id: napari-epitools.epitools_widget
+      python_name: napari_epitools._widget:epitools_widget
+      title: Epitools Cell Outlines Widget
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
@@ -45,3 +48,5 @@ contributions:
       display_name: Epitools Segmentation Widget
     - command: napari-epitools.outlines
       display_name: Epitools Cell Outlines Widget
+    - command: napari-epitools.epitools_widget
+      display_name: Epitools Widget
