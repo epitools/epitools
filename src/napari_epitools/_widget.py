@@ -1,6 +1,7 @@
 from magicgui import widgets
 from napari import current_viewer
 from napari.layers import Image
+from napari.qt.threading import thread_worker
 
 from napari_epitools.analysis import (
     calculate_projection,
@@ -134,27 +135,27 @@ def epitools_widget() -> widgets.Container:
     )
     widget.viewer = current_viewer()
 
-    @widget.run_proj_button.clicked.connect
-    def run_projection() -> None:
-        proj = calculate_projection(
+    def _add_projection(projection):
+        widget.viewer.add_image(projection, name="Projection")
+
+    @thread_worker
+    def _calculate_projection():
+        return calculate_projection(
             input_image.value.data,
             smoothing_radius.value,
             surface_smoothness_1.value,
             surface_smoothness_2.value,
             cut_off_distance.value,
         )
-        widget.viewer.add_image(proj, name="Projection")
 
-    @widget.run_seg_button.clicked.connect
-    def run_segmentation() -> None:
-        seeds, labels = thresholded_local_minima_seeded_watershed(
-            seg_image.value.data,
-            spot_sigma.value,
-            outline_sigma.value,
-            threshold.value,
-        )
-        lines = skeletonize(labels)
+    @widget.run_proj_button.clicked.connect
+    def run_projection() -> None:
+        worker = _calculate_projection()
+        worker.returned.connect(_add_projection)
+        worker.start()
 
+    def _add_segmentation(segmentation):
+        seeds, labels, lines = segmentation
         widget.viewer.add_points(
             seeds,
             name="Seed Points",
@@ -164,5 +165,23 @@ def epitools_widget() -> widgets.Container:
         )
         widget.viewer.add_labels(labels, name="Cells")
         widget.viewer.add_labels(lines, name="Cell Outlines")
+
+    @thread_worker
+    def _calculate_segmentation():
+        seeds, labels = thresholded_local_minima_seeded_watershed(
+            seg_image.value.data,
+            spot_sigma.value,
+            outline_sigma.value,
+            threshold.value,
+        )
+        lines = skeletonize(labels)
+
+        return seeds, labels, lines
+
+    @widget.run_seg_button.clicked.connect
+    def run_segmentation() -> None:
+        worker = _calculate_segmentation()
+        worker.returned.connect(_add_segmentation)
+        worker.start()
 
     return widget
