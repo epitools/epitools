@@ -16,12 +16,13 @@ def _smooth(
     Returns:
         The smoothed image stack.
     """
-    zsize = img.shape[0]
+    t_size, z_size = img.shape[:2]
     smoothed = np.zeros(img.shape)
-    for z in range(zsize):
-        smoothed[z] = gaussian(
-            img[z], sigma=smoothing_radius, preserve_range=True
-        )
+    for t in range(t_size):
+        for z in range(z_size):
+            smoothed[t, z] = gaussian(
+                img[t, z], sigma=smoothing_radius, preserve_range=True
+            )
 
     return smoothed
 
@@ -48,6 +49,9 @@ def _interpolate(
         Interpolated z coordinates.
     """
     indices = np.nonzero(max_indices)
+    if not np.any(indices):
+        return max_indices
+
     vals = max_indices[indices].astype(np.float64)
     xnodes, ynodes = x_size, y_size
     X, Y = np.meshgrid(np.arange(xnodes), np.arange(ynodes))
@@ -106,43 +110,69 @@ def calculate_projection(
     Returns:
         Stack projected onto a single plane.
     """
-    z_planes, y_size, x_size = input_image.shape
-    smoothed_imstack = _smooth(input_image, smoothing_radius)
+    if input_image.ndim == 3:
+        input_image = np.expand_dims(input_image, axis=0)
 
-    max_intensity = smoothed_imstack.max(axis=0)
-    max_indices = smoothed_imstack.argmax(axis=0)
-
-    confidencemap = z_planes * max_intensity / sum(smoothed_imstack, 0)
-    confthres = np.median(
-        confidencemap[confidencemap > np.median(confidencemap)]
+    t_size, z_size, y_size, x_size = input_image.shape
+    smoothed_imstack = _smooth(
+        input_image.astype(np.float64), smoothing_radius
     )
+    print(f"{smoothed_imstack.shape=}")
 
-    # keep only the brightest surface points (intensity in 1 quartile)
-    # assumed to be the surface of interest
-    mask = confidencemap > confthres
-    max_indices_confthres = max_indices * mask
-    z_interp = _interpolate(
-        max_indices_confthres, x_size, y_size, surface_smoothness_1
-    )
+    t_interp = []
+    for t in range(t_size):
+        smoothed_t = smoothed_imstack[t]
+        max_intensity = smoothed_t.max(axis=0)
+        max_indices = smoothed_t.argmax(axis=0)
 
-    # given the hight locations of the surface (z_interp) compute the difference
-    # towards the 1st quartile location (max_indices_confthres), ignore the rest (==0);
-    # the result reflects the distance (abs) between estimate and points.
-    max_indices_diff = np.abs(
-        z_interp - max_indices_confthres.astype("float64")
-    )
-    max_indices_diff[np.where(max_indices_confthres == 0)] = 0
+        confidencemap = z_size * max_intensity / sum(smoothed_t, 0)
+        confthres = np.median(
+            confidencemap[confidencemap > np.median(confidencemap)]
+        )
 
-    # only keep points which are relatively close to our first estimate
-    mask = max_indices_diff < cut_off_distance
-    max_indices_cut = max_indices_confthres * mask
+        # keep only the brightest surface points (intensity in 1 quartile)
+        # assumed to be the surface of interest
+        mask = confidencemap > confthres
+        max_indices_confthres = max_indices * mask
+        z_interp = _interpolate(
+            max_indices_confthres, x_size, y_size, surface_smoothness_1
+        )
 
-    # --- 2nd iteration -
-    # compute a better more detailed estimate with the filtered list (max_indices_cut)
-    # this is to make sure that the highest intensity points will be
-    # selected from the correct surface (The coarse grained estimate could
-    # potentially approximate the origin of the point to another plane)
-    z_interp = _interpolate(
-        max_indices_cut, x_size, y_size, surface_smoothness_2
-    )
-    return _calculate_projected_image(input_image, z_interp)
+        # given the hight locations of the surface (z_interp) compute the difference
+        # towards the 1st quartile location (max_indices_confthres), ignore the rest
+        # (==0); the result reflects the distance (abs) between estimate and points.
+        max_indices_diff = np.abs(
+            z_interp - max_indices_confthres.astype("float64")
+        )
+        max_indices_diff[np.where(max_indices_confthres == 0)] = 0
+
+        # only keep points which are relatively close to our first estimate
+        mask = max_indices_diff < cut_off_distance
+        max_indices_cut = max_indices_confthres * mask
+
+        # --- 2nd iteration -
+        # compute a better more detailed estimate with the filtered list
+        # (max_indices_cut) this is to make sure that the highest intensity points will
+        # be selected from the correct surface (The coarse grained estimate could
+        # potentially approximate the origin of the point to another plane)
+        z_interp = _interpolate(
+            max_indices_cut, x_size, y_size, surface_smoothness_2
+        )
+
+        t_interp.append(_calculate_projected_image(input_image[t], z_interp))
+
+    return np.stack(t_interp)
+
+
+if __name__ == "__main__":
+    from skimage.io import imread
+
+    image = imread("sample_data/Wing_disc/Ecad-stack.tif")
+
+    proj = calculate_projection(image, 0.5, 1, 1, 2)
+
+    from matplotlib import pyplot as plt
+
+    fig = plt.figure()
+    plt.imshow(proj[0])
+    plt.show()
