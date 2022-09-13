@@ -261,11 +261,19 @@ def epitools_widget() -> widgets.Container:
     def _add_projection(projection):
         print("Finished projection calc")
         widget.viewer.add_image(projection, name="Projection")
+        axes = [0, 1]
+        for axis in axes:
+            widget.viewer.dims.set_current_step(axis, 0)
 
     @thread_worker
     def _calculate_projection():
+        stack = input_image.value.data.astype(float)
+        if input_image.value.ndim > 3:
+            time_point = widget.viewer.dims.current_step[0]
+            stack = input_image.value.data[time_point].astype(float)
+
         return calculate_projection(
-            input_image.value.data.astype(float),
+            stack,
             smoothing_radius.value,
             surface_smoothness_1.value,
             surface_smoothness_2.value,
