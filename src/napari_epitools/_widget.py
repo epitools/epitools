@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 from magicgui import magic_factory, widgets
 from napari import current_viewer
 from napari.layers import Image
@@ -260,25 +261,39 @@ def epitools_widget() -> widgets.Container:
 
     def _add_projection(projection):
         print("Finished projection calc")
-        widget.viewer.add_image(projection, name="Projection")
-        axes = [0, 1]
-        for axis in axes:
-            widget.viewer.dims.set_current_step(axis, 0)
+        try:
+            widget.viewer.layers["Projection"].data = projection
+        except KeyError:
+            widget.viewer.add_image(projection, name="Projection")
+        finally:
+            axes = [0, 1]
+            if widget.viewer.dims.ndim == 3:
+                axes = [0]
+
+            for axis in axes:
+                widget.viewer.dims.set_current_step(axis, 0)
 
     @thread_worker
     def _calculate_projection():
         stack = input_image.value.data.astype(float)
-        if input_image.value.ndim > 3:
-            time_point = widget.viewer.dims.current_step[0]
-            stack = input_image.value.data[time_point].astype(float)
+        t_size = widget.viewer.dims.nsteps[0]
+        if input_image.value.ndim == 3:
+            stack = np.expand_dims(stack, axis=0)
+            t_size = 1
 
-        return calculate_projection(
-            stack,
-            smoothing_radius.value,
-            surface_smoothness_1.value,
-            surface_smoothness_2.value,
-            cut_off_distance.value,
-        )
+        proj = []
+        for t in range(t_size):
+            widget.viewer.dims.set_current_step(0, t)
+            proj.append(
+                calculate_projection(
+                    stack[t],
+                    smoothing_radius.value,
+                    surface_smoothness_1.value,
+                    surface_smoothness_2.value,
+                    cut_off_distance.value,
+                )
+            )
+        return np.stack(proj)[:, np.newaxis, ...]
 
     @widget.run_proj_button.clicked.connect
     def run_projection() -> None:
