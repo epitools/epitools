@@ -57,7 +57,7 @@ def thresholded_local_minima_seeded_watershed(
 
     # get seeds
     spots_stats = regionprops(spots)
-    seeds = [r.centroid for r in spots_stats]
+    seeds = [list(r.centroid) for r in spots_stats]
 
     # measure intensities
     stats = regionprops(labels, image)

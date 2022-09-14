@@ -82,6 +82,9 @@ THRESHOLD = {
     "step": 1,
     "value": 20,
 }
+PROJECTION_LAYER_NAME = "Projection"
+SEEDS_LAYER_NAME = "Seeds"
+CELLS_LAYER_NAME = "Cells"
 
 
 @magic_factory(
@@ -132,7 +135,7 @@ def projection_widget(
             surface_smoothness_2,
             cut_off_distance,
         )
-        return (proj, {"name": "Projection"}, "image")
+        return (proj, {"name": PROJECTION_LAYER_NAME}, "image")
 
     pbar.show()
     return run()
@@ -168,10 +171,10 @@ def projection_widget(
 #     #         surface_smoothness_2,
 #     #         cut_off_distance,
 #     #     )
-#     #     # return (proj, {"name": "Projection"}, "image")
+#     #     # return (proj, {"name": PROJECTION_LAYER_NAME}, "image")
 #     #     return proj
 
-#     return (proj, {"name": "Projection"}, "image")
+#     return (proj, {"name": PROJECTION_LAYER_NAME}, "image")
 
 
 @magic_factory(
@@ -201,7 +204,7 @@ def segmentation_widget(
         seeds_layer = (
             seeds,
             {
-                "name": "Seeds",
+                "name": SEEDS_LAYER_NAME,
                 "size": SEED_SIZE,
                 "edge_color": SEED_EDGE_COLOR,
                 "face_color": SEED_FACE_COLOR,
@@ -262,9 +265,9 @@ def epitools_widget() -> widgets.Container:
     def _add_projection(projection):
         print("Finished projection calc")
         try:
-            widget.viewer.layers["Projection"].data = projection
+            widget.viewer.layers[PROJECTION_LAYER_NAME].data = projection
         except KeyError:
-            widget.viewer.add_image(projection, name="Projection")
+            widget.viewer.add_image(projection, name=PROJECTION_LAYER_NAME)
         finally:
             axes = [0, 1]
             if widget.viewer.dims.ndim == 3:
@@ -302,28 +305,52 @@ def epitools_widget() -> widgets.Container:
         worker.start()
 
     def _add_segmentation(segmentation):
-        seeds, labels, lines = segmentation
-        widget.viewer.add_points(
-            seeds,
-            name="Seed Points",
-            size=SEED_SIZE,
-            edge_color=SEED_EDGE_COLOR,
-            face_color=SEED_FACE_COLOR,
-        )
-        widget.viewer.add_labels(labels, name="Cells")
-        widget.viewer.add_labels(lines, name="Cell Outlines")
+        seeds, labels = segmentation
+
+        try:
+            widget.viewer.layers[SEEDS_LAYER_NAME].data = seeds
+            widget.viewer.layers[CELLS_LAYER_NAME].data = labels
+        except KeyError:
+            widget.viewer.add_points(
+                seeds,
+                name=SEEDS_LAYER_NAME,
+                size=SEED_SIZE,
+                edge_color=SEED_EDGE_COLOR,
+                face_color=SEED_FACE_COLOR,
+            )
+            widget.viewer.add_labels(labels, name=CELLS_LAYER_NAME)
+        finally:
+            axes = [0, 1]
+            if widget.viewer.dims.ndim == 3:
+                axes = [0]
+
+            for axis in axes:
+                widget.viewer.dims.set_current_step(axis, 0)
 
     @thread_worker
     def _calculate_segmentation():
-        seeds, labels = thresholded_local_minima_seeded_watershed(
-            seg_image.value.data,
-            spot_sigma.value,
-            outline_sigma.value,
-            threshold.value,
-        )
-        lines = skeletonize(labels)
+        proj = seg_image.value.data.astype(float)
+        t_size = widget.viewer.dims.nsteps[0]
 
-        return seeds, labels, lines
+        seg_seeds = []
+        seg_labels = []
+        for t in range(t_size):
+            widget.viewer.dims.set_current_step(0, t)
+            seeds, labels = thresholded_local_minima_seeded_watershed(
+                proj[t],
+                spot_sigma.value,
+                outline_sigma.value,
+                threshold.value,
+            )
+
+            # seeds needs to include time dimension
+            for s in seeds:
+                s.insert(0, float(t))
+
+            seg_seeds.append(np.array(seeds))
+            seg_labels.append(labels)
+
+        return np.vstack(seg_seeds), np.stack(seg_labels)
 
     @widget.run_seg_button.clicked.connect
     def run_segmentation() -> None:
