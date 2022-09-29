@@ -279,24 +279,13 @@ def epitools_widget() -> widgets.Container:
     @thread_worker
     def _calculate_projection():
         stack = input_image.value.data.astype(float)
-        t_size = widget.viewer.dims.nsteps[0]
-        if input_image.value.ndim == 3:
-            stack = np.expand_dims(stack, axis=0)
-            t_size = 1
-
-        proj = []
-        for t in range(t_size):
-            widget.viewer.dims.set_current_step(0, t)
-            proj.append(
-                calculate_projection(
-                    stack[t],
-                    smoothing_radius.value,
-                    surface_smoothness_1.value,
-                    surface_smoothness_2.value,
-                    cut_off_distance.value,
-                )
-            )
-        return np.stack(proj)[:, np.newaxis, ...]
+        return calculate_projection(
+            stack,
+            smoothing_radius.value,
+            surface_smoothness_1.value,
+            surface_smoothness_2.value,
+            cut_off_distance.value,
+        )
 
     @widget.run_proj_button.clicked.connect
     def run_projection() -> None:
@@ -329,12 +318,21 @@ def epitools_widget() -> widgets.Container:
 
     @thread_worker
     def _calculate_segmentation():
-        proj = seg_image.value.data.astype(float)
-        t_size = widget.viewer.dims.nsteps[0]
+        # proj = seg_image.value.data.astype(float)
+        # t_size = proj.shape[0]
+        # if proj.ndim == 2:
+        #     proj = np.expand_dims(proj, axis=0)
+        #     t_size = 1
 
+        proj = seg_image.value.data.astype(float)
+        print(f"{proj.shape=}")
+        t_size = widget.viewer.dims.nsteps[0]
+        print(f"{widget.viewer.dims.nsteps=}")
+        print(f"{t_size=}")
         seg_seeds = []
         seg_labels = []
         for t in range(t_size):
+            print(f"{t=}")
             widget.viewer.dims.set_current_step(0, t)
             seeds, labels = thresholded_local_minima_seeded_watershed(
                 proj[t],
