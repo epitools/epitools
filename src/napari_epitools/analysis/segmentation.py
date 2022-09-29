@@ -71,3 +71,26 @@ def thresholded_local_minima_seeded_watershed(
     new_labels = np.take(np.asarray(new_label_indices, np.uint32), labels)
 
     return seeds, new_labels
+
+
+def calculate_segmentation(projection, spot_sigma, outline_sigma, threshold):
+    t_size = projection.shape[0]
+
+    seg_seeds = []
+    seg_labels = []
+    for t in range(t_size):
+        seeds, labels = thresholded_local_minima_seeded_watershed(
+            projection[t],
+            spot_sigma,
+            outline_sigma,
+            threshold,
+        )
+
+        # seeds needs to include time dimension
+        for s in seeds:
+            s.insert(0, float(t))
+
+        seg_seeds.append(np.array(seeds))
+        seg_labels.append(labels)
+
+    return np.vstack(seg_seeds), np.stack(seg_labels)

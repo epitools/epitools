@@ -1,6 +1,5 @@
 from typing import List
 
-import numpy as np
 from magicgui import magic_factory, widgets
 from napari import current_viewer
 from napari.layers import Image
@@ -10,8 +9,8 @@ from napari.utils.notifications import show_info
 
 from napari_epitools.analysis import (
     calculate_projection,
+    calculate_segmentation,
     skeletonize,
-    thresholded_local_minima_seeded_watershed,
 )
 
 # Rendering properties of seeds
@@ -191,15 +190,18 @@ def segmentation_widget(
     threshold: float,
 ) -> FunctionWorker[List[LayerDataTuple]]:
 
-    if input_image is None or input_image.data.ndim > 2:
+    if input_image is None:
         pbar.hide()
-        show_info("Load a 2D image first")
+        show_info("Load a projection first")
         return
 
     @thread_worker(connect={"returned": pbar.hide})
     def run() -> List[LayerDataTuple]:
-        seeds, labels = thresholded_local_minima_seeded_watershed(
-            input_image, spot_sigma, outline_sigma, threshold
+        seeds, labels = calculate_segmentation(
+            input_image,
+            spot_sigma,
+            outline_sigma,
+            threshold,
         )
         seeds_layer = (
             seeds,
@@ -319,27 +321,12 @@ def epitools_widget() -> widgets.Container:
     @thread_worker
     def _calculate_segmentation():
         proj = seg_image.value.data.astype(float)
-        t_size = proj.shape[0]
-
-        seg_seeds = []
-        seg_labels = []
-        for t in range(t_size):
-            widget.viewer.dims.set_current_step(0, t)
-            seeds, labels = thresholded_local_minima_seeded_watershed(
-                proj[t],
-                spot_sigma.value,
-                outline_sigma.value,
-                threshold.value,
-            )
-
-            # seeds needs to include time dimension
-            for s in seeds:
-                s.insert(0, float(t))
-
-            seg_seeds.append(np.array(seeds))
-            seg_labels.append(labels)
-
-        return np.vstack(seg_seeds), np.stack(seg_labels)
+        return calculate_segmentation(
+            proj,
+            spot_sigma.value,
+            outline_sigma.value,
+            threshold.value,
+        )
 
     @widget.run_seg_button.clicked.connect
     def run_segmentation() -> None:

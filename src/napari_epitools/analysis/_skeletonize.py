@@ -3,6 +3,9 @@ import numpy.typing as npt
 
 
 def _get_lines(cell_labels):
+    if cell_labels.ndim > 2:
+        cell_labels = np.squeeze(cell_labels)
+
     gradient = np.gradient(cell_labels)
     return (cell_labels > 0.0) & (
         np.square(gradient[0]) + np.square(gradient[1]) > 0.0
@@ -26,18 +29,13 @@ def skeletonize(
         The skeletonized labelled image.
     """
     if cell_labels.ndim == 2:
-        return _get_lines(cell_labels)
+        cell_outlines = _get_lines(cell_labels)
 
-    elif cell_labels.ndim == 3:
+    elif cell_labels.ndim > 2:
         time_points = cell_labels.shape[0]
-        cell_outlines = []
+        cell_outlines = np.zeros(cell_labels.shape, dtype=int)
         for t in range(time_points):
             frame = cell_labels[t]
-            cell_outlines.append(_get_lines(frame))
+            cell_outlines[t] = _get_lines(frame)
 
-        return np.stack(cell_outlines)
-
-    elif cell_labels.ndim > 3:
-        raise ValueError(
-            "Input data should be a time series with a single z plane"
-        )
+    return cell_outlines
