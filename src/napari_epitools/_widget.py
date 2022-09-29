@@ -318,21 +318,12 @@ def epitools_widget() -> widgets.Container:
 
     @thread_worker
     def _calculate_segmentation():
-        # proj = seg_image.value.data.astype(float)
-        # t_size = proj.shape[0]
-        # if proj.ndim == 2:
-        #     proj = np.expand_dims(proj, axis=0)
-        #     t_size = 1
-
         proj = seg_image.value.data.astype(float)
-        print(f"{proj.shape=}")
-        t_size = widget.viewer.dims.nsteps[0]
-        print(f"{widget.viewer.dims.nsteps=}")
-        print(f"{t_size=}")
+        t_size = proj.shape[0]
+
         seg_seeds = []
         seg_labels = []
         for t in range(t_size):
-            print(f"{t=}")
             widget.viewer.dims.set_current_step(0, t)
             seeds, labels = thresholded_local_minima_seeded_watershed(
                 proj[t],
