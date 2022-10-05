@@ -66,5 +66,10 @@ def test_calculate_projection(sample_data):
             SURFACE_SMOOTHNESS_2,
             CUT_OFF_DISTANCE,
         )
-        assert projection.ndim == 2
-        assert projection.shape == (sample_data.shape[1], sample_data.shape[2])
+        assert projection.ndim == 4
+        assert projection.shape == (
+            1,
+            1,
+            sample_data.shape[1],
+            sample_data.shape[2],
+        )
