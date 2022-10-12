@@ -1,16 +1,15 @@
-from typing import List
-
+import numpy as np
+import numpy.typing as npt
 from magicgui import magic_factory, widgets
 from napari import current_viewer
 from napari.layers import Image
 from napari.qt.threading import FunctionWorker, thread_worker
-from napari.types import ImageData, LayerDataTuple
-from napari.utils.notifications import show_info
+from napari.types import ImageData
+from napari.utils.notifications import show_error
 
 from napari_epitools.analysis import (
     calculate_projection,
     calculate_segmentation,
-    skeletonize,
 )
 
 # Rendering properties of seeds
@@ -102,7 +101,7 @@ def projection_widget(
     surface_smoothness_1: int,
     surface_smoothness_2: int,
     cut_off_distance: int,
-) -> FunctionWorker[LayerDataTuple]:
+) -> FunctionWorker:
     """Z projection using image interpolation.
     Args:
         pbar:
@@ -122,21 +121,33 @@ def projection_widget(
     Returns:
         Projected image as napari Image layer.
     """
+
     if input_image is None:
         pbar.hide()
-        show_info("Load an image first")
+        show_error("Load an image first")
         return
 
-    @thread_worker(connect={"returned": pbar.hide})
-    def run() -> LayerDataTuple:
-        proj = calculate_projection(
+    def handle_returned(projection) -> None:
+        pbar.hide()
+        projection_widget.viewer = current_viewer()
+        try:
+            projection_widget.viewer.layers[
+                PROJECTION_LAYER_NAME
+            ].data = projection
+        except KeyError:
+            projection_widget.viewer.add_image(
+                projection, name=PROJECTION_LAYER_NAME
+            )
+
+    @thread_worker(connect={"returned": handle_returned})
+    def run() -> npt.NDArray[np.float64]:
+        return calculate_projection(
             input_image,
             smoothing_radius,
             surface_smoothness_1,
             surface_smoothness_2,
             cut_off_distance,
         )
-        return (proj, {"name": PROJECTION_LAYER_NAME}, "image")
 
     pbar.show()
     return run()
@@ -154,35 +165,41 @@ def segmentation_widget(
     spot_sigma: float,
     outline_sigma: float,
     threshold: float,
-) -> FunctionWorker[List[LayerDataTuple]]:
+) -> FunctionWorker:
 
     if input_image is None:
         pbar.hide()
-        show_info("Load a projection first")
+        show_error("Load a projection first")
         return
 
-    @thread_worker(connect={"returned": pbar.hide})
-    def run() -> List[LayerDataTuple]:
-        seeds, labels = calculate_segmentation(
+    def handle_returned(result) -> None:
+        seeds, labels = result
+        pbar.hide()
+        segmentation_widget.viewer = current_viewer()
+
+        try:
+            segmentation_widget.viewer.layers[SEEDS_LAYER_NAME].data = seeds
+            segmentation_widget.viewer.layers[CELLS_LAYER_NAME].data = labels
+        except KeyError:
+            segmentation_widget.viewer.add_points(
+                seeds,
+                name=SEEDS_LAYER_NAME,
+                size=SEED_SIZE,
+                edge_color=SEED_EDGE_COLOR,
+                face_color=SEED_FACE_COLOR,
+            )
+            segmentation_widget.viewer.add_labels(
+                labels, name=CELLS_LAYER_NAME
+            )
+
+    @thread_worker(connect={"returned": handle_returned})
+    def run() -> npt.NDArray[np.int64]:
+        return calculate_segmentation(
             input_image,
             spot_sigma,
             outline_sigma,
             threshold,
         )
-        seeds_layer = (
-            seeds,
-            {
-                "name": SEEDS_LAYER_NAME,
-                "size": SEED_SIZE,
-                "edge_color": SEED_EDGE_COLOR,
-                "face_color": SEED_FACE_COLOR,
-            },
-            "points",
-        )
-        labels_layer = (labels, {"name": "Segmentation"}, "labels")
-        lines = skeletonize(labels)
-        lines_layer = (lines, {"name": "Skeletonize"}, "labels")
-        return [seeds_layer, labels_layer, lines_layer]
 
     pbar.show()
     return run()
