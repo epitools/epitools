@@ -160,17 +160,3 @@ def calculate_projection(
         t_interp[t] = _calculate_projected_image(input_image[t], z_interp)
 
     return t_interp
-
-
-if __name__ == "__main__":
-    from skimage.io import imread
-
-    image = imread("sample_data/Wing_disc/Ecad-stack.tif")
-
-    proj = calculate_projection(image, 0.5, 1, 1, 2)
-
-    from matplotlib import pyplot as plt
-
-    fig = plt.figure()
-    plt.imshow(np.squeeze(proj)[0])
-    plt.show()
