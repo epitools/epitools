@@ -2,14 +2,23 @@ import numpy as np
 import numpy.typing as npt
 
 
-def _get_lines(cell_labels):
+def _get_outlines(cell_labels: npt.NDArray[np.int64]) -> npt.NDArray[np.int64]:
+    """Calculate the boundary line of set of cell labels.
+
+    Args:
+        cell_labels:
+            Labelled (possibly time series) image.
+
+    Returns:
+        Outlines as a numpy array.
+    """
     if cell_labels.ndim > 2:
         cell_labels = np.squeeze(cell_labels)
 
     gradient = np.gradient(cell_labels)
-    return (cell_labels > 0.0) & (
-        np.square(gradient[0]) + np.square(gradient[1]) > 0.0
-    ).astype(int)
+    not_background = cell_labels > 0.0
+    positive_gradient = np.square(gradient[0]) + np.square(gradient[1]) > 0.0
+    return (not_background & positive_gradient).astype(int)
 
 
 def skeletonize(
@@ -29,13 +38,13 @@ def skeletonize(
         The skeletonized labelled image.
     """
     if cell_labels.ndim == 2:
-        cell_outlines = _get_lines(cell_labels)
+        cell_outlines = _get_outlines(cell_labels)
 
     elif cell_labels.ndim > 2:
         time_points = cell_labels.shape[0]
         cell_outlines = np.zeros(cell_labels.shape, dtype=int)
         for t in range(time_points):
             frame = cell_labels[t]
-            cell_outlines[t] = _get_lines(frame)
+            cell_outlines[t] = _get_outlines(frame)
 
     return cell_outlines
