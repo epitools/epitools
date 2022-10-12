@@ -176,13 +176,17 @@ def projection_widget(
         show_error("Load an image first")
         return
 
-    def handle_returned(projection) -> None:
+    def handle_returned(projection: npt.NDArray[np.float64]) -> None:
+        """Callback for `run` thread worker."""
+
         pbar.hide()
         projection_widget.viewer = current_viewer()
         _add_projection(projection_widget, projection)
 
     @thread_worker(connect={"returned": handle_returned})
     def run() -> npt.NDArray[np.float64]:
+        """Handle clicks on the `Run` button. Runs projection in a
+        separate thread to avoid blocking GUI."""
         return calculate_projection(
             input_image,
             smoothing_radius,
@@ -231,13 +235,21 @@ def segmentation_widget(
         show_error("Load a projection first")
         return
 
-    def handle_returned(result) -> None:
+    def handle_returned(
+        result: Tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]
+    ) -> None:
+        """Callback for `run` thread worker."""
+
         pbar.hide()
         segmentation_widget.viewer = current_viewer()
         _add_segmentation(segmentation_widget, result)
 
     @thread_worker(connect={"returned": handle_returned})
     def run() -> npt.NDArray[np.int64]:
+        """Handle clicks on the `Run` button. Runs segmentation in a
+        separate thread to avoid blocking GUI.
+        """
+
         return calculate_segmentation(
             input_image,
             spot_sigma,
@@ -297,11 +309,16 @@ def epitools_widget() -> widgets.Container:
     )
     widget.viewer = current_viewer()
 
-    def handle_projection(projection):
+    def handle_projection(projection: npt.NDArray[np.float64]) -> None:
+        """`projection_worker` returned callback."""
+
         _add_projection(widget, projection)
 
     @thread_worker
-    def _calculate_projection():
+    def projection_worker() -> npt.NDArray[np.float64]:
+        """Calculates projection in a separate worker thread to avoid
+        blocking GUI.
+        """
         stack = input_image.value.data.astype(float)
         return calculate_projection(
             stack,
@@ -313,15 +330,26 @@ def epitools_widget() -> widgets.Container:
 
     @widget.run_proj_button.clicked.connect
     def run_projection() -> None:
-        worker = _calculate_projection()
+        """Callback which responds to clicks on the `Run` button for
+        the projection part of the widget.
+        """
+        worker = projection_worker()
         worker.returned.connect(handle_projection)
         worker.start()
 
-    def handle_segmentation(segmentation):
+    def handle_segmentation(
+        segmentation: Tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]
+    ) -> None:
+        """`segmentation_worker` `returned` callback."""
         _add_segmentation(widget, segmentation)
 
     @thread_worker
-    def _calculate_segmentation():
+    def segmentation_worker() -> Tuple[
+        npt.NDArray[np.float64], npt.NDArray[np.int64]
+    ]:
+        """Calculates segmentation in a separate worker thread to avoid
+        blocking GUI.
+        """
         proj = seg_image.value.data.astype(float)
         return calculate_segmentation(
             proj,
@@ -332,7 +360,10 @@ def epitools_widget() -> widgets.Container:
 
     @widget.run_seg_button.clicked.connect
     def run_segmentation() -> None:
-        worker = _calculate_segmentation()
+        """Callback which responds to clicks on the `Run` button for
+        the segmentation part of the widget.
+        """
+        worker = segmentation_worker()
         worker.returned.connect(handle_segmentation)
         worker.start()
 
