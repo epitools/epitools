@@ -53,8 +53,7 @@ def _interpolate(
         return max_indices
 
     vals = max_indices[indices].astype(np.float64)
-    xnodes, ynodes = x_size, y_size
-    X, Y = np.meshgrid(np.arange(xnodes), np.arange(ynodes))
+    X, Y = np.meshgrid(np.arange(x_size), np.arange(y_size))
     interp_vals = griddata(indices, vals, (Y, X), method="nearest")
     return gaussian(interp_vals, sigma=smoothness)
 
