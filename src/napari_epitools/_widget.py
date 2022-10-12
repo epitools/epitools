@@ -157,7 +157,7 @@ def projection_widget(
         pbar:
             Progressbar widget
         input_image:
-            Numpy ndarray representation of 3D image stack
+            Numpy ndarray representation of multi-dimensional image stack.
         smoothing_radius:
             Kernel radius for gaussian blur to apply before estimating the surface.
         surface_smoothness_1:
@@ -166,8 +166,7 @@ def projection_widget(
             Surface smoothness for 3nd griddata estimation, larger means smoother.
         cut_off_distance:
             Cutoff distance in z-planes from the 1st estimated surface.
-    Raises:
-        ValueError: When no image is loaded.
+
     Returns:
         Projected image as napari Image layer.
     """
@@ -209,7 +208,24 @@ def segmentation_widget(
     outline_sigma: float,
     threshold: float,
 ) -> FunctionWorker:
+    """Segment cells in a projected image.
 
+    Args:
+        pbar:
+            Progressbar widget
+        input_image:
+            Numpy ndarray representation of a projected image stack.
+        spot_sigma:
+            Controls how close segmented cells can be.
+        outline_sigma:
+            Controls how precisely segmented cells are outlined.
+        threshold:
+            Cells with an average intensity below `threshold` are ignored.
+
+    Returns:
+        Seed points as a Napari Points layer and segmented cells as a
+        Napari Labels layer.
+    """
     if input_image is None:
         pbar.hide()
         show_error("Load a projection first")
