@@ -235,7 +235,13 @@ def segmentation_widget(
 
 def epitools_widget() -> widgets.Container:
     """
-    Widgets for epitools
+    A composite widget which includes both projection and segmentation widgets.
+
+    Projection is done by implementing the selective plane algorithm from:
+    https://epitools.github.io/wiki/Analysis_Modules/00_projection/
+
+    Segmentation is implemented by following the same approach as in:
+    https://github.com/haesleinhuepf/napari-segment-blobs-and-things-with-membranes
     """
     # Layout for projection
     input_image = widgets.create_widget(annotation=Image, label="Image:")
