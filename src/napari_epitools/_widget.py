@@ -7,7 +7,7 @@ from magicgui.widgets._bases import Widget
 from napari import current_viewer
 from napari.layers import Image
 from napari.qt.threading import FunctionWorker, thread_worker
-from napari.types import ImageData
+from napari.types import ImageData, LayerDataTuple
 from napari.utils.notifications import show_error
 
 from napari_epitools.analysis import (
@@ -100,41 +100,21 @@ def _reset_axes(widget: Widget) -> None:
         widget.viewer.dims.set_current_step(axis, 0)
 
 
-def _add_projection(
-    widget: Widget, projection: npt.NDArray[np.float64]
-) -> None:
-    """Adds a project layer to a widet's viewer."""
-    try:
-        widget.viewer.layers[PROJECTION_LAYER_NAME].data = projection
-    except KeyError:
-        widget.viewer.add_image(projection, name=PROJECTION_LAYER_NAME)
-    finally:
-        _reset_axes(widget)
+def _add_layers(widget: Widget, layers: list[LayerDataTuple]) -> None:
 
+    add_layer_func = {
+        "image": widget.viewer.add_image,
+        "labels": widget.viewer.add_labels,
+        "points": widget.viewer.add_points,
+    }
+    for layer in layers:
+        data, layer_data, layer_type = layer
+        try:
+            widget.viewer.layers[layer_data.get("name")].data = data
+        except KeyError:
+            add_layer_func.get(layer_type)(data, **layer_data)
 
-def _add_segmentation(
-    widget: Widget,
-    segmentation: Tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]],
-) -> None:
-    """Adds seeds as a points layer and labels as labels layer to a widget's
-    viewer.
-    """
-    seeds, labels = segmentation
-
-    try:
-        widget.viewer.layers[SEEDS_LAYER_NAME].data = seeds
-        widget.viewer.layers[CELLS_LAYER_NAME].data = labels
-    except KeyError:
-        widget.viewer.add_points(
-            seeds,
-            name=SEEDS_LAYER_NAME,
-            size=SEED_SIZE,
-            edge_color=SEED_EDGE_COLOR,
-            face_color=SEED_FACE_COLOR,
-        )
-        widget.viewer.add_labels(labels, name=CELLS_LAYER_NAME)
-    finally:
-        _reset_axes(widget)
+    _reset_axes(widget)
 
 
 @magic_factory(
@@ -181,7 +161,12 @@ def projection_widget(
 
         pbar.hide()
         projection_widget.viewer = current_viewer()
-        _add_projection(projection_widget, projection)
+        projection_layer = (
+            projection,
+            {"name": PROJECTION_LAYER_NAME},
+            "image",
+        )
+        _add_layers(projection_widget, [projection_layer])
 
     @thread_worker(connect={"returned": handle_returned})
     def run() -> npt.NDArray[np.float64]:
@@ -242,7 +227,20 @@ def segmentation_widget(
 
         pbar.hide()
         segmentation_widget.viewer = current_viewer()
-        _add_segmentation(segmentation_widget, result)
+        seeds, labels = result
+        labels_layer = (labels, {"name": CELLS_LAYER_NAME}, "labels")
+        seeds_layer = (
+            seeds,
+            {
+                "name": SEEDS_LAYER_NAME,
+                "size": SEED_SIZE,
+                "edge_color": SEED_EDGE_COLOR,
+                "face_color": SEED_FACE_COLOR,
+            },
+            "points",
+        )
+        layers = [labels_layer, seeds_layer]
+        _add_layers(segmentation_widget, layers)
 
     @thread_worker(connect={"returned": handle_returned})
     def run() -> npt.NDArray[np.int64]:
@@ -292,6 +290,8 @@ def epitools_widget() -> widgets.Container:
     run_seg_button = widgets.PushButton(
         name="run_seg_button", label="Run Segmentation"
     )
+
+    # composite widget
     widget = widgets.Container(
         widgets=[
             input_image,
@@ -311,8 +311,12 @@ def epitools_widget() -> widgets.Container:
 
     def handle_projection(projection: npt.NDArray[np.float64]) -> None:
         """`projection_worker` returned callback."""
-
-        _add_projection(widget, projection)
+        projection_layer = (
+            projection,
+            {"name": PROJECTION_LAYER_NAME},
+            "image",
+        )
+        _add_layers(widget, [projection_layer])
 
     @thread_worker
     def projection_worker() -> npt.NDArray[np.float64]:
@@ -341,7 +345,20 @@ def epitools_widget() -> widgets.Container:
         segmentation: Tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]
     ) -> None:
         """`segmentation_worker` `returned` callback."""
-        _add_segmentation(widget, segmentation)
+        seeds, labels = segmentation
+        labels_layer = (labels, {"name": CELLS_LAYER_NAME}, "labels")
+        seeds_layer = (
+            seeds,
+            {
+                "name": SEEDS_LAYER_NAME,
+                "size": SEED_SIZE,
+                "edge_color": SEED_EDGE_COLOR,
+                "face_color": SEED_FACE_COLOR,
+            },
+            "points",
+        )
+        layers = [labels_layer, seeds_layer]
+        _add_layers(widget, layers)
 
     @thread_worker
     def segmentation_worker() -> Tuple[
