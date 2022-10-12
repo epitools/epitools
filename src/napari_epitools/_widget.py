@@ -140,42 +140,6 @@ def projection_widget(
     return run()
 
 
-# this is experimental - looking at how to integrate
-# with napari-assistant
-# def selective_plane_projection(
-#     image: ImageData,
-#     smoothing_radius: float = 0.2,
-#     surface_smoothness_1: int = 5,
-#     surface_smoothness_2: int = 5,
-#     cut_off_distance: int = 2,
-# ) -> LayerDataTuple:
-
-#     if image is None:
-#         show_info("Load an image first")
-#         return
-
-#     proj = calculate_projection(
-#         image.astype(float),
-#         smoothing_radius,
-#         surface_smoothness_1,
-#         surface_smoothness_2,
-#         cut_off_distance,
-#     )
-#     # @thread_worker
-#     # def run() -> LayerDataTuple:
-#     #     proj = calculate_projection(
-#     #         image,
-#     #         smoothing_radius,
-#     #         surface_smoothness_1,
-#     #         surface_smoothness_2,
-#     #         cut_off_distance,
-#     #     )
-#     #     # return (proj, {"name": PROJECTION_LAYER_NAME}, "image")
-#     #     return proj
-
-#     return (proj, {"name": PROJECTION_LAYER_NAME}, "image")
-
-
 @magic_factory(
     pbar={"visible": False, "max": 0, "label": "working..."},
     spot_sigma=SPOT_SIGMA,
