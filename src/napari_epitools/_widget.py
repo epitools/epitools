@@ -19,6 +19,8 @@ SEED_EDGE_COLOR = "red"
 SEED_FACE_COLOR = "red"
 
 # Defaults
+PBAR = {"visible": False, "max": 0, "label": "working..."}
+
 SMOOTHING_RADIUS = {
     "widget_type": "FloatSlider",
     "name": "smoothing_radius",
@@ -87,7 +89,7 @@ CELLS_LAYER_NAME = "Cells"
 
 
 @magic_factory(
-    pbar={"visible": False, "max": 0, "label": "working..."},
+    pbar=PBAR,
     smoothing_radius=SMOOTHING_RADIUS,
     surface_smoothness_1=SURFACE_SMOOTHNESS_1,
     surface_smoothness_2=SURFACE_SMOOTHNESS_2,
@@ -141,7 +143,7 @@ def projection_widget(
 
 
 @magic_factory(
-    pbar={"visible": False, "max": 0, "label": "working..."},
+    pbar=PBAR,
     spot_sigma=SPOT_SIGMA,
     outline_sigma=OUTLINE_SIGMA,
     threshold=THRESHOLD,
