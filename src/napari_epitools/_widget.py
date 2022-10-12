@@ -1,6 +1,9 @@
+from typing import Tuple
+
 import numpy as np
 import numpy.typing as npt
 from magicgui import magic_factory, widgets
+from magicgui.widgets._bases import Widget
 from napari import current_viewer
 from napari.layers import Image
 from napari.qt.threading import FunctionWorker, thread_worker
@@ -87,6 +90,53 @@ SEEDS_LAYER_NAME = "Seeds"
 CELLS_LAYER_NAME = "Cells"
 
 
+def _reset_axes(widget: Widget) -> None:
+    """Set the dimension sliders to `0`"""
+    axes = [0, 1]
+    if widget.viewer.dims.ndim == 3:
+        axes = [0]
+
+    for axis in axes:
+        widget.viewer.dims.set_current_step(axis, 0)
+
+
+def _add_projection(
+    widget: Widget, projection: npt.NDArray[np.float64]
+) -> None:
+    """Adds a project layer to a widet's viewer."""
+    try:
+        widget.viewer.layers[PROJECTION_LAYER_NAME].data = projection
+    except KeyError:
+        widget.viewer.add_image(projection, name=PROJECTION_LAYER_NAME)
+    finally:
+        _reset_axes(widget)
+
+
+def _add_segmentation(
+    widget: Widget,
+    segmentation: Tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]],
+) -> None:
+    """Adds seeds as a points layer and labels as labels layer to a widget's
+    viewer.
+    """
+    seeds, labels = segmentation
+
+    try:
+        widget.viewer.layers[SEEDS_LAYER_NAME].data = seeds
+        widget.viewer.layers[CELLS_LAYER_NAME].data = labels
+    except KeyError:
+        widget.viewer.add_points(
+            seeds,
+            name=SEEDS_LAYER_NAME,
+            size=SEED_SIZE,
+            edge_color=SEED_EDGE_COLOR,
+            face_color=SEED_FACE_COLOR,
+        )
+        widget.viewer.add_labels(labels, name=CELLS_LAYER_NAME)
+    finally:
+        _reset_axes(widget)
+
+
 @magic_factory(
     pbar=PBAR,
     smoothing_radius=SMOOTHING_RADIUS,
@@ -130,14 +180,7 @@ def projection_widget(
     def handle_returned(projection) -> None:
         pbar.hide()
         projection_widget.viewer = current_viewer()
-        try:
-            projection_widget.viewer.layers[
-                PROJECTION_LAYER_NAME
-            ].data = projection
-        except KeyError:
-            projection_widget.viewer.add_image(
-                projection, name=PROJECTION_LAYER_NAME
-            )
+        _add_projection(projection_widget, projection)
 
     @thread_worker(connect={"returned": handle_returned})
     def run() -> npt.NDArray[np.float64]:
@@ -173,24 +216,9 @@ def segmentation_widget(
         return
 
     def handle_returned(result) -> None:
-        seeds, labels = result
         pbar.hide()
         segmentation_widget.viewer = current_viewer()
-
-        try:
-            segmentation_widget.viewer.layers[SEEDS_LAYER_NAME].data = seeds
-            segmentation_widget.viewer.layers[CELLS_LAYER_NAME].data = labels
-        except KeyError:
-            segmentation_widget.viewer.add_points(
-                seeds,
-                name=SEEDS_LAYER_NAME,
-                size=SEED_SIZE,
-                edge_color=SEED_EDGE_COLOR,
-                face_color=SEED_FACE_COLOR,
-            )
-            segmentation_widget.viewer.add_labels(
-                labels, name=CELLS_LAYER_NAME
-            )
+        _add_segmentation(segmentation_widget, result)
 
     @thread_worker(connect={"returned": handle_returned})
     def run() -> npt.NDArray[np.int64]:
@@ -247,19 +275,8 @@ def epitools_widget() -> widgets.Container:
     )
     widget.viewer = current_viewer()
 
-    def _add_projection(projection):
-        print("Finished projection calc")
-        try:
-            widget.viewer.layers[PROJECTION_LAYER_NAME].data = projection
-        except KeyError:
-            widget.viewer.add_image(projection, name=PROJECTION_LAYER_NAME)
-        finally:
-            axes = [0, 1]
-            if widget.viewer.dims.ndim == 3:
-                axes = [0]
-
-            for axis in axes:
-                widget.viewer.dims.set_current_step(axis, 0)
+    def handle_projection(projection):
+        _add_projection(widget, projection)
 
     @thread_worker
     def _calculate_projection():
@@ -275,31 +292,11 @@ def epitools_widget() -> widgets.Container:
     @widget.run_proj_button.clicked.connect
     def run_projection() -> None:
         worker = _calculate_projection()
-        worker.returned.connect(_add_projection)
+        worker.returned.connect(handle_projection)
         worker.start()
 
-    def _add_segmentation(segmentation):
-        seeds, labels = segmentation
-
-        try:
-            widget.viewer.layers[SEEDS_LAYER_NAME].data = seeds
-            widget.viewer.layers[CELLS_LAYER_NAME].data = labels
-        except KeyError:
-            widget.viewer.add_points(
-                seeds,
-                name=SEEDS_LAYER_NAME,
-                size=SEED_SIZE,
-                edge_color=SEED_EDGE_COLOR,
-                face_color=SEED_FACE_COLOR,
-            )
-            widget.viewer.add_labels(labels, name=CELLS_LAYER_NAME)
-        finally:
-            axes = [0, 1]
-            if widget.viewer.dims.ndim == 3:
-                axes = [0]
-
-            for axis in axes:
-                widget.viewer.dims.set_current_step(axis, 0)
+    def handle_segmentation(segmentation):
+        _add_segmentation(widget, segmentation)
 
     @thread_worker
     def _calculate_segmentation():
@@ -314,7 +311,7 @@ def epitools_widget() -> widgets.Container:
     @widget.run_seg_button.clicked.connect
     def run_segmentation() -> None:
         worker = _calculate_segmentation()
-        worker.returned.connect(_add_segmentation)
+        worker.returned.connect(handle_segmentation)
         worker.start()
 
     return widget
