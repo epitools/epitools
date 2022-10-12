@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -100,7 +100,7 @@ def _reset_axes(widget: Widget) -> None:
         widget.viewer.dims.set_current_step(axis, 0)
 
 
-def _add_layers(widget: Widget, layers: list[LayerDataTuple]) -> None:
+def _add_layers(widget: Widget, layers: List[LayerDataTuple]) -> None:
 
     add_layer_func = {
         "image": widget.viewer.add_image,
