@@ -123,7 +123,7 @@ def calculate_projection(
         max_intensity = smoothed_t.max(axis=0)
         max_indices = smoothed_t.argmax(axis=0)
 
-        confidencemap = z_size * max_intensity / sum(smoothed_t, 0)
+        confidencemap = z_size * max_intensity / np.sum(smoothed_t, axis=0)
         confthres = np.median(
             confidencemap[confidencemap > np.median(confidencemap)]
         )
@@ -172,5 +172,5 @@ if __name__ == "__main__":
     from matplotlib import pyplot as plt
 
     fig = plt.figure()
-    plt.imshow(proj[0])
+    plt.imshow(np.squeeze(proj)[0])
     plt.show()
