@@ -1,3 +1,5 @@
+from typing import Tuple
+
 import numpy as np
 import numpy.typing as npt
 from skimage.filters import gaussian
@@ -73,7 +75,28 @@ def thresholded_local_minima_seeded_watershed(
     return seeds, new_labels
 
 
-def calculate_segmentation(projection, spot_sigma, outline_sigma, threshold):
+def calculate_segmentation(
+    projection: npt.NDArray[np.float64],
+    spot_sigma: float,
+    outline_sigma: float,
+    threshold: float,
+) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]:
+    """Segment a 4D projected image using
+    `thresholded_local_minima_seeded_watershed`.
+
+    Args:
+        projection:
+            A projected image stack processed using Epitools.
+        spot_sigma:
+            Controls how close segmented cells can be.
+        outline_sigma:
+            Controls how precisely segmented cells are outlined.
+        threshold:
+            Cells with an average intensity below `threshold` are ignored.
+
+    Returns:
+        Tuple of segmented seed points and labels.
+    """
     t_size = projection.shape[0]
 
     seg_seeds = []
