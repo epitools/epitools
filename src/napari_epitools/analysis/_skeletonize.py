@@ -2,7 +2,9 @@ import numpy as np
 import numpy.typing as npt
 
 
-def _get_outlines(cell_labels: npt.NDArray[np.int64]) -> npt.NDArray[np.int64]:
+def _get_outlines(
+    cell_labels: npt.NDArray[np.float64],
+) -> npt.NDArray[np.int64]:
     """Calculate the boundary line of set of cell labels.
 
     Args:
@@ -18,7 +20,7 @@ def _get_outlines(cell_labels: npt.NDArray[np.int64]) -> npt.NDArray[np.int64]:
     gradient = np.gradient(cell_labels)
     not_background = cell_labels > 0.0
     positive_gradient = np.square(gradient[0]) + np.square(gradient[1]) > 0.0
-    return (not_background & positive_gradient).astype(int)
+    return (not_background & positive_gradient).astype(np.int64)
 
 
 def skeletonize(

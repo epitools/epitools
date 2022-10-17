@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Any, List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -12,7 +12,7 @@ def local_minima_seeded_watershed(
     image: npt.NDArray[np.float64],
     spot_sigma: float = 10,
     outline_sigma: float = 0,
-) -> npt.NDArray[np.float64]:
+) -> Tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]:
     """
     Segment cells in images with fluorescently marked membranes.
     The two sigma parameters allow tuning the segmentation result. The first
@@ -43,7 +43,7 @@ def thresholded_local_minima_seeded_watershed(
     spot_sigma: float = 3,
     outline_sigma: float = 0,
     minimum_intensity: float = 500,
-) -> npt.NDArray[np.float64]:
+) -> Tuple[List[List[Any]], npt.NDArray[np.uint32]]:
     """
     Segment cells in images with marked membranes that have a high signal intensity.
     The two sigma parameters allow tuning the segmentation result. The first sigma
