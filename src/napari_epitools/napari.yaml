@@ -14,9 +14,15 @@ contributions:
     - id: napari-epitools.load_sample_data
       python_name: napari_epitools._sample_data:load_sample_data
       title: Load sample data from napari EpiTools
-    - id: napari-epitools.projection
-      python_name: napari_epitools.projection:projection_widget
+    - id: napari-epitools.projection_widget
+      python_name: napari_epitools._widget:projection_widget
       title: Epitools Projection Widget
+    - id: napari-epitools.segmentation_widget
+      python_name: napari_epitools._widget:segmentation_widget
+      title: Epitools Segmentation Widget
+    - id: napari-epitools.epitools_widget
+      python_name: napari_epitools._widget:epitools_widget
+      title: Epitools Cell Outlines Widget
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
@@ -33,5 +39,10 @@ contributions:
       display_name: napari EpiTools
       key: test_image
   widgets:
-    - command: napari-epitools.projection
-      display_name: Epitools Projection Widget
+    - command: napari-epitools.epitools_widget
+      display_name: Epitools Widget
+    - command: napari-epitools.projection_widget
+      # autogenerate: true <- for use with napari-assistant
+      display_name: Projection > Selective Plane (epitools)
+    - command: napari-epitools.segmentation_widget
+      display_name: Segmentation / labeling > seg test (epitools)
