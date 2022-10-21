@@ -20,9 +20,6 @@ contributions:
     - id: napari-epitools.segmentation_widget
       python_name: napari_epitools._widget:segmentation_widget
       title: Epitools Segmentation Widget
-    - id: napari-epitools.epitools_widget
-      python_name: napari_epitools._widget:epitools_widget
-      title: Epitools Cell Outlines Widget
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
@@ -39,10 +36,8 @@ contributions:
       display_name: napari EpiTools
       key: test_image
   widgets:
-    - command: napari-epitools.epitools_widget
-      display_name: Epitools Widget
     - command: napari-epitools.projection_widget
       # autogenerate: true <- for use with napari-assistant
-      display_name: Projection > Selective Plane (epitools)
+      display_name: Projection (selective plane)
     - command: napari-epitools.segmentation_widget
-      display_name: Segmentation / labeling > seg test (epitools)
+      display_name: Segmentation (local minima seeded watershed)

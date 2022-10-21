@@ -6,7 +6,7 @@ import pytest
 from magicgui import widgets
 from skimage.io import imread
 
-from napari_epitools._widget import epitools_widget
+from napari_epitools._widget import projection_widget
 from napari_epitools.analysis import calculate_projection
 
 SMOOTHING_RADIUS = 0.2
@@ -26,13 +26,13 @@ def sample_data():
 @pytest.fixture
 def projection_widget_fixture(make_napari_viewer):
     make_napari_viewer()
-    return epitools_widget()
+    return projection_widget()
 
 
 def test_add_projection_widget(make_napari_viewer):
     viewer = make_napari_viewer()
     num_dw = len(list(viewer.window._dock_widgets))
-    widget = epitools_widget()
+    widget = projection_widget()
     viewer.window.add_dock_widget(widget)
     assert len(list(viewer.window._dock_widgets)) == num_dw + 1
 
