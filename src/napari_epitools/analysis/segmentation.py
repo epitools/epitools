@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -12,7 +12,7 @@ def local_minima_seeded_watershed(
     image: npt.NDArray[np.float64],
     spot_sigma: float = 10,
     outline_sigma: float = 0,
-) -> Tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]:
+) -> tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]:
     """
     Segment cells in images with fluorescently marked membranes.
     The two sigma parameters allow tuning the segmentation result. The first
@@ -21,8 +21,8 @@ def local_minima_seeded_watershed(
     filter applies two Gaussian blurs, local minima detection and a seeded watershed.
     See also
     --------
-    .. [1] https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_watershed.html # noqa E501
-    """
+    .. [1] https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_watershed.html
+    """  # noqa E501
 
     image = np.asarray(image)
 
@@ -43,7 +43,7 @@ def thresholded_local_minima_seeded_watershed(
     spot_sigma: float = 3,
     outline_sigma: float = 0,
     minimum_intensity: float = 500,
-) -> Tuple[List[List[Any]], npt.NDArray[np.uint32]]:
+) -> tuple[list[list[Any]], npt.NDArray[np.uint32]]:
     """
     Segment cells in images with marked membranes that have a high signal intensity.
     The two sigma parameters allow tuning the segmentation result. The first sigma
@@ -80,7 +80,7 @@ def calculate_segmentation(
     spot_sigma: float,
     outline_sigma: float,
     threshold: float,
-) -> Tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]:
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]:
     """Segment a 4D projected image using
     `thresholded_local_minima_seeded_watershed`.
 

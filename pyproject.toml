@@ -1,32 +1,56 @@
 [build-system]
-requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools",
+    "setuptools-scm",
+]
 
+[tool.mypy]
+plugins = [
+    "numpy.typing.mypy_plugin",
+    "pydantic.mypy",
+]
 
+[tool.ruff]
+fix = true
+force-exclude = true
+ignore = [
+    "PLR0913",
+    "S101",
+    "N806",
+]
+select = [
+    "A",
+    "B",
+    "C",
+    "DTZ",
+    "E",
+    "EM",
+    "F",
+    "FBT",
+    "I",
+    "ICN",
+    "ISC",
+    "N",
+    "PLC",
+    "PLE",
+    "PLR",
+    "PLW",
+    "Q",
+    "RUF",
+    "S",
+    "SIM",
+    "T",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
+]
+isort.known-first-party = ["btrack"]
+mccabe.max-complexity = 18
 
-[tool.black]
-target-version = ['py36', 'py37', 'py38']
-skip-string-normalization = false
-line-length = 79
-exclude = '''
-(
-  /(
-      \.eggs
-    | \.git
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-    | examples
-  )/
-)
-'''
+[tool.setuptools_scm]
 
-
-[tool.isort]
-profile = "black"
-line_length = 79
+[tool.tomlsort]
+spaces_indent_inline_array = 4
+trailing_comma_inline_array = true
