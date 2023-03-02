@@ -14,11 +14,6 @@ plugins = [
 [tool.ruff]
 fix = true
 force-exclude = true
-ignore = [
-    "PLR0913",
-    "S101",
-    "N806",
-]
 select = [
     "A",
     "B",

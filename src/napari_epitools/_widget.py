@@ -118,7 +118,7 @@ def _add_layers(widget: Widget, layers: list[LayerDataTuple]) -> None:
     surface_smoothness_2=SURFACE_SMOOTHNESS_2,
     cut_off_distance=CUT_OFF_DISTANCE,
 )
-def projection_widget(
+def projection_widget(  # noqa: PLR0913
     pbar: widgets.ProgressBar,
     input_image: ImageData,
     smoothing_radius: float,
