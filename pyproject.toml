@@ -47,5 +47,6 @@ mccabe.max-complexity = 18
 [tool.setuptools_scm]
 
 [tool.tomlsort]
+all = true
 spaces_indent_inline_array = 4
 trailing_comma_inline_array = true
