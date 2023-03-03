@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import napari.types
 import numpy as np
 import numpy.typing as npt
 from magicgui import magic_factory, widgets
 from magicgui.widgets._bases import Widget
 from napari import current_viewer
 from napari.qt.threading import thread_worker
-from napari.types import ImageData, LayerDataTuple
 from napari.utils.notifications import show_error
 
 from napari_epitools.analysis import (
@@ -97,7 +97,7 @@ def _reset_axes(widget: Widget) -> None:
         widget.viewer.dims.set_current_step(axis, 0)
 
 
-def _add_layers(widget: Widget, layers: list[LayerDataTuple]) -> None:
+def _add_layers(widget: Widget, layers: list[napari.types.LayerDataTuple]) -> None:
     add_layer_func = {
         "image": widget.viewer.add_image,
         "labels": widget.viewer.add_labels,
@@ -122,12 +122,12 @@ def _add_layers(widget: Widget, layers: list[LayerDataTuple]) -> None:
 )
 def projection_widget(  # noqa: PLR0913
     pbar: widgets.ProgressBar,
-    input_image: ImageData,
+    input_image: napari.types.ImageData,
     smoothing_radius: float,
     surface_smoothness_1: int,
     surface_smoothness_2: int,
     cut_off_distance: int,
-) -> npt.NDArray[np.float64] | None:
+) -> napari.types.ImageData:
     """Z projection using image interpolation.
     Args:
         pbar:
@@ -188,11 +188,11 @@ def projection_widget(  # noqa: PLR0913
 )
 def segmentation_widget(
     pbar: widgets.ProgressBar,
-    input_image: ImageData,
+    input_image: napari.types.ImageData,
     spot_sigma: float,
     outline_sigma: float,
     threshold: float,
-) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]] | None:
+) -> napari.types.LayerDataTuple:
     """Segment cells in a projected image.
 
     Args:
