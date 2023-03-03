@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import magicgui.widgets
 import napari.types
 import numpy as np
 import numpy.typing as npt
-from magicgui import magic_factory, widgets
-from magicgui.widgets._bases import Widget
+from magicgui import magic_factory
+from magicgui.widgets.bases import Widget
 from napari import current_viewer
 from napari.qt.threading import thread_worker
 from napari.utils.notifications import show_error
@@ -121,7 +122,7 @@ def _add_layers(widget: Widget, layers: list[napari.types.LayerDataTuple]) -> No
     cut_off_distance=CUT_OFF_DISTANCE,
 )
 def projection_widget(  # noqa: PLR0913
-    pbar: widgets.ProgressBar,
+    pbar: magicgui.widgets.ProgressBar,
     input_image: napari.types.ImageData,
     smoothing_radius: float,
     surface_smoothness_1: int,
@@ -187,7 +188,7 @@ def projection_widget(  # noqa: PLR0913
     threshold=THRESHOLD,
 )
 def segmentation_widget(
-    pbar: widgets.ProgressBar,
+    pbar: magicgui.widgets.ProgressBar,
     input_image: napari.types.ImageData,
     spot_sigma: float,
     outline_sigma: float,

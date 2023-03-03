@@ -1,9 +1,9 @@
 from pathlib import Path
 from unittest.mock import patch
 
+import magicgui
 import numpy as np
 import pytest
-from magicgui import widgets
 from skimage.io import imread
 
 from napari_epitools._widget import projection_widget
@@ -43,7 +43,7 @@ def test_add_projection_widget(make_napari_viewer):
 
 @pytest.mark.skip(reason="unfinished")
 def test_projection_widget_run_button(projection_widget_fixture, sample_data):
-    pbar = widgets.ProgressBar()
+    pbar = magicgui.widgets.ProgressBar()
     with patch(
         "napari_epitools.projection.analysis.calculate_projection"
     ) as calculate_projection:
