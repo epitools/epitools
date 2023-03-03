@@ -5,7 +5,7 @@ import numpy.typing as npt
 from magicgui import magic_factory, widgets
 from magicgui.widgets._bases import Widget
 from napari import current_viewer
-from napari.qt.threading import FunctionWorker, thread_worker
+from napari.qt.threading import thread_worker
 from napari.types import ImageData, LayerDataTuple
 from napari.utils.notifications import show_error
 
@@ -127,7 +127,7 @@ def projection_widget(  # noqa: PLR0913
     surface_smoothness_1: int,
     surface_smoothness_2: int,
     cut_off_distance: int,
-) -> FunctionWorker:
+) -> npt.NDArray[np.float64] | None:
     """Z projection using image interpolation.
     Args:
         pbar:
@@ -150,7 +150,7 @@ def projection_widget(  # noqa: PLR0913
     if input_image is None:
         pbar.hide()
         show_error("Load an image first")
-        return
+        return None
 
     def handle_returned(projection: npt.NDArray[np.float64]) -> None:
         """Callback for `run` thread worker."""
@@ -192,7 +192,7 @@ def segmentation_widget(
     spot_sigma: float,
     outline_sigma: float,
     threshold: float,
-) -> FunctionWorker:
+) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]] | None:
     """Segment cells in a projected image.
 
     Args:
@@ -214,7 +214,7 @@ def segmentation_widget(
     if input_image is None:
         pbar.hide()
         show_error("Load a projection first")
-        return
+        return None
 
     def handle_returned(
         result: tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]
