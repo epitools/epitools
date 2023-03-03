@@ -1,3 +1,4 @@
+import gc
 from pathlib import Path
 from unittest.mock import patch
 
@@ -39,6 +40,12 @@ def test_add_projection_widget(make_napari_viewer):
     )
 
     assert len(list(viewer.window._dock_widgets)) == num_dw + 1  # noqa: S101
+
+    viewer.close()
+    # Run a full garbage collection here so that any remaining viewer
+    # and related instances are removed for future tests that may use
+    # make_napari_viewer.
+    gc.collect()
 
 
 @pytest.mark.skip(reason="unfinished")
