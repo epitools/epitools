@@ -1,12 +1,13 @@
-from typing import List, Tuple
+from __future__ import annotations
 
+import magicgui.widgets
+import napari.types
 import numpy as np
 import numpy.typing as npt
-from magicgui import magic_factory, widgets
-from magicgui.widgets._bases import Widget
+from magicgui import magic_factory
+from magicgui.widgets.bases import Widget
 from napari import current_viewer
-from napari.qt.threading import FunctionWorker, thread_worker
-from napari.types import ImageData, LayerDataTuple
+from napari.qt.threading import thread_worker
 from napari.utils.notifications import show_error
 
 from napari_epitools.analysis import (
@@ -87,20 +88,17 @@ THRESHOLD = {
 PROJECTION_LAYER_NAME = "Projection"
 SEEDS_LAYER_NAME = "Seeds"
 CELLS_LAYER_NAME = "Cells"
+WIDGET_NDIM = 3
 
 
 def _reset_axes(widget: Widget) -> None:
     """Set the dimension sliders to `0`"""
-    axes = [0, 1]
-    if widget.viewer.dims.ndim == 3:
-        axes = [0]
-
+    axes = [0] if widget.viewer.dims.ndim == WIDGET_NDIM else [0, 1]
     for axis in axes:
         widget.viewer.dims.set_current_step(axis, 0)
 
 
-def _add_layers(widget: Widget, layers: List[LayerDataTuple]) -> None:
-
+def _add_layers(widget: Widget, layers: list[napari.types.LayerDataTuple]) -> None:
     add_layer_func = {
         "image": widget.viewer.add_image,
         "labels": widget.viewer.add_labels,
@@ -111,7 +109,7 @@ def _add_layers(widget: Widget, layers: List[LayerDataTuple]) -> None:
         try:
             widget.viewer.layers[layer_data.get("name")].data = data
         except KeyError:
-            add_layer_func.get(layer_type)(data, **layer_data)
+            add_layer_func[layer_type](data, **layer_data)
 
     _reset_axes(widget)
 
@@ -123,14 +121,14 @@ def _add_layers(widget: Widget, layers: List[LayerDataTuple]) -> None:
     surface_smoothness_2=SURFACE_SMOOTHNESS_2,
     cut_off_distance=CUT_OFF_DISTANCE,
 )
-def projection_widget(
-    pbar: widgets.ProgressBar,
-    input_image: ImageData,
+def projection_widget(  # noqa: PLR0913
+    pbar: magicgui.widgets.ProgressBar,
+    input_image: napari.types.ImageData,
     smoothing_radius: float,
     surface_smoothness_1: int,
     surface_smoothness_2: int,
     cut_off_distance: int,
-) -> FunctionWorker:
+) -> napari.types.ImageData:
     """Z projection using image interpolation.
     Args:
         pbar:
@@ -153,7 +151,7 @@ def projection_widget(
     if input_image is None:
         pbar.hide()
         show_error("Load an image first")
-        return
+        return None
 
     def handle_returned(projection: npt.NDArray[np.float64]) -> None:
         """Callback for `run` thread worker."""
@@ -190,12 +188,12 @@ def projection_widget(
     threshold=THRESHOLD,
 )
 def segmentation_widget(
-    pbar: widgets.ProgressBar,
-    input_image: ImageData,
+    pbar: magicgui.widgets.ProgressBar,
+    input_image: napari.types.ImageData,
     spot_sigma: float,
     outline_sigma: float,
     threshold: float,
-) -> FunctionWorker:
+) -> napari.types.LayerDataTuple:
     """Segment cells in a projected image.
 
     Args:
@@ -217,10 +215,10 @@ def segmentation_widget(
     if input_image is None:
         pbar.hide()
         show_error("Load a projection first")
-        return
+        return None
 
     def handle_returned(
-        result: Tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]
+        result: tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]
     ) -> None:
         """Callback for `run` thread worker."""
 
@@ -242,7 +240,7 @@ def segmentation_widget(
         _add_layers(segmentation_widget, layers)
 
     @thread_worker(connect={"returned": handle_returned})
-    def run() -> npt.NDArray[np.int64]:
+    def run() -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]:
         """Handle clicks on the `Run` button. Runs segmentation in a
         separate thread to avoid blocking GUI.
         """
