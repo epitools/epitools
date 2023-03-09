@@ -65,7 +65,6 @@ paths.source = [
 [tool.mypy]
 plugins = [
     "numpy.typing.mypy_plugin",
-    "pydantic.mypy",
 ]
 
 [tool.pytest.ini_options]
