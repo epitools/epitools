@@ -104,7 +104,7 @@ select = [
     "W",
     "YTT",
 ]
-isort.known-first-party = ["btrack"]
+isort.known-first-party = ["napari_epitools"]
 mccabe.max-complexity = 18
 
 [tool.setuptools_scm]
