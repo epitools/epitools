@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import magicgui.widgets
+import napari.qt.threading
 import napari.types
 import numpy as np
 import numpy.typing as npt
@@ -128,7 +129,7 @@ def projection_widget(  # noqa: PLR0913
     surface_smoothness_1: int,
     surface_smoothness_2: int,
     cut_off_distance: int,
-) -> napari.types.ImageData:
+) -> napari.qt.threading.FunctionWorker:
     """Z projection using image interpolation.
     Args:
         pbar:
@@ -193,7 +194,7 @@ def segmentation_widget(
     spot_sigma: float,
     outline_sigma: float,
     threshold: float,
-) -> napari.types.LayerDataTuple:
+) -> napari.qt.threading.FunctionWorker:
     """Segment cells in a projected image.
 
     Args:
