@@ -113,12 +113,13 @@ def calculate_projection(
         Stack projected onto a single plane.
     """
     if input_image.ndim == IMAGE_NDIM:
+        # assume we have a stack of images at a single point in time
         input_image = np.expand_dims(input_image, axis=0)
 
     t_size, z_size, y_size, x_size = input_image.shape
     smoothed_imstack = _smooth(input_image.astype(np.float64), smoothing_radius)
 
-    t_interp = np.zeros((t_size, 1, y_size, x_size))
+    t_interp = np.zeros((t_size, y_size, x_size))  # remove the z-axis when projecting
     for t in range(t_size):
         smoothed_t = smoothed_imstack[t]
         max_intensity = smoothed_t.max(axis=0)
@@ -135,7 +136,7 @@ def calculate_projection(
             max_indices_confthres, x_size, y_size, surface_smoothness_1
         )
 
-        # given the hight locations of the surface (z_interp) compute the difference
+        # given the height locations of the surface (z_interp) compute the difference
         # towards the 1st quartile location (max_indices_confthres), ignore the rest
         # (==0); the result reflects the distance (abs) between estimate and points.
         max_indices_diff = np.abs(z_interp - max_indices_confthres.astype("float64"))
