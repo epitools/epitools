@@ -13,7 +13,7 @@ SMOOTHING_RADIUS = 0.2
 SURFACE_SMOOTHNESS_1 = 50
 SURFACE_SMOOTHNESS_2 = 50
 CUT_OFF_DISTANCE = 20
-PROJECTION_NDIM = 4
+PROJECTION_NDIM = 3
 
 
 @pytest.fixture
@@ -67,8 +67,7 @@ def test_calculate_projection(sample_data):
         )
         assert projection.ndim == PROJECTION_NDIM  # noqa: S101
         assert projection.shape == (  # noqa: S101
-            1,
-            1,
+            1,  # single frame in the timeseries
             sample_data.shape[1],
             sample_data.shape[2],
         )

@@ -27,7 +27,7 @@ SMOOTHING_RADIUS = {
     "min": 0.0,
     "max": 10.0,
     "step": 0.1,
-    "value": 0.2,
+    "value": 1,
 }
 
 SURFACE_SMOOTHNESS_1 = {
@@ -54,7 +54,7 @@ CUT_OFF_DISTANCE = {
     "min": 0,
     "max": 5,
     "step": 1,
-    "value": 2,
+    "value": 3,
 }
 
 SPOT_SIGMA = {
@@ -63,7 +63,7 @@ SPOT_SIGMA = {
     "min": 0,
     "max": 20,
     "step": 0.1,
-    "value": 3,
+    "value": 10,
 }
 
 OUTLINE_SIGMA = {
@@ -72,7 +72,7 @@ OUTLINE_SIGMA = {
     "min": 0,
     "max": 20,
     "step": 0.1,
-    "value": 0,
+    "value": 3,
 }
 
 THRESHOLD = {
@@ -81,7 +81,7 @@ THRESHOLD = {
     "min": 0,
     "max": 100,
     "step": 1,
-    "value": 20,
+    "value": 3,
 }
 PROJECTION_LAYER_NAME = "Projection"
 SEEDS_LAYER_NAME = "Seeds"
