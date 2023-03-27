@@ -69,7 +69,7 @@ def thresholded_local_minima_seeded_watershed(
 
     # filter labels with low intensity
     new_label_indices, _, _ = relabel_sequential(
-        (np.asarray(intensities) > minimum_intensity) * np.arange(labels.max())
+        (np.asarray(intensities) > minimum_intensity) * np.arange(1, labels.max() + 1)
     )
     new_label_indices = np.insert(new_label_indices, 0, 0)
     new_labels = np.take(np.asarray(new_label_indices, np.uint32), labels)
