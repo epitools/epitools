@@ -69,10 +69,11 @@ regionprops = calculate_regionprops(
     image=projected_image,
     labels=labels,
 )
+regionprops["index"] = regionprops.pop("label")
 
 # Add results to viewer
 viewer.add_image(projected_image, name="Projected")
-viewer.add_labels(labels, name="Cells")
+viewer.add_labels(labels, name="Cells", properties=regionprops)
 viewer.add_points(seeds, name="Seeds", size=3, edge_color="red", face_color="red")
 
 # The napari event loop needs to be run under here to allow the window
