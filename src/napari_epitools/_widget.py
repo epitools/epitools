@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import magicgui.widgets
+import napari.qt.threading
 import napari.types
 import numpy as np
 import numpy.typing as npt
@@ -20,8 +20,6 @@ SEED_SIZE = 3
 SEED_EDGE_COLOR = "red"
 SEED_FACE_COLOR = "red"
 
-# Defaults
-PBAR = {"visible": False, "max": 0, "label": "working..."}
 
 SMOOTHING_RADIUS = {
     "widget_type": "FloatSlider",
@@ -115,24 +113,20 @@ def _add_layers(widget: Widget, layers: list[napari.types.LayerDataTuple]) -> No
 
 
 @magic_factory(
-    pbar=PBAR,
     smoothing_radius=SMOOTHING_RADIUS,
     surface_smoothness_1=SURFACE_SMOOTHNESS_1,
     surface_smoothness_2=SURFACE_SMOOTHNESS_2,
     cut_off_distance=CUT_OFF_DISTANCE,
 )
-def projection_widget(  # noqa: PLR0913
-    pbar: magicgui.widgets.ProgressBar,
+def projection_widget(
     input_image: napari.types.ImageData,
     smoothing_radius: float,
     surface_smoothness_1: int,
     surface_smoothness_2: int,
     cut_off_distance: int,
-) -> napari.types.ImageData:
+) -> napari.qt.threading.FunctionWorker:
     """Z projection using image interpolation.
     Args:
-        pbar:
-            Progressbar widget
         input_image:
             Numpy ndarray representation of multi-dimensional image stack.
         smoothing_radius:
@@ -149,14 +143,12 @@ def projection_widget(  # noqa: PLR0913
     """
 
     if input_image is None:
-        pbar.hide()
         show_error("Load an image first")
         return None
 
     def handle_returned(projection: npt.NDArray[np.float64]) -> None:
         """Callback for `run` thread worker."""
 
-        pbar.hide()
         projection_widget.viewer = current_viewer()
         projection_layer = (
             projection,
@@ -169,6 +161,7 @@ def projection_widget(  # noqa: PLR0913
     def run() -> npt.NDArray[np.float64]:
         """Handle clicks on the `Run` button. Runs projection in a
         separate thread to avoid blocking GUI."""
+
         return calculate_projection(
             input_image,
             smoothing_radius,
@@ -177,28 +170,23 @@ def projection_widget(  # noqa: PLR0913
             cut_off_distance,
         )
 
-    pbar.show()
     return run()
 
 
 @magic_factory(
-    pbar=PBAR,
     spot_sigma=SPOT_SIGMA,
     outline_sigma=OUTLINE_SIGMA,
     threshold=THRESHOLD,
 )
 def segmentation_widget(
-    pbar: magicgui.widgets.ProgressBar,
     input_image: napari.types.ImageData,
     spot_sigma: float,
     outline_sigma: float,
     threshold: float,
-) -> napari.types.LayerDataTuple:
+) -> napari.qt.threading.FunctionWorker:
     """Segment cells in a projected image.
 
     Args:
-        pbar:
-            Progressbar widget
         input_image:
             Numpy ndarray representation of a projected image stack.
         spot_sigma:
@@ -212,8 +200,8 @@ def segmentation_widget(
         Seed points as a Napari Points layer and segmented cells as a
         Napari Labels layer.
     """
+
     if input_image is None:
-        pbar.hide()
         show_error("Load a projection first")
         return None
 
@@ -222,7 +210,6 @@ def segmentation_widget(
     ) -> None:
         """Callback for `run` thread worker."""
 
-        pbar.hide()
         segmentation_widget.viewer = current_viewer()
         seeds, labels = result
         labels_layer = (labels, {"name": CELLS_LAYER_NAME}, "labels")
@@ -252,5 +239,4 @@ def segmentation_widget(
             threshold,
         )
 
-    pbar.show()
     return run()
