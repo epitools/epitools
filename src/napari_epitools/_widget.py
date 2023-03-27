@@ -6,6 +6,7 @@ import napari.qt.threading
 import napari.types
 import numpy as np
 import numpy.typing as npt
+import pandas._typing as pdt
 from magicgui import magic_factory
 from magicgui.widgets.bases import Widget
 from napari import current_viewer
@@ -14,6 +15,7 @@ from napari.utils.notifications import show_error
 
 from napari_epitools.analysis import (
     calculate_projection,
+    calculate_regionprops,
     calculate_segmentation,
 )
 
@@ -269,6 +271,40 @@ def segmentation_widget(
             spot_sigma,
             outline_sigma,
             threshold,
+        )
+
+    return run()
+
+
+@magic_factory()
+def regionprops_widget(
+    input_image: napari.types.ImageData,
+    input_labels: napari.types.LabelsData,
+) -> napari.qt.threading.FunctionWorker:
+    """Create a widget for calculating region properties of labelled segmentations."""
+
+    if input_image is None:
+        show_error("Please load a projected image first")
+
+    if input_labels is None:
+        show_error("Please load a segmneted image first")
+        return None
+
+    def display_results(result: pdt.DatetimeLike) -> None:
+        """Add results to the ui"""
+
+        regionprops_widget.viewer = current_viewer()
+        pass
+
+    @thread_worker(connect={"returned": display_results})
+    def run() -> pdt.DatetimeLike:
+        """Handle clicks on the `Run` button. Calculates regionprops in a
+        separate thread to avoid blocking GUI.
+        """
+
+        return calculate_regionprops(
+            image=input_image,
+            labels=input_labels,
         )
 
     return run()

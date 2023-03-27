@@ -20,6 +20,9 @@ contributions:
     - id: napari-epitools.segmentation_widget
       python_name: napari_epitools._widget:segmentation_widget
       title: Epitools Segmentation Widget
+    - id: napari-epitools.regionprops_widget
+      python_name: napari_epitools._widget:regionprops_widget
+      title: Epitools regionprops widget
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
@@ -41,3 +44,5 @@ contributions:
       display_name: Projection (selective plane)
     - command: napari-epitools.segmentation_widget
       display_name: Segmentation (local minima seeded watershed)
+    - command: napari-epitools.regionprops_widget
+      display_name: RegionProps (cell statistics)
