@@ -18,7 +18,7 @@ import skimage.measure
 def calculate_regionprops(
     image: napari.types.ImageData,
     labels: napari.types.LabelsData,
-) -> npt.ArrayLike:
+) -> list[dict[str, npt.NDArray]]:
     """Calculate the region based properties of a segmented image"""
 
     properties = ["label", "area", "perimeter", "orientation"]

@@ -15,26 +15,10 @@ import skimage.io
 
 from napari_epitools.analysis import (
     calculate_projection,
-    calculate_regionprops,
     calculate_segmentation,
 )
 
 viewer = napari.Viewer()
-
-# Add widgets to the viewer
-_, projection_widget = viewer.window.add_plugin_dock_widget(
-    plugin_name="napari-epitools",
-    widget_name="Projection (selective plane)",
-)
-
-_, segmentation_widget = viewer.window.add_plugin_dock_widget(
-    plugin_name="napari-epitools",
-    widget_name="Segmentation (local minima seeded watershed)",
-)
-_, regionprops_widget = viewer.window.add_plugin_dock_widget(
-    plugin_name="napari-epitools",
-    widget_name="RegionProps (cell statistics)",
-)
 
 # This is how the original 4D image was cropped
 # image_path = pathlib.Path("sample_data") / "4d" / "181210_DM_CellMOr_subsub_reg_decon-1.tif"  # noqa: E501
@@ -65,17 +49,33 @@ seeds, labels = calculate_segmentation(
     threshold=3,
 )
 
-regionprops = calculate_regionprops(
-    image=projected_image,
-    labels=labels,
-)
-
 # Add results to viewer
 image_layer = viewer.add_image(projected_image, name="Projected")
 labels_layer = viewer.add_labels(labels, name="Cells")
 seeds_layer = viewer.add_points(
-    seeds, name="Seeds", size=3, edge_color="red", face_color="red"
+    seeds,
+    name="Seeds",
+    size=3,
+    edge_color="red",
+    face_color="red",
 )
+
+
+# Add widgets to the viewer
+_, projection_widget = viewer.window.add_plugin_dock_widget(
+    plugin_name="napari-epitools",
+    widget_name="Projection (selective plane)",
+)
+
+_, segmentation_widget = viewer.window.add_plugin_dock_widget(
+    plugin_name="napari-epitools",
+    widget_name="Segmentation (local minima seeded watershed)",
+)
+_, regionprops_widget = viewer.window.add_plugin_dock_widget(
+    plugin_name="napari-epitools",
+    widget_name="RegionProps (cell statistics)",
+)
+
 
 # The napari event loop needs to be run under here to allow the window
 # to be spawned from a Python script
