@@ -6,7 +6,6 @@ import napari.qt.threading
 import napari.types
 import numpy as np
 import numpy.typing as npt
-import pandas._typing as pdt
 from magicgui import magic_factory
 from magicgui.widgets.bases import Widget
 from napari import current_viewer
@@ -276,35 +275,76 @@ def segmentation_widget(
     return run()
 
 
-@magic_factory()
-def regionprops_widget(
-    input_image: napari.types.ImageData,
-    input_labels: napari.types.LabelsData,
-) -> napari.qt.threading.FunctionWorker:
+def regionprops_widget() -> magicgui.widgets.Container:
     """Create a widget for calculating region properties of labelled segmentations."""
 
-    if input_image is None:
-        show_error("Please load a projected image first")
+    # First create our UI along with some default configs for the widgets
+    widgets = _create_regionprops_widgets()
+    regionprops_widget = magicgui.widgets.Container(
+        widgets=widgets,
+        scrollable=False,
+    )
+    regionprops_widget.viewer = napari.current_viewer()
 
-    if input_labels is None:
-        show_error("Please load a segmneted image first")
-        return None
+    regionprops_widget.run.changed.connect(lambda: run_regionprops(regionprops_widget))
 
-    def display_results(result: pdt.DatetimeLike) -> None:
-        """Add results to the ui"""
+    return regionprops_widget
 
-        regionprops_widget.viewer = current_viewer()
+
+def _create_regionprops_widgets() -> list[Widget]:
+    """Create widgets for calculating and exporting cell statistics"""
+
+    image_tooltip = "Select an 'Image' layer to use for calculating cell statistics."
+    image = magicgui.widgets.create_widget(
+        annotation=napari.layers.Image,
+        name="input_image",
+        label="image",
+        options={"tooltip": image_tooltip},
+    )
+
+    labels_tooltip = (
+        "Select a 'Labels' layer to use for calculating cell statistics.\n"
+        "These should be the corresponding labels for the selected Image."
+    )
+    labels = magicgui.widgets.create_widget(
+        annotation=napari.layers.Labels,
+        name="input_labels",
+        label="labels",
+        options={"tooltip": labels_tooltip},
+    )
+
+    run_tooltip = "Calculate cell statistics for the selected Image and Labels"
+    run = magicgui.widgets.create_widget(
+        name="run",
+        label="Run",
+        widget_type="PushButton",
+        options={"tooltip": run_tooltip},
+    )
+
+    return [image, labels, run]
+
+
+def run_regionprops(
+    regionprops_widget: magicgui.widgets.Container,
+) -> None:
+    """Calculate cell statistics for the selected Image and Labels"""
+
+    image = regionprops_widget.input_image.value
+    labels = regionprops_widget.input_labels.value
+    regionprops = calculate_regionprops(
+        image=image.data,
+        labels=labels.data,
+    )
+
+    viewer = napari.current_viewer()
+    viewer.dims.events.current_step.connect(
+        lambda event: _update_regionprops(labels, regionprops, event.value[0])
+    )
+
+
+def _update_regionprops(labels: napari.types.LabelsData, regionprops, frame):
+    """Update regionprops for current frame"""
+    try:
+        labels.features = regionprops[frame]
+    except IndexError:
         pass
-
-    @thread_worker(connect={"returned": display_results})
-    def run() -> pdt.DatetimeLike:
-        """Handle clicks on the `Run` button. Calculates regionprops in a
-        separate thread to avoid blocking GUI.
-        """
-
-        return calculate_regionprops(
-            image=input_image,
-            labels=input_labels,
-        )
-
-    return run()

@@ -22,10 +22,19 @@ def calculate_regionprops(
     """Calculate the region based properties of a segmented image"""
 
     properties = ["label", "area", "perimeter", "orientation"]
-    regionprops = skimage.measure.regionprops_table(
-        label_image=labels[0],
-        intensity_image=image[0],
-        properties=properties,
-    )
+
+    # Calculate regionprops for each frame
+    regionprops = [
+        skimage.measure.regionprops_table(
+            label_image=frame_labels,
+            intensity_image=frame_image,
+            properties=properties,
+        )
+        for frame_labels, frame_image in zip(labels, image)
+    ]
+
+    # skimage uses 'label' for what napari calls 'index'
+    for frame_regionprops in regionprops:
+        frame_regionprops["index"] = frame_regionprops.pop("label")
 
     return regionprops

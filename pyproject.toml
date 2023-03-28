@@ -76,6 +76,10 @@ testpaths = [
 [tool.ruff]
 fix = true
 force-exclude = true
+ignore = [
+    "B905", # set 'strict=' for zip
+    "SIM105", # use contextlib.suppress(IndexError)
+]
 select = [
     "A",
     "B",
