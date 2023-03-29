@@ -288,16 +288,6 @@ def regionprops_widget() -> magicgui.widgets.Container:
     viewer = napari.current_viewer()
     regionprops_widget.viewer = viewer
 
-    # Ensure every Labels layer has a ._frame_features attribute
-    # This will be used to store a list of regionprops dictionaries - one per frame
-    for layer in viewer.layers:
-        _add_frame_features_attr(layer=layer)
-
-    # Also add this attribute for all new Labels layers
-    viewer.layers.events.inserted.connect(
-        lambda event: _add_frame_features_attr(layer=event.value),
-    )
-
     # Update regionprops when scrolling through frames
     viewer.dims.events.current_step.connect(
         lambda event: _update_regionprops(layers=viewer.layers, frame=event.value[0]),
@@ -347,19 +337,6 @@ def _create_regionprops_widgets() -> list[Widget]:
     return [image, labels, run]
 
 
-def _add_frame_features_attr(layer: napari.layers.Layer) -> None:
-    """Add a _frame_features attribute to a Labels layer.
-
-    This will store the regionprops at each frame. As the frame is
-    changed, the corresponding regionprops will be set as the
-    Labels.features so they are displayed in the status bar.
-    """
-
-    if not isinstance(layer, napari.layers.Labels):
-        return
-    layer._frame_features = None
-
-
 def _update_regionprops(
     layers: list[napari.layers.Layer],
     frame: int,
@@ -367,10 +344,10 @@ def _update_regionprops(
     """Update Labels regionprops for current frame"""
 
     for layer in layers:
-        if not isinstance(layer, napari.layers.Labels) or layer._frame_features is None:
-            continue
         try:
-            layer.features = layer._frame_features[frame]
+            layer.features = layer.metadata["frame_features"][frame]
+        except KeyError:
+            pass
         except IndexError:
             pass
 
@@ -387,7 +364,7 @@ def run_regionprops(
     )
 
     # We will use these to update the cell stats at each frame
-    labels._frame_features = regionprops
+    labels.metadata["frame_features"] = regionprops
 
     # Set cell stats for the current frame
     viewer = napari.current_viewer()
