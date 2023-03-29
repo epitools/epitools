@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import os
+
 import magicgui.widgets
 import napari.layers
 import napari.qt.threading
 import napari.types
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 from magicgui import magic_factory
+from magicgui.types import FileDialogMode
 from magicgui.widgets.bases import Widget
 from napari import current_viewer
 from napari.qt.threading import thread_worker
@@ -301,6 +305,13 @@ def regionprops_widget() -> magicgui.widgets.Container:
         ),
     )
 
+    # write the regionprops to CSV
+    regionprops_widget.export.changed.connect(
+        lambda: export_regionprops(
+            labels=regionprops_widget.input_labels.value,
+        ),
+    )
+
     return regionprops_widget
 
 
@@ -329,12 +340,22 @@ def _create_regionprops_widgets() -> list[Widget]:
     run_tooltip = "Calculate cell statistics for the selected Image and Labels"
     run = magicgui.widgets.create_widget(
         name="run",
-        label="Run",
+        label="Calculate statistics",
         widget_type="PushButton",
         options={"tooltip": run_tooltip},
     )
 
-    return [image, labels, run]
+    export_tooltip = (
+        "Export the cell statistics for the selected Image and Labels to a CSV file"
+    )
+    export = magicgui.widgets.create_widget(
+        name="export",
+        label="Export statistics",
+        widget_type="PushButton",
+        options={"tooltip": export_tooltip},
+    )
+
+    return [image, labels, run, export]
 
 
 def _update_regionprops(
@@ -373,3 +394,50 @@ def run_regionprops(
         labels.features = regionprops[current_frame]
     except IndexError:
         pass
+
+
+def export_regionprops(
+    labels: napari.layers.Labels,
+) -> None:
+    """Get filename for exporting Labels cell statitics to CSV"""
+
+    app = magicgui.application.use_app()
+    show_file_dialog = app.get_obj("show_file_dialog")
+    filename = show_file_dialog(
+        mode=FileDialogMode.OPTIONAL_FILE,
+        caption="Specify file to save Epitools cell statistics",
+        start_path=None,
+        filter="*.csv",
+    )
+
+    if filename is None:
+        return
+
+    _regionprops_to_csv(
+        filename=filename,
+        labels=labels,
+    )
+
+
+def _regionprops_to_csv(
+    filename: os.PathLike,
+    labels: napari.layers.Labels,
+) -> None:
+    """Write cell statistics for all frames in the selected Labels to CSV"""
+
+    try:
+        frame_features = labels.metadata["frame_features"]
+    except KeyError:
+        message = f"'{labels.name}' has no cell statistics to export"
+        napari.utils.notifications.show_error(message)
+        return
+
+    df = pd.concat(
+        [pd.DataFrame.from_dict(features) for features in frame_features],
+        keys=[f"Frame {frame}" for frame in range(len(frame_features))],
+    )
+    df.to_csv(filename)
+
+    # confirm export
+    message = f"'{labels.name}' cell statistics written to {filename}"
+    napari.utils.notifications.show_info(message)
