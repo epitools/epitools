@@ -435,10 +435,10 @@ def _cell_statistics_to_csv(
         return
 
     df = pd.concat(
-        [pd.DataFrame.from_dict(features) for features in cell_statistics],
+        [pd.DataFrame.from_dict(stats).set_index("index") for stats in cell_statistics],
         keys=[f"Frame {frame}" for frame in range(len(cell_statistics))],
     )
-    df.to_csv(filename)
+    df.to_csv(filename, index_label=["frame", "label"])
 
     # confirm export
     message = f"'{labels.name}' cell statistics written to {filename}"
