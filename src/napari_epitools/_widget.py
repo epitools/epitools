@@ -389,6 +389,10 @@ def run_cell_statistics(
     # We will use these to update the cell stats at each frame
     labels.metadata["cell_statistics"] = cell_statistics
 
+    # confirm calculation finished
+    message = f"'Finished calculating cell statistics for '{labels.name}'"
+    napari.utils.notifications.show_info(message)
+
     # Set cell stats for the current frame
     viewer = napari.current_viewer()
     current_frame = viewer.dims.current_step[0]
@@ -436,7 +440,7 @@ def _cell_statistics_to_csv(
 
     df = pd.concat(
         [pd.DataFrame.from_dict(stats).set_index("index") for stats in cell_statistics],
-        keys=[f"Frame {frame}" for frame in range(len(cell_statistics))],
+        keys=list(range(len(cell_statistics))),
     )
     df.to_csv(filename, index_label=["frame", "label"])
 
