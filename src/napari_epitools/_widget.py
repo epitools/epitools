@@ -280,9 +280,8 @@ def segmentation_widget(
 
 
 def cell_statistics_widget() -> magicgui.widgets.Container:
-    """Create a widget for calculating region properties of labelled segmentations."""
+    """Create a widget for calculating cell statistics of labelled segmentations."""
 
-    # First create our UI along with some default configs for the widgets
     widgets = _create_cell_statistics_widgets()
     cell_statistics_widget = magicgui.widgets.Container(
         widgets=widgets,
