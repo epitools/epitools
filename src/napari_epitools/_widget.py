@@ -17,8 +17,8 @@ from napari.qt.threading import thread_worker
 from napari.utils.notifications import show_error
 
 from napari_epitools.analysis import (
+    calculate_cell_statistics,
     calculate_projection,
-    calculate_regionprops,
     calculate_segmentation,
 )
 
@@ -279,43 +279,45 @@ def segmentation_widget(
     return run()
 
 
-def regionprops_widget() -> magicgui.widgets.Container:
+def cell_statistics_widget() -> magicgui.widgets.Container:
     """Create a widget for calculating region properties of labelled segmentations."""
 
     # First create our UI along with some default configs for the widgets
-    widgets = _create_regionprops_widgets()
-    regionprops_widget = magicgui.widgets.Container(
+    widgets = _create_cell_statistics_widgets()
+    cell_statistics_widget = magicgui.widgets.Container(
         widgets=widgets,
         scrollable=False,
     )
 
     viewer = napari.current_viewer()
-    regionprops_widget.viewer = viewer
+    cell_statistics_widget.viewer = viewer
 
-    # Update regionprops when scrolling through frames
+    # Update cell_statistics when scrolling through frames
     viewer.dims.events.current_step.connect(
-        lambda event: _update_regionprops(layers=viewer.layers, frame=event.value[0]),
-    )
-
-    # calculate regionprops when pressing 'Run' button
-    regionprops_widget.run.changed.connect(
-        lambda: run_regionprops(
-            image=regionprops_widget.input_image.value,
-            labels=regionprops_widget.input_labels.value,
+        lambda event: _update_cell_statistics(
+            layers=viewer.layers, frame=event.value[0]
         ),
     )
 
-    # write the regionprops to CSV
-    regionprops_widget.export.changed.connect(
-        lambda: export_regionprops(
-            labels=regionprops_widget.input_labels.value,
+    # calculate cell_statistics when pressing 'Run' button
+    cell_statistics_widget.run.changed.connect(
+        lambda: run_cell_statistics(
+            image=cell_statistics_widget.input_image.value,
+            labels=cell_statistics_widget.input_labels.value,
         ),
     )
 
-    return regionprops_widget
+    # write the cell_statistics to CSV
+    cell_statistics_widget.export.changed.connect(
+        lambda: export_cell_statistics(
+            labels=cell_statistics_widget.input_labels.value,
+        ),
+    )
+
+    return cell_statistics_widget
 
 
-def _create_regionprops_widgets() -> list[Widget]:
+def _create_cell_statistics_widgets() -> list[Widget]:
     """Create widgets for calculating and exporting cell statistics"""
 
     image_tooltip = "Select an 'Image' layer to use for calculating cell statistics."
@@ -358,45 +360,45 @@ def _create_regionprops_widgets() -> list[Widget]:
     return [image, labels, run, export]
 
 
-def _update_regionprops(
+def _update_cell_statistics(
     layers: list[napari.layers.Layer],
     frame: int,
 ) -> None:
-    """Update Labels regionprops for current frame"""
+    """Update Labels cell_statistics for current frame"""
 
     for layer in layers:
         try:
-            layer.features = layer.metadata["frame_features"][frame]
+            layer.features = layer.metadata["cell_statistics"][frame]
         except KeyError:
             pass
         except IndexError:
             pass
 
 
-def run_regionprops(
+def run_cell_statistics(
     image: napari.layers.Image,
     labels: napari.layers.Labels,
 ) -> None:
     """Calculate cell statistics for all frames in the selected Image and Labels"""
 
-    regionprops = calculate_regionprops(
+    cell_statistics = calculate_cell_statistics(
         image=image.data,
         labels=labels.data,
     )
 
     # We will use these to update the cell stats at each frame
-    labels.metadata["frame_features"] = regionprops
+    labels.metadata["cell_statistics"] = cell_statistics
 
     # Set cell stats for the current frame
     viewer = napari.current_viewer()
     current_frame = viewer.dims.current_step[0]
     try:
-        labels.features = regionprops[current_frame]
+        labels.features = cell_statistics[current_frame]
     except IndexError:
         pass
 
 
-def export_regionprops(
+def export_cell_statistics(
     labels: napari.layers.Labels,
 ) -> None:
     """Get filename for exporting Labels cell statitics to CSV"""
@@ -413,28 +415,28 @@ def export_regionprops(
     if filename is None:
         return
 
-    _regionprops_to_csv(
+    _cell_statistics_to_csv(
         filename=filename,
         labels=labels,
     )
 
 
-def _regionprops_to_csv(
+def _cell_statistics_to_csv(
     filename: os.PathLike,
     labels: napari.layers.Labels,
 ) -> None:
     """Write cell statistics for all frames in the selected Labels to CSV"""
 
     try:
-        frame_features = labels.metadata["frame_features"]
+        cell_statistics = labels.metadata["cell_statistics"]
     except KeyError:
         message = f"'{labels.name}' has no cell statistics to export"
         napari.utils.notifications.show_error(message)
         return
 
     df = pd.concat(
-        [pd.DataFrame.from_dict(features) for features in frame_features],
-        keys=[f"Frame {frame}" for frame in range(len(frame_features))],
+        [pd.DataFrame.from_dict(features) for features in cell_statistics],
+        keys=[f"Frame {frame}" for frame in range(len(cell_statistics))],
     )
     df.to_csv(filename)
 

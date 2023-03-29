@@ -15,7 +15,7 @@ import napari
 import skimage.measure
 
 
-def calculate_regionprops(
+def calculate_cell_statistics(
     image: napari.types.ImageData,
     labels: napari.types.LabelsData,
 ) -> list[dict[str, npt.NDArray]]:
@@ -23,8 +23,8 @@ def calculate_regionprops(
 
     properties = ["label", "area", "perimeter", "orientation"]
 
-    # Calculate regionprops for each frame
-    regionprops = [
+    # Calculate cell statistics for each frame
+    cell_statistics = [
         skimage.measure.regionprops_table(
             label_image=frame_labels,
             intensity_image=frame_image,
@@ -34,7 +34,7 @@ def calculate_regionprops(
     ]
 
     # skimage uses 'label' for what napari calls 'index'
-    for frame_regionprops in regionprops:
-        frame_regionprops["index"] = frame_regionprops.pop("label")
+    for frame_stats in cell_statistics:
+        frame_stats["index"] = frame_stats.pop("label")
 
-    return regionprops
+    return cell_statistics

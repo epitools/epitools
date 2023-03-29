@@ -71,9 +71,9 @@ _, segmentation_widget = viewer.window.add_plugin_dock_widget(
     plugin_name="napari-epitools",
     widget_name="Segmentation (local minima seeded watershed)",
 )
-_, regionprops_widget = viewer.window.add_plugin_dock_widget(
+_, cell_statistics_widget = viewer.window.add_plugin_dock_widget(
     plugin_name="napari-epitools",
-    widget_name="RegionProps (cell statistics)",
+    widget_name="Cell statistics",
 )
 
 
