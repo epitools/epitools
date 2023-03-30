@@ -178,7 +178,7 @@ def _init_segmentation_widget(widget):
 
     viewer = napari.current_viewer()
 
-    # Automatically select newly added Labels
+    # Automatically select a newly added Image layer
     viewer.layers.events.inserted.connect(
         lambda event: _select_inserted_image(event.value, widget.input_image),
     )
@@ -190,7 +190,9 @@ def _select_inserted_image(new_layer, widget):
     if not isinstance(new_layer, napari.layers.Image):
         return
 
-    widget.native.setCurrentIndex(len(widget) - 1)
+    widget.native.setCurrentIndex(
+        len(widget) - 1
+    )  # the new layer is always last in the list
 
 
 @magic_factory(
