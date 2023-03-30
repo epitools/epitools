@@ -380,13 +380,14 @@ def run_cell_statistics(
 ) -> None:
     """Calculate cell statistics for all frames in the selected Image and Labels"""
 
-    cell_statistics = calculate_cell_statistics(
+    cell_statistics, graphs = calculate_cell_statistics(
         image=image.data,
         labels=labels.data,
     )
 
     # We will use these to update the cell stats at each frame
     labels.metadata["cell_statistics"] = cell_statistics
+    labels.metadata["graphs"] = graphs
 
     # confirm calculation finished
     message = f"'Finished calculating cell statistics for '{labels.name}'"
