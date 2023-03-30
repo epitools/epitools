@@ -173,10 +173,31 @@ def projection_widget(
     return run()
 
 
+def _init_segmentation_widget(widget):
+    """Add callbacks for the widget"""
+
+    viewer = napari.current_viewer()
+
+    # Automatically select newly added Labels
+    viewer.layers.events.inserted.connect(
+        lambda event: _select_inserted_image(event.value, widget.input_image),
+    )
+
+
+def _select_inserted_image(new_layer, widget):
+    """Update the selected Image when a image layer is added"""
+
+    if not isinstance(new_layer, napari.layers.Image):
+        return
+
+    widget.native.setCurrentIndex(len(widget) - 1)
+
+
 @magic_factory(
     spot_sigma=SPOT_SIGMA,
     outline_sigma=OUTLINE_SIGMA,
     threshold=THRESHOLD,
+    widget_init=_init_segmentation_widget,
 )
 def segmentation_widget(
     input_image: napari.types.ImageData,
