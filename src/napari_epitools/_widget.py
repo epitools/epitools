@@ -390,7 +390,7 @@ def run_cell_statistics(
     labels.metadata["graphs"] = graphs
 
     # confirm calculation finished
-    message = f"'Finished calculating cell statistics for '{labels.name}'"
+    message = f"Finished calculating cell statistics for '{labels.name}'"
     napari.utils.notifications.show_info(message)
 
     # Set cell stats for the current frame
