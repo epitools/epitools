@@ -15,6 +15,8 @@ from skimage.io import imread
 
 def load_sample_data():
     """Generates an image"""
-    img_path = Path("sample_data") / "8bitDataset" / "test_image.tif"
+    img_path = (
+        Path("sample_data") / "4d" / "181210_DM_CellMOr_subsub_reg_decon-1_cropped.tif"
+    )
     data = imread(img_path)
     return [(data, {"name": "Epitools test data"})]
