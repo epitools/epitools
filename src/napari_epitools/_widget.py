@@ -200,9 +200,8 @@ def _select_inserted_image(
     if not isinstance(new_layer, napari.layers.Image):
         return
 
-    widget.native.setCurrentIndex(
-        len(widget) - 1
-    )  # the new layer is always last in the list
+    # the new layer is always last in the list
+    widget.native.setCurrentIndex(len(widget) - 1)
 
 
 @magic_factory(
