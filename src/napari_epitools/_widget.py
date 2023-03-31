@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import magicgui.widgets
+import napari.layers
 import napari.qt.threading
 import napari.types
 import numpy as np
@@ -173,18 +175,26 @@ def projection_widget(
     return run()
 
 
-def _init_segmentation_widget(widget):
-    """Add callbacks for the widget"""
+def _init_segmentation_widget(
+    container: magicgui.widgets._function_gui.FunctionGui,
+):
+    """Add callbacks for the widget that is used to select the input image"""
 
     viewer = napari.current_viewer()
 
     # Automatically select a newly added Image layer
     viewer.layers.events.inserted.connect(
-        lambda event: _select_inserted_image(event.value, widget.input_image),
+        lambda event: _select_inserted_image(
+            new_layer=event.value,
+            widget=container.input_image,
+        ),
     )
 
 
-def _select_inserted_image(new_layer, widget):
+def _select_inserted_image(
+    new_layer: napari.layers.Layer,
+    widget: magicgui.widgets.ComboBox,
+):
     """Update the selected Image when a image layer is added"""
 
     if not isinstance(new_layer, napari.layers.Image):
