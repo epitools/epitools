@@ -78,9 +78,11 @@ def _create_graphs(
     for index, graph in enumerate(graphs):
         try:
             graph.remove_node(0)
+            message = f"Removing background node for graph at frame {index}"
+            logger.log(level=2, msg=message)
         except networkx.exception.NetworkXError:
             message = f"No background node to remove for graph at frame {index}"
-            logger.debug(message)
+            logger.log(level=2, msg=message)
 
     return graphs
 

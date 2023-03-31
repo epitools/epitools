@@ -380,12 +380,12 @@ def _update_cell_statistics(
             layer.features = layer.metadata["cell_statistics"][frame]
         except KeyError:
             message = f"No cell statistics to load for layer {layer.name}"
-            logger.debug(message)
+            logger.log(level=1, msg=message)
         except IndexError:
             message = (
                 f"No cell statistics to load for layer {layer.name} at frame {frame}"
             )
-            logger.debug(message)
+            logger.log(level=9, msg=message)
 
 
 def run_cell_statistics(
