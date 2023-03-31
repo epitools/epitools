@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 
 import magicgui.widgets
@@ -14,13 +15,14 @@ from magicgui.types import FileDialogMode
 from magicgui.widgets.bases import Widget
 from napari import current_viewer
 from napari.qt.threading import thread_worker
-from napari.utils.notifications import show_error
 
 from napari_epitools.analysis import (
     calculate_cell_statistics,
     calculate_projection,
     calculate_segmentation,
 )
+
+logger = logging.getLogger(__name__)
 
 # Rendering properties of seeds
 SEED_SIZE = 3
@@ -115,6 +117,8 @@ def _add_layers(widget: Widget, layers: list[napari.types.LayerDataTuple]) -> No
             widget.viewer.layers[layer_data.get("name")].data = data
         except KeyError:
             add_layer_func[layer_type](data, **layer_data)
+            message = f"Adding a new layer {layer_data['name']}"
+            logger.debug(message)
 
     _reset_axes(widget)
 
@@ -150,7 +154,7 @@ def projection_widget(
     """
 
     if input_image is None:
-        show_error("Load an image first")
+        napari.utils.notifications.show_error("Load an image first")
         return None
 
     def handle_returned(projection: npt.NDArray[np.float64]) -> None:
@@ -203,6 +207,12 @@ def _select_inserted_image(
     """Update the selected Image when a image layer is added"""
 
     if not isinstance(new_layer, napari.layers.Image):
+        message = (
+            f"Not selecting new layer {new_layer.name} as input for the "
+            f"segmentation widget as {new_layer.name} is {type(new_layer)} "
+            "layer not a Labels layer."
+        )
+        logger.debug(message)
         return
 
     # the new layer is always last in the list
@@ -239,7 +249,7 @@ def segmentation_widget(
     """
 
     if input_image is None:
-        show_error("Load a projection first")
+        napari.utils.notifications.show_error("Load a projection first")
         return None
 
     def handle_returned(
@@ -369,9 +379,13 @@ def _update_cell_statistics(
         try:
             layer.features = layer.metadata["cell_statistics"][frame]
         except KeyError:
-            pass
+            message = f"No cell statistics to load for layer {layer.name}"
+            logger.debug(message)
         except IndexError:
-            pass
+            message = (
+                f"No cell statistics to load for layer {layer.name} at frame {frame}"
+            )
+            logger.debug(message)
 
 
 def run_cell_statistics(
@@ -399,7 +413,10 @@ def run_cell_statistics(
     try:
         labels.features = cell_statistics[current_frame]
     except IndexError:
-        pass
+        message = (
+            f"No cell statistics to load for {labels.name} at frame {current_frame}"
+        )
+        logger.debug(message)
 
 
 def export_cell_statistics(
@@ -417,6 +434,8 @@ def export_cell_statistics(
     )
 
     if filename is None:
+        message = f"Cel statistics not saved for {labels.name} - no filename given"
+        napari.utils.notifications.show_info(message)
         return
 
     _cell_statistics_to_csv(

@@ -5,6 +5,7 @@ of labelled images using skimage.
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,6 +17,8 @@ import networkx.exception
 import numpy as np
 import skimage.graph
 import skimage.measure
+
+logger = logging.getLogger(__name__)
 
 
 def calculate_cell_statistics(
@@ -72,11 +75,12 @@ def _create_graphs(
     graphs = [skimage.graph.RAG(frame_labels) for frame_labels in labels]
 
     # remove the background if it exists
-    for graph in graphs:
+    for index, graph in enumerate(graphs):
         try:
             graph.remove_node(0)
         except networkx.exception.NetworkXError:
-            pass
+            message = f"No background node to remove for graph at frame {index}"
+            logger.debug(message)
 
     return graphs
 
