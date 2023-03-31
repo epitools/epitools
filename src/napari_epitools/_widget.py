@@ -445,5 +445,5 @@ def _cell_statistics_to_csv(
     df.to_csv(filename, index_label=["frame", "label"])
 
     # confirm export
-    message = f"'{labels.name}' cell statistics written to {filename}"
+    message = f"'{labels.name}' cell statistics written to '{filename}'"
     napari.utils.notifications.show_info(message)
