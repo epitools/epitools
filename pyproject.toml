@@ -24,13 +24,14 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "napari-assistant",
-    "napari-skimage-regionprops",
-    "napari-time-slicer>=0.4.8",
-    "napari-tools-menu",
     "numpy",
+    "scipy",
+    "pandas",
+    "matplotlib",
+    "napari",
+    "magicgui",
     "qtpy",
-    "scikit-image",
+    "scikit-image>=0.20",
 ]
 description = "EpiTools Plugin"
 dynamic = [
