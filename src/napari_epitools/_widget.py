@@ -404,11 +404,11 @@ def _create_colour_labels_widgets() -> list[Widget]:
     statisitc_tooltip = "Select which statistic to use for colouring the 'Labels'"
     statistic = magicgui.widgets.create_widget(
         name="colourmap_statistic",
-        value="None",
+        value="id",
         label="statistic",
         widget_type="ComboBox",
         options={
-            "choices": ["None", "area", "perimeter", "orientation", "neighbours"],
+            "choices": ["id", "area", "perimeter", "orientation", "neighbours"],
             "tooltip": statisitc_tooltip,
         },
     )
@@ -588,7 +588,7 @@ def create_colourmaps(
 ) -> None:
     """Create a colourmap for a cell statistic each frame.
 
-    If the statistic is set to "None", then the colour mode is set to "auto", which will
+    If the statistic is set to "id", then the colour mode is set to "auto", which will
     colour regions based on their ids.
 
     If the statistics is set to any other value, a colourmap is created for that
@@ -603,7 +603,7 @@ def create_colourmaps(
         napari.utils.notifications.show_error(_msg)
         return
 
-    if colourmap_statistic == "None":
+    if colourmap_statistic == "id":
         labels.metadata.pop("metadata", None)
         labels.color_mode = "auto"
         return
