@@ -491,9 +491,11 @@ def _update_cell_statistics(
         try:
             layer.color = layer.metadata["colourmaps"][frame]
         except KeyError:
-            pass
+            message = f"No colourmaps load apply to layer {layer.name}"
+            logger.log(level=1, msg=message)
         except IndexError:
-            pass
+            message = f"No colourmap to apply for layer {layer.name} at frame {frame}"
+            logger.log(level=9, msg=message)
 
 
 def run_cell_statistics(
@@ -631,13 +633,18 @@ def create_colourmaps(
 
     labels.metadata["colourmaps"] = colourmaps
 
+    # confirm colourmaps created
+    message = f"'{colourmap_statistic}' colourmaps created for '{labels.name}'"
+    napari.utils.notifications.show_info(message)
+
     # Set cell colourmap for the current frame
     viewer = napari.current_viewer()
     current_frame = viewer.dims.current_step[0]
     try:
         labels.color = colourmaps[current_frame]
     except IndexError:
-        return
+        message = f"No colourmap to apply for {labels.name} at frame {current_frame}"
+        logger.debug(message)
 
 
 def _create_colourmap(
