@@ -28,7 +28,7 @@ https://napari.org/plugins/index.html
 To install, please clone the repository and do a local install using `pip`:
 
 ```
-git clone git@github.com:epitools/epitools.git
+git clone https://github.com/epitools/epitools.git
 cd epitools
 python -m pip install .
 ```
