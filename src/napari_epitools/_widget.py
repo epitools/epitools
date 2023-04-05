@@ -659,4 +659,4 @@ def _create_colourmap(
     colourmap_data = np.clip(colourmap_data, a_min=0, a_max=1)
     colours = plt.cm.turbo(colourmap_data)
 
-    return {index: colour for index, colour in zip(indices, colours)}
+    return dict(zip(indices, colours))
