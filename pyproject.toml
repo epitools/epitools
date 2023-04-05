@@ -25,12 +25,12 @@ classifiers = [
 ]
 dependencies = [
     "napari-assistant",
-    "napari-skimage-regionprops",
+    "napari-pyclesperanto-assistant",
     "napari-time-slicer>=0.4.8",
     "napari-tools-menu",
     "numpy",
     "qtpy",
-    "scikit-image",
+    "scikit-image>=0.20",
 ]
 description = "EpiTools Plugin"
 dynamic = [
