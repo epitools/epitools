@@ -24,11 +24,10 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "napari-assistant",
-    "napari-pyclesperanto-assistant",
-    "napari-time-slicer>=0.4.8",
-    "napari-tools-menu",
     "numpy",
+    "scipy",
+    "pandas",
+    "napari",
     "qtpy",
     "scikit-image>=0.20",
 ]
