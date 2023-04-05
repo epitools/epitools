@@ -27,7 +27,9 @@ dependencies = [
     "numpy",
     "scipy",
     "pandas",
+    "matplotlib",
     "napari",
+    "magicgui",
     "qtpy",
     "scikit-image>=0.20",
 ]
