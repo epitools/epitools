@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def calculate_cell_statistics(
     image: napari.types.ImageData,
     labels: napari.types.LabelsData,
-) -> tuple[list[dict[str, npt.NDArray]], list[skimage.graph._rag.RAG]]:
+) -> tuple[list[dict[str, npt.NDArray]], list[skimage.graph.RAG]]:
     """Calculate the region based properties of a segmented image"""
 
     # Calculate cell statistics for each frame
@@ -69,7 +69,7 @@ def _calculate_cell_statistics(
 
 def _create_graphs(
     labels: napari.types.LabelsData,
-) -> skimage.graph._rag.RAG:
+) -> list[skimage.graph.RAG]:
     """Create graph of neighbouring cells"""
 
     graphs = [skimage.graph.RAG(frame_labels) for frame_labels in labels]

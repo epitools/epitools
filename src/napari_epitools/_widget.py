@@ -4,6 +4,7 @@ import logging
 import os
 
 import magicgui.widgets
+import matplotlib.pyplot as plt
 import napari.layers
 import napari.qt.threading
 import napari.types
@@ -292,9 +293,11 @@ def segmentation_widget(
 def cell_statistics_widget() -> magicgui.widgets.Container:
     """Create a widget for calculating cell statistics of labelled segmentations."""
 
-    widgets = _create_cell_statistics_widgets()
+    cell_statistics_widgets = _create_cell_statistics_widgets()
+    colour_labels_widgets = _create_colour_labels_widgets()
+
     cell_statistics_widget = magicgui.widgets.Container(
-        widgets=widgets,
+        widgets=[*cell_statistics_widgets, *colour_labels_widgets],
         scrollable=False,
     )
 
@@ -304,7 +307,8 @@ def cell_statistics_widget() -> magicgui.widgets.Container:
     # Update cell_statistics when scrolling through frames
     viewer.dims.events.current_step.connect(
         lambda event: _update_cell_statistics(
-            layers=viewer.layers, frame=event.value[0]
+            layers=viewer.layers,
+            frame=event.value[0],
         ),
     )
 
@@ -321,6 +325,17 @@ def cell_statistics_widget() -> magicgui.widgets.Container:
         lambda: export_cell_statistics(
             labels=cell_statistics_widget.input_labels.value,
         ),
+    )
+
+    # create colourmap for selected Labels
+    cell_statistics_widget.colourmap_create_button.changed.connect(
+        lambda: create_colourmaps(
+            labels=cell_statistics_widget.colourmap_input_labels.value,
+            colourmap_statistic=cell_statistics_widget.colourmap_statistic.current_choice,
+            lower_limit=cell_statistics_widget.colourmap_lower_limit,
+            upper_limit=cell_statistics_widget.colourmap_upper_limit,
+            autolimits=cell_statistics_widget.colourmap_autolimits.value,
+        )
     )
 
     return cell_statistics_widget
@@ -369,11 +384,97 @@ def _create_cell_statistics_widgets() -> list[Widget]:
     return [image, labels, run, export]
 
 
+def _create_colour_labels_widgets() -> list[Widget]:
+    """Create widgets for colouring Labels layers by their featuers"""
+
+    create_colour_labels_heading = magicgui.widgets.create_widget(
+        label="<b>Colour by statistic</b>",  # bold label
+        widget_type="Label",
+        gui_only=True,
+    )
+
+    labels_tooltip = "Select a 'Labels' layer to set colourmap for"
+    labels = magicgui.widgets.create_widget(
+        annotation=napari.layers.Labels,
+        name="colourmap_input_labels",
+        label="labels",
+        options={"tooltip": labels_tooltip},
+    )
+
+    statisitc_tooltip = "Select which statistic to use for colouring the 'Labels'"
+    statistic = magicgui.widgets.create_widget(
+        name="colourmap_statistic",
+        value="id",
+        label="statistic",
+        widget_type="ComboBox",
+        options={
+            "choices": ["id", "area", "perimeter", "orientation", "neighbours"],
+            "tooltip": statisitc_tooltip,
+        },
+    )
+
+    lower_limit_tooltip = "Set the lower limit for the colourmap"
+    lower_limit = magicgui.widgets.create_widget(
+        value=0.0,
+        name="colourmap_lower_limit",
+        label="lower limit",
+        widget_type="FloatSpinBox",
+        options={
+            "tooltip": lower_limit_tooltip,
+            "min": -3.4 * 10**38,
+            "max": 3.4 * 10**38,
+        },
+    )
+
+    upper_limit_tooltip = "Set the upper limit for the colourmap"
+    upper_limit = magicgui.widgets.create_widget(
+        value=100.0,
+        name="colourmap_upper_limit",
+        label="upper limit",
+        widget_type="FloatSpinBox",
+        options={
+            "tooltip": upper_limit_tooltip,
+            "min": -3.4 * 10**38,
+            "max": 3.4 * 10**38,
+        },
+    )
+
+    auto_limits_tooltip = "Automatically set colourmap limits based on feature values."
+    auto_limits = magicgui.widgets.create_widget(
+        value=False,
+        name="colourmap_autolimits",
+        label="Auto-limits",
+        widget_type="CheckBox",
+        options={"tooltip": auto_limits_tooltip},
+    )
+
+    create_colourmap_tooltip = "Create colourmap for the selected Labels layer"
+    create_colourmap = magicgui.widgets.create_widget(
+        name="colourmap_create_button",
+        label="Create colourmap",
+        widget_type="PushButton",
+        options={"tooltip": create_colourmap_tooltip},
+    )
+
+    return [
+        create_colour_labels_heading,
+        labels,
+        statistic,
+        lower_limit,
+        upper_limit,
+        auto_limits,
+        create_colourmap,
+    ]
+
+
 def _update_cell_statistics(
     layers: list[napari.layers.Layer],
     frame: int,
 ) -> None:
-    """Update Labels cell_statistics for current frame"""
+    """Update Labels cell_statistics for current frame.
+
+    Apply any colourmaps for the Labels layers at the current frame.
+    """
 
     for layer in layers:
         try:
@@ -385,6 +486,15 @@ def _update_cell_statistics(
             message = (
                 f"No cell statistics to load for layer {layer.name} at frame {frame}"
             )
+            logger.log(level=9, msg=message)
+
+        try:
+            layer.color = layer.metadata["colourmaps"][frame]
+        except KeyError:
+            message = f"No colourmaps load apply to layer {layer.name}"
+            logger.log(level=1, msg=message)
+        except IndexError:
+            message = f"No colourmap to apply for layer {layer.name} at frame {frame}"
             logger.log(level=9, msg=message)
 
 
@@ -466,3 +576,87 @@ def _cell_statistics_to_csv(
     # confirm export
     message = f"'{labels.name}' cell statistics written to '{filename}'"
     napari.utils.notifications.show_info(message)
+
+
+def create_colourmaps(
+    labels: napari.layers.Labels,
+    colourmap_statistic: str,
+    lower_limit: Widget,
+    upper_limit: Widget,
+    *,
+    autolimits: bool,
+) -> None:
+    """Create a colourmap for a cell statistic each frame.
+
+    If the statistic is set to "id", then the colour mode is set to "auto", which will
+    colour regions based on their ids.
+
+    If the statistics is set to any other value, a colourmap is created for that
+    statistic for each frame.
+    """
+
+    if "cell_statistics" not in labels.metadata:
+        _msg = (
+            "Cannot create colourmaps - "
+            "the selected Labels layer has no cell staistics."
+        )
+        napari.utils.notifications.show_error(_msg)
+        return
+
+    if colourmap_statistic == "id":
+        labels.metadata.pop("metadata", None)
+        labels.color_mode = "auto"
+        return
+
+    cell_statistics = [
+        frame_statistics[colourmap_statistic]
+        for frame_statistics in labels.metadata["cell_statistics"]
+    ]
+    cell_indices = [
+        frame_statistics["index"]
+        for frame_statistics in labels.metadata["cell_statistics"]
+    ]
+
+    if autolimits:
+        lower_limit.value = min(min(statistics) for statistics in cell_statistics)
+        upper_limit.value = max(max(statistics) for statistics in cell_statistics)
+
+    colourmaps = [
+        _create_colourmap(
+            float(lower_limit.value),
+            float(upper_limit.value),
+            statistics,
+            indices,
+        )
+        for statistics, indices in zip(cell_statistics, cell_indices)
+    ]
+
+    labels.metadata["colourmaps"] = colourmaps
+
+    # confirm colourmaps created
+    message = f"'{colourmap_statistic}' colourmaps created for '{labels.name}'"
+    napari.utils.notifications.show_info(message)
+
+    # Set cell colourmap for the current frame
+    viewer = napari.current_viewer()
+    current_frame = viewer.dims.current_step[0]
+    try:
+        labels.color = colourmaps[current_frame]
+    except IndexError:
+        message = f"No colourmap to apply for {labels.name} at frame {current_frame}"
+        logger.debug(message)
+
+
+def _create_colourmap(
+    lower_limit: float,
+    upper_limit: float,
+    statistics: npt.NDArray,
+    indices: npt.NDArray,
+) -> dict[int, npt.NDArray]:
+    """Create a dictionary of colours - one per unique region"""
+
+    colourmap_data = (statistics - lower_limit) / upper_limit
+    colourmap_data = np.clip(colourmap_data, a_min=0, a_max=1)
+    colours = plt.cm.turbo(colourmap_data)
+
+    return dict(zip(indices, colours))
