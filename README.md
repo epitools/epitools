@@ -23,9 +23,15 @@ https://napari.org/plugins/index.html
 
 ## Installation
 
-You can install `napari-epitools` via [pip]:
+`napari-epitools` is not yet available to install from PyPI or napari-hub.
 
-    pip install napari-epitools
+To install, please clone the repository and do a local install using `pip`:
+
+```
+git clone git@github.com:epitools/epitools.git
+cd epitools
+python -m pip install .
+```
 
 ## Contributing
 
