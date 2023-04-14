@@ -263,7 +263,7 @@ def export_cell_statistics(
     )
 
     if filename is None:
-        message = f"Cel statistics not saved for {labels.name} - no filename given"
+        message = f"Cell statistics not saved for {labels.name} - no filename given"
         napari.utils.notifications.show_info(message)
         return
 
