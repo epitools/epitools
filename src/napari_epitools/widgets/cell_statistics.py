@@ -15,12 +15,10 @@ def create_cell_statistics_widget() -> magicgui.widgets.Container:
     cell_statistics_widgets = _create_cell_statistics_widgets()
     colour_labels_widgets = _create_colour_labels_widgets()
 
-    cell_statistics_widget = magicgui.widgets.Container(
+    return magicgui.widgets.Container(
         widgets=[*cell_statistics_widgets, *colour_labels_widgets],
         scrollable=False,
     )
-
-    return cell_statistics_widget
 
 
 def _create_cell_statistics_widgets() -> list[Widget]:
