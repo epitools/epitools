@@ -11,7 +11,6 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from magicgui.types import FileDialogMode
-from magicgui.widgets.bases import Widget
 
 import napari_epitools.analysis
 import napari_epitools.widgets
@@ -300,8 +299,8 @@ def _cell_statistics_to_csv(
 def create_colourmaps(
     labels: napari.layers.Labels,
     colourmap_statistic: str,
-    lower_limit: Widget,
-    upper_limit: Widget,
+    lower_limit: magicgui.widgets.FloatSlider,
+    upper_limit: magicgui.widgets.FloatSlider,
     *,
     autolimits: bool,
 ) -> None:
