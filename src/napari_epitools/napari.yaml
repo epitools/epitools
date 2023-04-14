@@ -15,13 +15,13 @@ contributions:
       python_name: napari_epitools._sample_data:load_sample_data
       title: Load sample data from napari EpiTools
     - id: napari-epitools.projection_widget
-      python_name: napari_epitools._widget:projection_widget
+      python_name: napari_epitools.main:create_projection_widget
       title: Epitools Projection Widget
     - id: napari-epitools.segmentation_widget
-      python_name: napari_epitools._widget:segmentation_widget
+      python_name: napari_epitools.main:create_segmentation_widget
       title: Epitools Segmentation Widget
     - id: napari-epitools.cell_statistics_widget
-      python_name: napari_epitools._widget:cell_statistics_widget
+      python_name: napari_epitools.main:create_cell_statistics_widget
       title: Epitools cell statistics widget
   readers:
     - command: napari-epitools.get_reader
