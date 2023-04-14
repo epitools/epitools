@@ -93,6 +93,7 @@ isort = {known-first-party = [
     "first-party",
     "local-folder",
 ], "sections.napari" = [
+    "magicgui",
     "napari",
 ]}
 select = [
