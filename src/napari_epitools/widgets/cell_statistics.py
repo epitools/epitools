@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import magicgui.widgets
 import napari
 from magicgui.widgets import Widget
