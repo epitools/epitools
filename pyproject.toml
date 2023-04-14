@@ -57,7 +57,9 @@ optional-dependencies.dev = [
 
 [tool.coverage]
 report = {skip_covered = true, sort = "cover"}
-run = {branch = true, parallel = true, source = ["napari_epitools"]}
+run = {branch = true, parallel = true, source = [
+    "napari_epitools",
+]}
 paths.source = [
     "src",
     ".tox*/*/lib/python*/site-packages",
@@ -81,6 +83,18 @@ ignore = [
     "B905", # set 'strict=' for zip
     "SIM105", # use contextlib.suppress(IndexError)
 ]
+isort = {known-first-party = [
+    "napari_epitools",
+], section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "napari",
+    "first-party",
+    "local-folder",
+], "sections.napari" = [
+    "napari",
+]}
 select = [
     "A",
     "B",
@@ -108,7 +122,6 @@ select = [
     "W",
     "YTT",
 ]
-isort.known-first-party = ["napari_epitools"]
 mccabe.max-complexity = 18
 
 [tool.setuptools_scm]
@@ -119,6 +132,7 @@ spaces_indent_inline_array = 4
 trailing_comma_inline_array = true
 overrides."project.classifiers".inline_arrays = false
 overrides."tool.coverage.paths.source".inline_arrays = false
+overrides."tool.ruff.isort.section-order".inline_arrays = false
 
 [tool.tox]
 legacy_tox_ini = """
