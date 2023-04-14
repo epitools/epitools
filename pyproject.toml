@@ -71,7 +71,7 @@ plugins = [
 [tool.pytest.ini_options]
 addopts = "--color=yes -v"
 testpaths = [
-    "src",
+    "tests",
 ]
 
 [tool.ruff]
