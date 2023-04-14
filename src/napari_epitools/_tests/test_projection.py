@@ -38,7 +38,7 @@ def test_add_projection_widget(make_napari_viewer):
         widget_name="Projection (selective plane)",
     )
 
-    assert len(list(viewer.window._dock_widgets)) == num_dw + 1  # noqa: S101
+    assert len(list(viewer.window._dock_widgets)) == num_dw + 1
 
 
 @pytest.mark.skip(reason="unfinished")
@@ -65,8 +65,8 @@ def test_calculate_projection(sample_data):
             SURFACE_SMOOTHNESS_2,
             CUT_OFF_DISTANCE,
         )
-        assert projection.ndim == PROJECTION_NDIM  # noqa: S101
-        assert projection.shape == (  # noqa: S101
+        assert projection.ndim == PROJECTION_NDIM
+        assert projection.shape == (
             1,  # single frame in the timeseries
             sample_data.shape[1],
             sample_data.shape[2],
