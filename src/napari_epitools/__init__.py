@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging
 
+__all__: list[str] = []
 __version__ = "0.0.1"
 
 # get the logger instance

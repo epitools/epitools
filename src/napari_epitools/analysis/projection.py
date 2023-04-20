@@ -5,7 +5,7 @@ import numpy.typing as npt
 from scipy.interpolate import griddata
 from skimage.filters import gaussian
 
-IMAGE_NDIM = 3
+THREE_DIMENSIONAL = 3
 
 
 def _smooth(
@@ -112,8 +112,9 @@ def calculate_projection(
     Returns:
         Stack projected onto a single plane.
     """
-    if input_image.ndim == IMAGE_NDIM:
-        # assume we have a stack of images at a single point in time
+    if input_image.ndim == THREE_DIMENSIONAL:
+        # Assume we have a stack of images at a single point in time (ZYX)
+        # Expand so we have TZYX
         input_image = np.expand_dims(input_image, axis=0)
 
     t_size, z_size, y_size, x_size = input_image.shape

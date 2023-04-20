@@ -73,7 +73,7 @@ plugins = [
 [tool.pytest.ini_options]
 addopts = "--color=yes -v"
 testpaths = [
-    "src",
+    "tests",
 ]
 
 [tool.ruff]
@@ -83,6 +83,11 @@ ignore = [
     "B905", # set 'strict=' for zip
     "SIM105", # use contextlib.suppress(IndexError)
 ]
+per-file-ignores = {"__init__.py" = [
+    "F401", # unused-import
+], "test_*.py" = [
+    "S101", # use of 'assert'
+]}
 select = [
     "A",
     "B",
