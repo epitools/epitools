@@ -83,19 +83,6 @@ ignore = [
     "B905", # set 'strict=' for zip
     "SIM105", # use contextlib.suppress(IndexError)
 ]
-isort = {known-first-party = [
-    "napari_epitools",
-], section-order = [
-    "future",
-    "standard-library",
-    "third-party",
-    "napari",
-    "first-party",
-    "local-folder",
-], "sections.napari" = [
-    "magicgui",
-    "napari",
-]}
 select = [
     "A",
     "B",
@@ -122,6 +109,21 @@ select = [
     "UP",
     "W",
     "YTT",
+]
+isort.known-first-party = [
+    "napari_epitools",
+]
+isort.section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "napari",
+    "first-party",
+    "local-folder",
+]
+isort.sections.napari = [
+    "magicgui",
+    "napari",
 ]
 mccabe.max-complexity = 18
 
