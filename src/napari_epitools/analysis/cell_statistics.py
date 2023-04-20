@@ -9,14 +9,16 @@ import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import napari.types
     import numpy.typing as npt
 
-import napari
+    import napari.types
+
 import networkx.exception
 import numpy as np
 import skimage.graph
 import skimage.measure
+
+import napari
 
 logger = logging.getLogger(__name__)
 

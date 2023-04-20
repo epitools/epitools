@@ -1,10 +1,11 @@
 from pathlib import Path
 from unittest.mock import patch
 
-import magicgui
 import numpy as np
 import pytest
 from skimage.io import imread
+
+import magicgui
 
 from napari_epitools._widget import projection_widget
 from napari_epitools.analysis import calculate_projection

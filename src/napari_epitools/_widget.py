@@ -3,14 +3,15 @@ from __future__ import annotations
 import logging
 import os
 
-import magicgui.widgets
 import matplotlib.pyplot as plt
-import napari.layers
-import napari.qt.threading
-import napari.types
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+
+import magicgui.widgets
+import napari.layers
+import napari.qt.threading
+import napari.types
 from magicgui import magic_factory
 from magicgui.types import FileDialogMode
 from magicgui.widgets.bases import Widget
