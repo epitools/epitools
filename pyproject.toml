@@ -15,8 +15,8 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -24,15 +24,15 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Visualization",
 ]
 dependencies = [
-    "numpy",
-    "scipy",
-    "pandas",
+    "PartSeg",
+    "magicgui",
     "matplotlib",
     "napari",
-    "magicgui",
+    "numpy",
+    "pandas",
     "qtpy",
     "scikit-image>=0.20",
-    "PartSeg",
+    "scipy",
 ]
 description = "EpiTools Plugin"
 dynamic = [
@@ -58,7 +58,9 @@ optional-dependencies.dev = [
 
 [tool.coverage]
 report = {skip_covered = true, sort = "cover"}
-run = {branch = true, parallel = true, source = ["napari_epitools"]}
+run = {branch = true, parallel = true, source = [
+    "napari_epitools",
+]}
 paths.source = [
     "src",
     ".tox*/*/lib/python*/site-packages",
@@ -114,17 +116,32 @@ select = [
     "W",
     "YTT",
 ]
-isort.known-first-party = ["napari_epitools"]
+isort.known-first-party = [
+    "napari_epitools",
+]
+isort.section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "napari",
+    "first-party",
+    "local-folder",
+]
+isort.sections.napari = [
+    "magicgui",
+    "napari",
+]
 mccabe.max-complexity = 18
 
 [tool.setuptools_scm]
 
 [tool.tomlsort]
-sort_inline_arrays = false
-sort_inline_tables = true
-sort_table_keys = true
+all = true
 spaces_indent_inline_array = 4
 trailing_comma_inline_array = true
+overrides."project.classifiers".inline_arrays = false
+overrides."tool.coverage.paths.source".inline_arrays = false
+overrides."tool.ruff.isort.section-order".inline_arrays = false
 
 [tool.tox]
 legacy_tox_ini = """
