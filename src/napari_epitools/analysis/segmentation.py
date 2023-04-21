@@ -24,7 +24,7 @@ def local_minima_seeded_watershed(
     See also
     --------
     .. [1] https://scikit-image.org/docs/dev/auto_examples/segmentation/plot_watershed.html
-    """  # noqa E501
+    """
 
     image = np.asarray(image)
 
