@@ -25,6 +25,10 @@ __all__ = [
 logger = logging.getLogger(__name__)
 
 
+THREE_DIMENSIONAL = 3  # ZYX
+FOUR_DIMENSIONAL = 4  # TZYX
+
+
 def create_projection_widget() -> magicgui.widgets.Container:
     """Create a widget to project a 4d timeseries (TZYX) along the z dimension"""
 
@@ -61,10 +65,33 @@ def run_projection(
         cutoff_distance,
     )
 
+    # Remove z dimension from scale and translate arrays
+    if image.ndim == THREE_DIMENSIONAL:  # ZYX
+        mask = [1, 2]
+    elif image.ndim == FOUR_DIMENSIONAL:  # TZYX
+        mask = [0, 2, 3]
+
+    two_d_scale = image.metadata["scale"][mask]
+    two_d_translate = np.asarray(image.translate)[mask]
+
+    # spacing for regionprops
+    two_d_spacing = (
+        image.metadata["spacing"]
+        if image.ndim == THREE_DIMENSIONAL
+        else image.metadata["spacing"][1:]
+    )
+
+    two_d_metadata = {
+        "scale": two_d_scale,
+        "spacing": two_d_spacing,
+    }
+
     viewer = napari.current_viewer()
     viewer.add_image(
         data=projected_data,
         name="Projection",
+        translate=two_d_translate,
+        metadata=two_d_metadata,
     )
 
 
@@ -129,9 +156,16 @@ def run_segmentation(
         threshold=threshold,
     )
 
+    labels_metadata = {
+        "scale": image.metadata["scale"],
+        "spacing": image.metadata["spacing"],
+    }
+
     viewer = napari.current_viewer()
     viewer.add_labels(
         data=labels_data,
+        translate=image.translate,
+        metadata=labels_metadata,
         name="Cells",
     )
     viewer.add_points(
@@ -226,6 +260,7 @@ def run_cell_statistics(
     cell_statistics, graphs = napari_epitools.analysis.calculate_cell_statistics(
         image=image.data,
         labels=labels.data,
+        pixel_spacing=image.metadata["spacing"],
     )
 
     # We will use these to update the cell stats at each frame

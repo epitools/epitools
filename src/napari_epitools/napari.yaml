@@ -26,7 +26,7 @@ contributions:
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
-      filename_patterns: ["*.npy"]
+      filename_patterns: ["*.tif", "*.tiff"]
   writers:
     - command: napari-epitools.write_multiple
       layer_types: ["image*", "labels*"]

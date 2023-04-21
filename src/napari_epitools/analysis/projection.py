@@ -127,6 +127,7 @@ def calculate_projection(
         max_indices = smoothed_t.argmax(axis=0)
 
         confidencemap = z_size * max_intensity / np.sum(smoothed_t, axis=0)
+        np.nan_to_num(confidencemap, copy=False)
         confthres = np.median(confidencemap[confidencemap > np.median(confidencemap)])
 
         # keep only the brightest surface points (intensity in 1 quartile)

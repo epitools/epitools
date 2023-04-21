@@ -5,7 +5,12 @@ It implements the Reader specification, but your plugin may choose to
 implement multiple readers or even other plugin contributions. see:
 https://napari.org/plugins/guides.html?#readers
 """
+
+import pathlib
+
 import numpy as np
+import PartSegCore.analysis.load_functions
+import PartSegCore.napari_plugins.loader
 
 
 def napari_get_reader(path):
@@ -29,7 +34,12 @@ def napari_get_reader(path):
         path = path[0]
 
     # if we know we cannot read the file, we immediately return None.
-    if not path.endswith(".npy"):
+    supported_extensions = [
+        ".tif",
+        ".tiff",
+    ]
+    extension = pathlib.Path(path).suffix.lower()
+    if extension not in supported_extensions:
         return None
 
     # otherwise we return the *function* that can read ``path``.
@@ -60,13 +70,24 @@ def reader_function(path):
     """
     # handle both a string and a list of strings
     paths = [path] if isinstance(path, str) else path
-    # load all files into array
-    arrays = [np.load(_path) for _path in paths]
-    # stack arrays into single array
-    data = np.squeeze(np.stack(arrays))
 
-    # optional kwargs for the corresponding viewer.add_* method
-    add_kwargs = {}
+    # load all files using PartSeg
+    loader = PartSegCore.analysis.load_functions.LoadStackImage()
+    image_stack = loader.load(load_locations=paths)
 
-    layer_type = "image"  # optional, default is "image"
-    return [(data, add_kwargs, layer_type)]
+    image_layers = PartSegCore.napari_plugins.loader.project_to_layers(
+        project_info=image_stack,
+    )
+
+    for layer in image_layers:
+        layer_data, layer_kwargs, layer_type = layer
+        layer_kwargs["metadata"] = {
+            "scale": np.asarray(
+                layer_kwargs.pop("scale")
+            ),  # don't scale the image in the viewer
+            "spacing": np.asarray(
+                image_stack.image.spacing
+            ),  # we need this for regionprops
+        }
+
+    return image_layers
