@@ -24,11 +24,12 @@ logger = logging.getLogger(__name__)
 def calculate_cell_statistics(
     image: napari.types.ImageData,
     labels: napari.types.LabelsData,
+    pixel_spacing: tuple[float],
 ) -> tuple[list[dict[str, npt.NDArray]], list[skimage.graph.RAG]]:
     """Calculate the region based properties of a segmented image"""
 
     # Calculate cell statistics for each frame
-    cell_statistics = _calculate_cell_statistics(image, labels)
+    cell_statistics = _calculate_cell_statistics(image, labels, pixel_spacing)
 
     # Create graph of neighbouring cells at each frame
     graphs = _create_graphs(labels)
@@ -46,6 +47,7 @@ def calculate_cell_statistics(
 def _calculate_cell_statistics(
     image: napari.types.ImageData,
     labels: napari.types.LabelsData,
+    pixel_spacing: tuple[float],
 ) -> list[dict[str, npt.NDArray]]:
     """Calculate cell properties using skimage regionprops"""
 
@@ -56,6 +58,7 @@ def _calculate_cell_statistics(
             label_image=frame_labels,
             intensity_image=frame_image,
             properties=properties,
+            spacing=pixel_spacing,
         )
         for frame_labels, frame_image in zip(labels, image)
     ]
@@ -63,6 +66,8 @@ def _calculate_cell_statistics(
     # skimage uses 'label' for what napari calls 'index'
     for frame_stats in cell_statistics:
         frame_stats["index"] = frame_stats.pop("label")
+        frame_stats["perimeter"] *= 1e6  # convert to um
+        frame_stats["area"] *= 1e12  # convert to um2
 
     return cell_statistics
 
