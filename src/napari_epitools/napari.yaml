@@ -4,7 +4,7 @@ contributions:
   commands:
     - id: napari-epitools.get_reader
       python_name: napari_epitools._reader:napari_get_reader
-      title: Open data with napari EpiTools
+      title: EpiTools (".tif", ".tiff")
     - id: napari-epitools.write_multiple
       python_name: napari_epitools._writer:write_multiple
       title: Save multi-layer data with napari EpiTools
@@ -26,7 +26,7 @@ contributions:
   readers:
     - command: napari-epitools.get_reader
       accepts_directories: false
-      filename_patterns: ["*.npy"]
+      filename_patterns: ["*.tif", "*.tiff"]
   writers:
     - command: napari-epitools.write_multiple
       layer_types: ["image*", "labels*"]
