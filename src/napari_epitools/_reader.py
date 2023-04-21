@@ -38,12 +38,11 @@ def napari_get_reader(path):
         ".tif",
         ".tiff",
     ]
-    extension = pathlib.Path(path).suffix.lower()
-    if extension not in supported_extensions:
-        return None
-
-    # otherwise we return the *function* that can read ``path``.
-    return reader_function
+    return (
+        reader_function
+        if pathlib.Path(path).suffix.lower() in supported_extensions
+        else None
+    )
 
 
 def reader_function(path):
