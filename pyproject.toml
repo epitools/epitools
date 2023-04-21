@@ -32,6 +32,7 @@ dependencies = [
     "magicgui",
     "qtpy",
     "scikit-image>=0.20",
+    "PartSeg",
 ]
 description = "EpiTools Plugin"
 dynamic = [
