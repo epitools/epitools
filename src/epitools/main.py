@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 THREE_DIMENSIONAL = 3  # ZYX
 FOUR_DIMENSIONAL = 4  # TZYX
+DEFAULT_PIXEL_SPACING = (1e-6, 1e-6)  # 1 um
 
 
 def create_projection_widget() -> magicgui.widgets.Container:
@@ -65,31 +66,25 @@ def run_projection(
         cutoff_distance,
     )
 
-    # Remove z dimension from scale and translate arrays
+    # Remove z dimension from the scale and translate arrays
     if image.ndim == THREE_DIMENSIONAL:  # ZYX
         mask = [1, 2]
     elif image.ndim == FOUR_DIMENSIONAL:  # TZYX
         mask = [0, 2, 3]
 
-    two_d_scale = image.metadata["scale"][mask]
     two_d_translate = np.asarray(image.translate)[mask]
+    two_d_scale = np.asarray(image.scale)[mask]
 
-    # spacing for regionprops
-    two_d_spacing = (
-        image.metadata["spacing"]
-        if image.ndim == THREE_DIMENSIONAL
-        else image.metadata["spacing"][1:]
-    )
-
-    two_d_metadata = {
-        "scale": two_d_scale,
-        "spacing": two_d_spacing,
-    }
+    # add spacing info for regionprops if we have it
+    two_d_metadata = {}
+    if "spacing" in image.metadata:
+        two_d_metadata["spacing"] = image.metadata["spacing"][1:]  # ZYX[1:]
 
     viewer = napari.current_viewer()
     viewer.add_image(
         data=projected_data,
         name="Projection",
+        scale=two_d_scale,
         translate=two_d_translate,
         metadata=two_d_metadata,
     )
@@ -156,24 +151,21 @@ def run_segmentation(
         threshold=threshold,
     )
 
-    labels_metadata = {
-        "scale": image.metadata["scale"],
-        "spacing": image.metadata["spacing"],
-    }
-
     viewer = napari.current_viewer()
     viewer.add_labels(
         data=labels_data,
+        scale=image.scale,
         translate=image.translate,
-        metadata=labels_metadata,
         name="Cells",
     )
     viewer.add_points(
         data=seeds_data,
         name="Seeds",
-        size=3,
+        size=3 * image.scale[1],
         edge_color="red",
         face_color="red",
+        scale=image.scale,
+        translate=image.translate,
     )
 
 
@@ -257,10 +249,16 @@ def run_cell_statistics(
 ) -> None:
     """Calculate cell statistics for all frames in the selected Image and Labels"""
 
+    pixel_spacing = (
+        image.metadata["spacing"]
+        if "spacing" in image.metadata
+        else DEFAULT_PIXEL_SPACING
+    )
+
     cell_statistics, graphs = epitools.analysis.calculate_cell_statistics(
         image=image.data,
         labels=labels.data,
-        pixel_spacing=image.metadata["spacing"],
+        pixel_spacing=pixel_spacing,
     )
 
     # We will use these to update the cell stats at each frame

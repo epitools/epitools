@@ -81,12 +81,8 @@ def reader_function(path):
     for layer in image_layers:
         layer_data, layer_kwargs, layer_type = layer
         layer_kwargs["metadata"] = {
-            "scale": np.asarray(
-                layer_kwargs.pop("scale")
-            ),  # don't scale the image in the viewer
             "spacing": np.asarray(
                 image_stack.image.spacing
             ),  # we need this for regionprops
         }
-
     return image_layers
