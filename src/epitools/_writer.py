@@ -8,17 +8,38 @@ Replace code below according to your needs.
 """
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any
+import pathlib
+from typing import Any
 
-if TYPE_CHECKING:
-    DataType = Any | Sequence[Any]
-    FullLayerData = tuple[DataType, dict, str]
+import PartSegCore.napari_plugins.save_tiff_layer
 
 
-def write_single_image(path: str, data: Any, meta: dict):
+def write_single_image(path: str | pathlib.Path, data: Any, meta: dict):
     """Writes a single image layer"""
 
+    path = pathlib.Path(path)
+    if not path.suffix:
+        path = path.with_suffix(".tif")
 
-def write_multiple(path: str, data: list[FullLayerData]):
-    """Writes multiple layers of different types."""
+    if path.suffix not in [".tif", ".tiff"]:
+        return
+
+    path = PartSegCore.napari_plugins.save_tiff_layer.napari_write_image(
+        path=path.as_posix(),
+        data=data,
+        meta=meta,
+    )
+
+    return path
+
+
+def write_single_labels(path: str, data: Any, meta: dict):
+    """Writes a single labels layer"""
+
+    path = PartSegCore.napari_plugins.save_tiff_layer.napari_write_labels(
+        path=path,
+        data=data,
+        meta=meta,
+    )
+
+    return path
