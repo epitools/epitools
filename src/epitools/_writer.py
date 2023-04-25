@@ -11,16 +11,73 @@ from __future__ import annotations
 import pathlib
 from typing import Any
 
+import numpy as np
 import PartSegImage
+from PartSegImage.image import DEFAULT_SCALE_FACTOR
 
-SCALE_MASKS = {
-    "XY": [0, 1],  # 2D grayscale
+import napari
+
+import napari_epitools.widgets.dialogue
+
+TWO_DIMENSIONAL = 2
+THREE_DIMENSIONAL = 3
+FOUR_DIMENSIONAL = 4
+FIVE_DIMENSIONAL = 5
+AXES_ORDER_MASKS = {
+    "YX": [0, 1],  # 2D grayscale
     "TYX": [1, 2],  # 2D grayscale timeseries
     "TYXC": [1, 2],  # 2D multichannel timeseries
     "ZYX": [0, 1, 2],  # 3D grayscale
     "TZYX": [1, 2, 3],  # 3D grayscale timeseries
+    "ZYXC": [0, 1, 2],  # 3D multichannel
     "TZYXC": [1, 2, 3],  # 3D multichannel timeseries
 }
+
+
+def _get_axes_dimensions(ndim: int, name: str) -> str | None:
+    """Determine the dimensions the axes in an image correspond to.
+
+    If there are multiple possibilities, the user will be asked to select
+    the correct dimensions.
+    """
+
+    if ndim == TWO_DIMENSIONAL:
+        return "YX"
+    elif ndim == FIVE_DIMENSIONAL:
+        return "TZYXC"
+
+    title = "Select axes dimensions"
+    prompt = (
+        f"{name} has {ndim} dimensions.\n"
+        "Please select the dimensions the axes correspond to."
+    )
+    parent = napari.current_viewer().window.qt_viewer
+
+    if ndim == THREE_DIMENSIONAL:
+        options = {
+            "2D grayscale timeseries (TYX)": "TYX",
+            "3D grayscake (ZYX)": "ZYX",
+        }
+    elif ndim == FOUR_DIMENSIONAL:
+        options = {
+            "2D multichannel timeseries (TYXC)": "TYXC",
+            "3D grayscale timeseries (TZYX)": "TZYX",
+            "3D multichannel (ZYXC)": "ZYXC",
+        }
+    else:
+        # TODO: show notification that we cannot save 1D images
+        # or images with >5 dimensions
+        return None
+
+    selected = napari_epitools.widgets.dialogue.select_option(
+        options=options.keys(),
+        title=title,
+        prompt=prompt,
+        parent=parent,
+    )
+    axes_order = selected if selected is None else options[selected]
+
+    return axes_order
 
 
 def write_single_image(path: str | pathlib.Path, data: Any, meta: dict):
@@ -33,29 +90,32 @@ def write_single_image(path: str | pathlib.Path, data: Any, meta: dict):
     if path.suffix not in [".tif", ".tiff"]:
         return []
 
-    # Undo scaling before saving
-    scale_factor = PartSegImage.Image.DEFAULT_SCALE_FACTOR
-    scale_shift = min(data.ndim, 3)
+    axes_order = _get_axes_dimensions(ndim=data.ndim, name=meta["name"])
+    if axes_order is None:
+        return []
 
-    # TODO: launch dialogue for user to select axes order
-    axes = "TZYX"
-    channel_names = [meta["name"]]
-    if data.shape[-1] < 6:  # noqa: PLR2004
-        axes += "C"
-        scale_shift -= 1
-        channel_names = [f'{meta["name"]} {i}' for i in range(1, data.shape[-1] + 1)]
+    axes_order_mask = AXES_ORDER_MASKS[axes_order]
+
+    # Set channel names
+    n_channels = data.shape[axes_order.index("C")] if "C" in axes_order else 1
+    channel_names = (
+        [f'{meta["name"]} {i}' for i in range(1, n_channels + 1)]
+        if "C" in axes_order
+        else [meta["name"]]
+    )
 
     image = PartSegImage.Image(
         data=data,
-        image_spacing=(meta["scale"] / scale_factor)[-scale_shift:],
-        axes_order="TZXY"[-data.ndim :],
+        image_spacing=np.divide(meta["scale"], DEFAULT_SCALE_FACTOR)[axes_order_mask],
+        axes_order=axes_order,
         channel_names=channel_names,
-        shift=(meta["translate"] / scale_factor)[-scale_shift:],
-        name="ROI",
+        shift=np.divide(meta["translate"], DEFAULT_SCALE_FACTOR)[axes_order_mask],
+        name="Image",  # PartSeg identifier for correct loading later on
     )
     PartSegImage.ImageWriter.save(
         image=image,
-        path=path.as_posix(),
+        save_path=path.as_posix(),
+        compression=False,
     )
 
     return [path]
@@ -72,15 +132,14 @@ def write_single_labels(path: str | pathlib.Path, data: Any, meta: dict):
         return []
 
     # Undo scaling before saving
-    scale_factor = PartSegImage.Image.DEFAULT_SCALE_FACTOR
     scale_shift = min(data.ndim, 3)
 
     image = PartSegImage.Image(
         data=data,
-        image_spacing=(meta["scale"] / scale_factor)[-scale_shift:],
+        image_spacing=(meta["scale"] / DEFAULT_SCALE_FACTOR)[-scale_shift:],
         axes_order="TZXY"[-data.ndim :],
         channel_names=[meta["name"]],
-        shift=(meta["translate"] / scale_factor)[-scale_shift:],
+        shift=(meta["translate"] / DEFAULT_SCALE_FACTOR)[-scale_shift:],
         name="ROI",
     )
     PartSegImage.ImageWriter.save(

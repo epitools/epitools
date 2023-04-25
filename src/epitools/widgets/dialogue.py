@@ -13,8 +13,9 @@ def select_option(
     options,
     *,
     title: str = "",
+    prompt: str = "",
     parent: Any | None = None,
-) -> str | int | None:
+) -> str | None:
     """Show a dialog with a set of options and request the user to select one.
 
     Dialog is modal and immediately blocks execution until user closes it.
@@ -28,7 +29,10 @@ def select_option(
     options : List[Any]
         List of values to display in a ComboBox
     title : str
-        An optional label to put at the top., by default ""
+        An optional label to use for the window title. Defaults to an empty string.
+    prompt : str
+        An optional instruction / explanation for the user. This will be displayed below
+        the list of options. Defaults to an empty string.
     parent : Widget, optional
         An optional parent widget, by default None.
         The dialog will inherit style from the parent object.
@@ -42,14 +46,12 @@ def select_option(
 
     """
 
-    widgets = []
-    if title:
-        widgets.append(magicgui.widgets.Label(value=title))
-
     options_box = magicgui.widgets.ComboBox(choices=options)
-    widgets.append(options_box)
-
+    widgets = (
+        [options_box, magicgui.widgets.Label(value=prompt)] if prompt else [options_box]
+    )
     dialogue = magicgui.widgets.Dialog(widgets=widgets, parent=parent)
+    dialogue.native.setWindowTitle(title)
     selected = dialogue.exec()
 
     return options_box.value if selected else None
