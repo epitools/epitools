@@ -12,7 +12,7 @@ SMOOTHING_RADIUS = 0.2
 SURFACE_SMOOTHNESS_1 = 50
 SURFACE_SMOOTHNESS_2 = 50
 CUT_OFF_DISTANCE = 20
-PROJECTION_NDIM = 3
+PROJECTION_NDIM = 4
 
 
 @pytest.fixture(scope="function")
@@ -77,6 +77,7 @@ def test_calculate_projection(test_image):
         assert projection.ndim == PROJECTION_NDIM
         assert projection.shape == (
             1,  # single frame in the timeseries
+            1,  # single slice in Z
             test_image.data.shape[2],
             test_image.data.shape[3],
         )
