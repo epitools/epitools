@@ -23,6 +23,9 @@ import napari
 logger = logging.getLogger(__name__)
 
 
+FOUR_DIMENSIONAL = 4
+
+
 def calculate_cell_statistics(
     image: napari.types.ImageData,
     labels: napari.types.LabelsData,
@@ -54,6 +57,10 @@ def _calculate_cell_statistics(
     """Calculate cell properties using skimage regionprops"""
 
     properties = ["label", "area", "perimeter", "orientation"]
+
+    # remove z axis if necessary
+    image = image[:, 0] if image.ndim == FOUR_DIMENSIONAL else image
+    labels = labels[:, 0] if labels.ndim == FOUR_DIMENSIONAL else labels
 
     cell_statistics = [
         skimage.measure.regionprops_table(

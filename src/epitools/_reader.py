@@ -81,8 +81,8 @@ def reader_function(path):
     for layer in image_layers:
         layer_data, layer_kwargs, layer_type = layer
         layer_kwargs["metadata"] = {
-            "spacing": np.asarray(
-                image_stack.image.spacing
-            ),  # we need this for regionprops
+            "yx_spacing": np.asarray(
+                image_stack.image.spacing[1:]
+            ),  # ZYX[1:], we need this spacing for regionprops
         }
     return image_layers

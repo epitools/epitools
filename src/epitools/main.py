@@ -66,27 +66,15 @@ def run_projection(
         cutoff_distance,
     )
 
-    # Remove z dimension from the scale and translate arrays
-    if image.ndim == THREE_DIMENSIONAL:  # ZYX
-        mask = [1, 2]
-    elif image.ndim == FOUR_DIMENSIONAL:  # TZYX
-        mask = [0, 2, 3]
-
-    two_d_translate = np.asarray(image.translate)[mask]
-    two_d_scale = np.asarray(image.scale)[mask]
-
-    # add spacing info for regionprops if we have it
-    two_d_metadata = {}
-    if "spacing" in image.metadata:
-        two_d_metadata["spacing"] = image.metadata["spacing"][1:]  # ZYX[1:]
-
     viewer = napari.current_viewer()
     viewer.add_image(
         data=projected_data,
         name="Projection",
-        scale=two_d_scale,
-        translate=two_d_translate,
-        metadata=two_d_metadata,
+        scale=image.scale,
+        translate=image.translate,
+        rotate=image.rotate,
+        plane=image.plane,
+        metadata=image.metadata,
     )
 
 
@@ -156,6 +144,8 @@ def run_segmentation(
         data=labels_data,
         scale=image.scale,
         translate=image.translate,
+        rotate=image.rotate,
+        plane=image.plane,
         name="Cells",
     )
     viewer.add_points(
@@ -166,6 +156,8 @@ def run_segmentation(
         face_color="red",
         scale=image.scale,
         translate=image.translate,
+        rotate=image.rotate,
+        plane=image.plane,
     )
 
 
@@ -179,7 +171,7 @@ def create_cell_statistics_widget() -> magicgui.widgets.Container:
     viewer.dims.events.current_step.connect(
         lambda event: _update_cell_statistics(
             layers=viewer.layers,
-            frame=event.value[0],
+            frame=event.value[0],  # pass in the time frame
         ),
     )
 
@@ -250,7 +242,7 @@ def run_cell_statistics(
     """Calculate cell statistics for all frames in the selected Image and Labels"""
 
     pixel_spacing = (
-        image.metadata["spacing"]
+        image.metadata["yx_spacing"]
         if "spacing" in image.metadata
         else DEFAULT_PIXEL_SPACING
     )
