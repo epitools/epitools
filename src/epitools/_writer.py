@@ -55,13 +55,13 @@ def _get_axes_dimensions(ndim: int, name: str) -> str | None:
 
     if ndim == THREE_DIMENSIONAL:
         options = {
-            "2D grayscale timeseries (TYX)": "TYX",
-            "3D grayscake (ZYX)": "ZYX",
+            "2D timeseries (TYX)": "TYX",
+            "3D (ZYX)": "ZYX",
         }
     elif ndim == FOUR_DIMENSIONAL:
         options = {
             "2D multichannel timeseries (TYXC)": "TYXC",
-            "3D grayscale timeseries (TZYX)": "TZYX",
+            "3D timeseries (TZYX)": "TZYX",
             "3D multichannel (ZYXC)": "ZYXC",
         }
     else:
@@ -131,20 +131,24 @@ def write_single_labels(path: str | pathlib.Path, data: Any, meta: dict):
     if path.suffix not in [".tif", ".tiff"]:
         return []
 
-    # Undo scaling before saving
-    scale_shift = min(data.ndim, 3)
+    axes_order = _get_axes_dimensions(ndim=data.ndim, name=meta["name"])
+    if axes_order is None:
+        return []
+
+    axes_order_mask = AXES_ORDER_MASKS[axes_order]
 
     image = PartSegImage.Image(
         data=data,
-        image_spacing=(meta["scale"] / DEFAULT_SCALE_FACTOR)[-scale_shift:],
-        axes_order="TZXY"[-data.ndim :],
+        image_spacing=np.divide(meta["scale"], DEFAULT_SCALE_FACTOR)[axes_order_mask],
+        axes_order=axes_order,
         channel_names=[meta["name"]],
-        shift=(meta["translate"] / DEFAULT_SCALE_FACTOR)[-scale_shift:],
-        name="ROI",
+        shift=np.divide(meta["translate"], DEFAULT_SCALE_FACTOR)[axes_order_mask],
+        name="ROI",  # PartSeg identifier for correct loading later on
     )
     PartSegImage.ImageWriter.save(
         image=image,
-        path=path.as_posix(),
+        save_path=path.as_posix(),
+        compression=False,
     )
 
     return [path]
