@@ -38,10 +38,10 @@ description = "EpiTools Plugin"
 dynamic = [
     "version",
 ]
-name = "napari_epitools"
+name = "epitools"
 readme = "README.md"
 requires-python = ">=3.8"
-entry-points."napari.manifest".napari-epitools = "napari_epitools:napari.yaml"
+entry-points."napari.manifest".epitools = "epitools:napari.yaml"
 license.file = "LICENSE"
 optional-dependencies.dev = [
     "black",
@@ -59,7 +59,7 @@ optional-dependencies.dev = [
 [tool.coverage]
 report = {skip_covered = true, sort = "cover"}
 run = {branch = true, parallel = true, source = [
-    "napari_epitools",
+    "epitools",
 ]}
 paths.source = [
     "src",
@@ -117,7 +117,7 @@ select = [
     "YTT",
 ]
 isort.known-first-party = [
-    "napari_epitools",
+    "epitools",
 ]
 isort.section-order = [
     "future",

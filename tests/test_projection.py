@@ -5,8 +5,8 @@ import numpy as np
 import pytest
 from skimage.io import imread
 
-from napari_epitools.analysis import calculate_projection
-from napari_epitools.main import create_projection_widget
+from epitools.analysis import calculate_projection
+from epitools.main import create_projection_widget
 
 SMOOTHING_RADIUS = 0.2
 SURFACE_SMOOTHNESS_1 = 50
@@ -32,7 +32,7 @@ def test_add_projection_widget(make_napari_viewer):
     viewer = make_napari_viewer()
     num_dw = len(list(viewer.window._dock_widgets))
     viewer.window.add_plugin_dock_widget(
-        plugin_name="napari-epitools",
+        plugin_name="epitools",
         widget_name="Projection (selective plane)",
     )
 
@@ -43,7 +43,7 @@ def test_add_projection_widget(make_napari_viewer):
 def test_projection_widget_run_button(
     make_napari_viewer, projection_widget_fixture, sample_data
 ):
-    with patch("napari_epitools.analysis.calculate_projection") as calculate_projection:
+    with patch("epitools.analysis.calculate_projection") as calculate_projection:
         mock_projection = np.zeros((sample_data.shape[1], sample_data.shape[1]))
         calculate_projection.return_value = mock_projection
         viewer = make_napari_viewer()
@@ -52,7 +52,7 @@ def test_projection_widget_run_button(
 
 
 def test_calculate_projection(sample_data):
-    with patch("napari_epitools.analysis.projection._interpolate") as interp:
+    with patch("epitools.analysis.projection._interpolate") as interp:
         mock_interpolation = np.zeros((sample_data.shape[1], sample_data.shape[2]))
         interp.return_value = mock_interpolation
         projection = calculate_projection(

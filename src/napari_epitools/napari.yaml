@@ -1,48 +1,48 @@
-name: napari-epitools
-display_name: napari EpiTools
+name: epitools
+display_name: EpiTools
 contributions:
   commands:
-    - id: napari-epitools.get_reader
-      python_name: napari_epitools._reader:napari_get_reader
+    - id: epitools.get_reader
+      python_name: epitools._reader:napari_get_reader
       title: Open data with napari EpiTools
-    - id: napari-epitools.write_multiple
-      python_name: napari_epitools._writer:write_multiple
+    - id: epitools.write_multiple
+      python_name: epitools._writer:write_multiple
       title: Save multi-layer data with napari EpiTools
-    - id: napari-epitools.write_single_image
-      python_name: napari_epitools._writer:write_single_image
+    - id: epitools.write_single_image
+      python_name: epitools._writer:write_single_image
       title: Save image data with napari EpiTools
-    - id: napari-epitools.load_sample_data
-      python_name: napari_epitools._sample_data:load_sample_data
+    - id: epitools.load_sample_data
+      python_name: epitools._sample_data:load_sample_data
       title: Load sample data from napari EpiTools
-    - id: napari-epitools.projection_widget
-      python_name: napari_epitools.main:create_projection_widget
+    - id: epitools.projection_widget
+      python_name: epitools.main:create_projection_widget
       title: Epitools Projection Widget
-    - id: napari-epitools.segmentation_widget
-      python_name: napari_epitools.main:create_segmentation_widget
+    - id: epitools.segmentation_widget
+      python_name: epitools.main:create_segmentation_widget
       title: Epitools Segmentation Widget
-    - id: napari-epitools.cell_statistics_widget
-      python_name: napari_epitools.main:create_cell_statistics_widget
+    - id: epitools.cell_statistics_widget
+      python_name: epitools.main:create_cell_statistics_widget
       title: Epitools cell statistics widget
   readers:
-    - command: napari-epitools.get_reader
+    - command: epitools.get_reader
       accepts_directories: false
       filename_patterns: ["*.tif", "*.tiff"]
   writers:
-    - command: napari-epitools.write_multiple
+    - command: epitools.write_multiple
       layer_types: ["image*", "labels*"]
       filename_extensions: []
-    - command: napari-epitools.write_single_image
+    - command: epitools.write_single_image
       layer_types: ["image"]
       filename_extensions: [".npy"]
   sample_data:
-    - command: napari-epitools.load_sample_data
+    - command: epitools.load_sample_data
       display_name: napari EpiTools
       key: test_image
   widgets:
-    - command: napari-epitools.projection_widget
+    - command: epitools.projection_widget
       # autogenerate: true <- for use with napari-assistant
       display_name: Projection (selective plane)
-    - command: napari-epitools.segmentation_widget
+    - command: epitools.segmentation_widget
       display_name: Segmentation (local minima seeded watershed)
-    - command: napari-epitools.cell_statistics_widget
+    - command: epitools.cell_statistics_widget
       display_name: Cell statistics

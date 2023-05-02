@@ -13,8 +13,8 @@ import napari.layers
 import napari.qt.threading
 from magicgui.types import FileDialogMode
 
-import napari_epitools.analysis
-import napari_epitools.widgets
+import epitools.analysis
+import epitools.widgets
 
 __all__ = [
     "create_projection_widget",
@@ -32,7 +32,7 @@ FOUR_DIMENSIONAL = 4  # TZYX
 def create_projection_widget() -> magicgui.widgets.Container:
     """Create a widget to project a 4d timeseries (TZYX) along the z dimension"""
 
-    projection_widget = napari_epitools.widgets.create_projection_widget()
+    projection_widget = epitools.widgets.create_projection_widget()
 
     # Project the timeseries when pressing the 'Run' button
     projection_widget.run.changed.connect(
@@ -57,7 +57,7 @@ def run_projection(
 ) -> None:
     """Project a 4d timeseries along the z dimension"""
 
-    projected_data = napari_epitools.analysis.calculate_projection(
+    projected_data = epitools.analysis.calculate_projection(
         image.data,
         smoothing_radius,
         surface_smoothness_1,
@@ -98,7 +98,7 @@ def run_projection(
 def create_segmentation_widget() -> magicgui.widgets.Container:
     """Create a widget to segment a 3d (TYZ) timeseries"""
 
-    segmentation_widget = napari_epitools.widgets.create_segmentation_widget()
+    segmentation_widget = epitools.widgets.create_segmentation_widget()
     viewer = napari.current_viewer()
 
     # Automatically select a newly added Image layer
@@ -149,7 +149,7 @@ def run_segmentation(
 ) -> None:
     """Segment a 3d timeserise (TYZ) at each frame"""
 
-    seeds_data, labels_data = napari_epitools.analysis.calculate_segmentation(
+    seeds_data, labels_data = epitools.analysis.calculate_segmentation(
         projection=image.data,
         spot_sigma=spot_sigma,
         outline_sigma=outline_sigma,
@@ -180,7 +180,7 @@ def run_segmentation(
 def create_cell_statistics_widget() -> magicgui.widgets.Container:
     """Create a widget for calculating cell statistics of labelled segmentations."""
 
-    cell_statistics_widget = napari_epitools.widgets.create_cell_statistics_widget()
+    cell_statistics_widget = epitools.widgets.create_cell_statistics_widget()
     viewer = napari.current_viewer()
 
     # Update cell_statistics when scrolling through frames
@@ -257,7 +257,7 @@ def run_cell_statistics(
 ) -> None:
     """Calculate cell statistics for all frames in the selected Image and Labels"""
 
-    cell_statistics, graphs = napari_epitools.analysis.calculate_cell_statistics(
+    cell_statistics, graphs = epitools.analysis.calculate_cell_statistics(
         image=image.data,
         labels=labels.data,
         pixel_spacing=image.metadata["spacing"],
