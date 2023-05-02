@@ -10,11 +10,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from skimage.io import imread
+import napari_epitools._reader
 
 
 def load_sample_data():
-    """Generates an image"""
+    """Load a sample dataset"""
+
     img_path = Path("sample_data") / "8bitDataset" / "test_image.tif"
-    data = imread(img_path)
-    return [(data, {"name": "Epitools test data"})]
+    return napari_epitools._reader.reader_function(path=img_path.as_posix())
