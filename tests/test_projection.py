@@ -1,12 +1,12 @@
-from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
 import pytest
-from skimage.io import imread
 
+import napari
+
+import epitools._sample_data
 from epitools.analysis import calculate_projection
-from epitools.main import create_projection_widget
 
 SMOOTHING_RADIUS = 0.2
 SURFACE_SMOOTHNESS_1 = 50
@@ -15,15 +15,19 @@ CUT_OFF_DISTANCE = 20
 PROJECTION_NDIM = 3
 
 
-@pytest.fixture
-def sample_data():
-    img_path = img_path = Path("sample_data") / "8bitDataset" / "test_image.tif"
-    return imread(img_path)
+@pytest.fixture(scope="function")
+def test_image() -> napari.layers.Image:
+    data, metadata, layer_type = epitools._sample_data.load_sample_data()[0]
+    metadata["name"] = "Test Image"
+    return napari.layers.Image(data, **metadata)
 
 
-@pytest.fixture
-def projection_widget_fixture():
-    return create_projection_widget()
+@pytest.fixture(scope="function")
+def viewer_with_test_image(make_napari_viewer, test_image) -> napari.Viewer:
+    viewer = make_napari_viewer()
+    viewer.add_layer(test_image)
+
+    return viewer
 
 
 def test_add_projection_widget(make_napari_viewer):
@@ -39,16 +43,22 @@ def test_add_projection_widget(make_napari_viewer):
     assert len(list(viewer.window._dock_widgets)) == num_dw + 1
 
 
-@pytest.mark.skip(reason="unfinished")
 def test_projection_widget_run_button(
-    make_napari_viewer, projection_widget_fixture, sample_data
+    viewer_with_test_image,
 ):
-    with patch("epitools.analysis.calculate_projection") as calculate_projection:
-        mock_projection = np.zeros((sample_data.shape[1], sample_data.shape[1]))
-        calculate_projection.return_value = mock_projection
-        viewer = make_napari_viewer()
-        viewer.add_image(sample_data)
-        projection_widget_fixture.run.clicked()
+    dock_widget, container = viewer_with_test_image.window.add_plugin_dock_widget(
+        plugin_name="napari-epitools",
+        widget_name="Projection (selective plane)",
+    )
+    container.run.clicked()
+
+    assert len(viewer_with_test_image.layers) == 2  # noqa: PLR2004
+
+    original_layer, new_layer = viewer_with_test_image.layers
+
+    assert isinstance(new_layer, napari.layers.Image)
+    assert new_layer.name == "Projection"
+    assert new_layer.data.shape[-2:] == original_layer.data.shape[-2:]  # yx dimensions
 
 
 def test_calculate_projection(sample_data):
