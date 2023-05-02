@@ -22,11 +22,8 @@ def create_segmentation_widget() -> magicgui.widgets.Container:
         value=10.0,
         name="spot_sigma",
         label="spot sigma",
-        widget_type="FloatSlider",
+        widget_type="FloatSpinBox",
         options={
-            "min": 0,
-            "max": 20,
-            "step": 0.1,
             "tooltip": spot_sigma_tooltip,
         },
     )
@@ -36,11 +33,8 @@ def create_segmentation_widget() -> magicgui.widgets.Container:
         value=3.0,
         name="outline_sigma",
         label="outline sigma",
-        widget_type="FloatSlider",
+        widget_type="FloatSpinBox",
         options={
-            "min": 0,
-            "max": 20,
-            "step": 0.1,
             "tooltip": outline_sigma_tooltip,
         },
     )
@@ -50,11 +44,8 @@ def create_segmentation_widget() -> magicgui.widgets.Container:
         value=3.0,
         name="threshold",
         label="threshold sigma",
-        widget_type="FloatSlider",
+        widget_type="FloatSpinBox",
         options={
-            "min": 0,
-            "max": 100,
-            "step": 0.5,
             "tooltip": threshold_tooltip,
         },
     )

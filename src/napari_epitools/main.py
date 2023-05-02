@@ -335,8 +335,8 @@ def _cell_statistics_to_csv(
 def create_colourmaps(
     labels: napari.layers.Labels,
     colourmap_statistic: str,
-    lower_limit: magicgui.widgets.FloatSlider,
-    upper_limit: magicgui.widgets.FloatSlider,
+    lower_limit: magicgui.widgets.FloatSpinBox,
+    upper_limit: magicgui.widgets.FloatSpinBox,
     *,
     autolimits: bool,
 ) -> None:
