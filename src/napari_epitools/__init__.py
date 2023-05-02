@@ -9,7 +9,7 @@ __version__ = "0.0.1"
 logger = logging.getLogger(__name__)
 
 formatter = logging.Formatter(
-    "%(levelname)s [%(asctime)s] napari-epitools: %(message)s",
+    "%(levelname)s [%(asctime)s] epitools: %(message)s",
     datefmt="%Y/%m/%d %I:%M:%S %p",
 )
 console_handler = logging.StreamHandler()

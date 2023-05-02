@@ -1,11 +1,11 @@
-# napari-epitools
+# epitools
 
-[![License](https://img.shields.io/pypi/l/napari-epitools.svg?color=green)](https://github.com/githubuser/napari-epitools/raw/main/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/napari-epitools.svg?color=green)](https://pypi.org/project/napari-epitools)
-[![Python Version](https://img.shields.io/pypi/pyversions/napari-epitools.svg?color=green)](https://python.org)
-[![tests](https://github.com/githubuser/napari-epitools/workflows/tests/badge.svg)](https://github.com/githubuser/napari-epitools/actions)
-[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-epitools)](https://napari-hub.org/plugins/napari-epitools)
+[![License](https://img.shields.io/pypi/l/epitools.svg?color=green)](https://github.com/githubuser/epitools/raw/main/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/epitools.svg?color=green)](https://pypi.org/project/epitools)
+[![Python Version](https://img.shields.io/pypi/pyversions/epitools.svg?color=green)](https://python.org)
+[![tests](https://github.com/githubuser/epitools/workflows/tests/badge.svg)](https://github.com/githubuser/epitools/actions)
 [![coverage](https://coveralls.io/repos/github/epitools/epitools/badge.svg?branch=main)](https://coveralls.io/github/epitools/epitools?branch=main)
+[![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/epitools)](https://napari-hub.org/plugins/epitools)
 
 EpiTools Plugin
 
@@ -23,7 +23,7 @@ https://napari.org/plugins/index.html
 
 ## Installation
 
-`napari-epitools` is not yet available to install from PyPI or napari-hub.
+`epitools` is not yet available to install from PyPI or napari-hub.
 
 To install, please clone the repository and do a local install using `pip`:
 
@@ -41,7 +41,7 @@ the coverage at least stays the same before you submit a pull request.
 ## License
 
 Distributed under the terms of the [BSD-3] license,
-"napari-epitools" is free and open source software
+"epitools" is free and open source software
 
 ## Issues
 
