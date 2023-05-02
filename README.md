@@ -4,8 +4,8 @@
 [![PyPI](https://img.shields.io/pypi/v/napari-epitools.svg?color=green)](https://pypi.org/project/napari-epitools)
 [![Python Version](https://img.shields.io/pypi/pyversions/napari-epitools.svg?color=green)](https://python.org)
 [![tests](https://github.com/githubuser/napari-epitools/workflows/tests/badge.svg)](https://github.com/githubuser/napari-epitools/actions)
-[![codecov](https://codecov.io/gh/githubuser/napari-epitools/branch/main/graph/badge.svg)](https://codecov.io/gh/githubuser/napari-epitools)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/napari-epitools)](https://napari-hub.org/plugins/napari-epitools)
+[![coverage](https://coveralls.io/repos/github/epitools/epitools/badge.svg?branch=main)](https://coveralls.io/github/epitools/epitools?branch=main)
 
 EpiTools Plugin
 
