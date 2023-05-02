@@ -61,12 +61,14 @@ def test_projection_widget_run_button(
     assert new_layer.data.shape[-2:] == original_layer.data.shape[-2:]  # yx dimensions
 
 
-def test_calculate_projection(sample_data):
-    with patch("epitools.analysis.projection._interpolate") as interp:
-        mock_interpolation = np.zeros((sample_data.shape[1], sample_data.shape[2]))
+def test_calculate_projection(test_image):
+    with patch("napari_epitools.analysis.projection._interpolate") as interp:
+        mock_interpolation = np.zeros(
+            (test_image.data.shape[2], test_image.data.shape[3])
+        )
         interp.return_value = mock_interpolation
         projection = calculate_projection(
-            sample_data,
+            test_image.data,
             SMOOTHING_RADIUS,
             SURFACE_SMOOTHNESS_1,
             SURFACE_SMOOTHNESS_2,
@@ -75,6 +77,6 @@ def test_calculate_projection(sample_data):
         assert projection.ndim == PROJECTION_NDIM
         assert projection.shape == (
             1,  # single frame in the timeseries
-            sample_data.shape[1],
-            sample_data.shape[2],
+            test_image.data.shape[2],
+            test_image.data.shape[3],
         )
