@@ -1,9 +1,9 @@
 # epitools
 
-[![License](https://img.shields.io/pypi/l/epitools.svg?color=green)](https://github.com/githubuser/epitools/raw/main/LICENSE)
+[![License](https://img.shields.io/pypi/l/epitools.svg?color=green)](https://raw.githubusercontent.com/epitools/epitools/main/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/epitools.svg?color=green)](https://pypi.org/project/epitools)
 [![Python Version](https://img.shields.io/pypi/pyversions/epitools.svg?color=green)](https://python.org)
-[![tests](https://github.com/githubuser/epitools/workflows/tests/badge.svg)](https://github.com/githubuser/epitools/actions)
+[![tests](https://github.com/epitools/epitools/actions/workflows/test_and_deploy.yml/badge.svg)](https://github.com/epitools/epitools/actions/workflows/test_and_deploy.yml)
 [![coverage](https://coveralls.io/repos/github/epitools/epitools/badge.svg?branch=main)](https://coveralls.io/github/epitools/epitools?branch=main)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/epitools)](https://napari-hub.org/plugins/epitools)
 
