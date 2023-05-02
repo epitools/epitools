@@ -24,11 +24,8 @@ def create_projection_widget() -> magicgui.widgets.Container:
         value=1,
         name="smoothing_radius",
         label="smoothing radius",
-        widget_type="FloatSlider",
+        widget_type="FloatSpinBox",
         options={
-            "min": 0,
-            "max": 10,
-            "step": 0.1,
             "tooltip": smoothing_radius_tooltip,
         },
     )
@@ -40,11 +37,8 @@ def create_projection_widget() -> magicgui.widgets.Container:
         value=5,
         name="surface_smoothness_1",
         label="surface smoothness 1",
-        widget_type="Slider",
+        widget_type="SpinBox",
         options={
-            "min": 0,
-            "max": 10,
-            "step": 1,
             "tooltip": surface_smoothness_1_tooltip,
         },
     )
@@ -56,11 +50,8 @@ def create_projection_widget() -> magicgui.widgets.Container:
         value=5,
         name="surface_smoothness_2",
         label="surface smoothness 2",
-        widget_type="Slider",
+        widget_type="SpinBox",
         options={
-            "min": 0,
-            "max": 10,
-            "step": 1,
             "tooltip": surface_smoothness_2_tooltip,
         },
     )
@@ -72,11 +63,8 @@ def create_projection_widget() -> magicgui.widgets.Container:
         value=3,
         name="cutoff_distance",
         label="z cutoff distance",
-        widget_type="Slider",
+        widget_type="SpinBox",
         options={
-            "min": 0,
-            "max": 5,
-            "step": 1,
             "tooltip": cutoff_distance_tooltip,
         },
     )
