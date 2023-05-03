@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-import numpy as np
 import pytest
 
 import napari
@@ -55,6 +54,11 @@ def test_projection_widget_run_button(
     viewer_with_image,
     projected_image,
 ):
+    """
+    Check that pressing the 'Run' button performs projection of the selected
+    image and adds a new layer to the viewer
+    """
+
     dock_widget, container = viewer_with_image.window.add_plugin_dock_widget(
         plugin_name="epitools",
         widget_name="Projection (selective plane)",
@@ -76,19 +80,17 @@ def test_projection_widget_run_button(
 
 
 def test_calculate_projection(image):
-    with patch("epitools.analysis.projection._interpolate") as interp:
-        mock_interpolation = np.zeros((image.data.shape[2], image.data.shape[3]))
-        interp.return_value = mock_interpolation
-        projection = calculate_projection(
-            image.data,
-            SMOOTHING_RADIUS,
-            SURFACE_SMOOTHNESS_1,
-            SURFACE_SMOOTHNESS_2,
-            CUT_OFF_DISTANCE,
-        )
-        assert projection.ndim == PROJECTION_NDIM
-        assert projection.shape == (
-            1,  # single frame in the timeseries
-            image.data.shape[2],
-            image.data.shape[3],
-        )
+    projection = calculate_projection(
+        image.data,
+        SMOOTHING_RADIUS,
+        SURFACE_SMOOTHNESS_1,
+        SURFACE_SMOOTHNESS_2,
+        CUT_OFF_DISTANCE,
+    )
+
+    assert projection.ndim == PROJECTION_NDIM
+    assert projection.shape == (
+        1,  # single frame in the timeseries
+        image.data.shape[2],
+        image.data.shape[3],
+    )

@@ -59,6 +59,11 @@ def test_segmentation_widget_run_button(
     viewer_with_image,
     seeds_and_labels,
 ):
+    """
+    Check that pressing the 'Run' button performs segmentation of the selected
+    image and adds two new layers (cells and seeds) to the viewer
+    """
+
     dock_widget, container = viewer_with_image.window.add_plugin_dock_widget(
         plugin_name="epitools",
         widget_name="Segmentation (local minima seeded watershed)",

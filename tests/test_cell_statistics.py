@@ -63,6 +63,12 @@ def test_segmentation_widget_run_button(
     viewer_with_image,
     seeds_and_labels,
 ):
+    """
+    Check that pressing the 'Run' button calculates cell statistics
+    using the selected image and labels layers, and that the labels layer
+    has it's features set to the calculated cell statistics.
+    """
+
     dock_widget, container = viewer_with_image.window.add_plugin_dock_widget(
         plugin_name="epitools",
         widget_name="Cell statistics",
