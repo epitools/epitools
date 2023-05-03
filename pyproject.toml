@@ -178,7 +178,7 @@ legacy_tox_ini = """
         pytest-cov
         pytest-qt
         pytest-xvfb ; sys_platform == 'linux'
-    commands = pytest --cov --cov-report=xml
+    commands = pytest --cov --cov-report=lcov
 
     [tox]
     envlist = py{38,39,310}-{linux,macos,windows}
