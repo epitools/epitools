@@ -16,8 +16,8 @@ THRESHOLD = 3.0
 
 @pytest.fixture(scope="function")
 def projected_image() -> napari.layers.Image:
-    data, metadata, layer_type = epitools._sample_data.load_projected_data()[0]
-    return napari.layers.Image(data, **metadata)
+    data, kwargs, layer_type = epitools._sample_data.load_projected_data()[0]
+    return napari.layers.Image(data, **kwargs)
 
 
 @pytest.fixture(scope="function")
@@ -25,18 +25,18 @@ def seeds_and_labels(
     make_napari_viewer,
 ) -> tuple[napari.layers.Points, napari.layers.Labels]:
     seeds_layer_data, labels_layer_data = epitools._sample_data.load_segmented_data()
-    seeds_data, seeds_metadata, _ = seeds_layer_data
-    labels_data, labels_metadata, _ = labels_layer_data
+    seeds_data, seeds_kwargs, _ = seeds_layer_data
+    labels_data, labels_kwargs, _ = labels_layer_data
     return (
-        napari.layers.Points(seeds_data, **seeds_metadata),
-        napari.layers.Labels(labels_data, **labels_metadata),
+        napari.layers.Points(seeds_data, **seeds_kwargs),
+        napari.layers.Labels(labels_data, **labels_kwargs),
     )
 
 
 @pytest.fixture(scope="function")
 def labels() -> napari.layers.Labels:
-    data, metadata, layer_type = epitools._sample_data.load_segmented_data()[0]
-    return napari.layers.Labels(data, **metadata)
+    data, kwargs, layer_type = epitools._sample_data.load_segmented_data()[0]
+    return napari.layers.Labels(data, **kwargs)
 
 
 @pytest.fixture(scope="function")

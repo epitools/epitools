@@ -11,6 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 import epitools._reader
 
@@ -36,24 +37,37 @@ def load_segmented_data():
     labels_path = (
         Path("sample_data") / "8bitDataset" / "test_image-projected-segmented.tif"
     )
-    labels_data, labels_metadata, labels_layer_type = epitools._reader.reader_function(
+    labels_data, labels_kwargs, labels_layer_type = epitools._reader.reader_function(
         path=labels_path.as_posix(),
     )[0]
-    labels_metadata["name"] = "Cells"
+
+    labels_kwargs["name"] = "Cells"
+    labels_kwargs["metadata"] = _load_cell_statistics()
 
     # Load seeds
     seeds_path = (
         Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-seeds.npy"
     )
     seeds_data = np.load(seeds_path)
-    seeds_metadata = {"name": "Seeds", "translate": labels_metadata["translate"]}
+    seeds_kwargs = {"name": "Seeds", "translate": labels_kwargs["translate"]}
     seeds_layer_type = "points"
 
-    seeds_metadata["name"] = "Seeds"
-    seeds_metadata["translate"] = labels_metadata["translate"]
+    seeds_kwargs["name"] = "Seeds"
+    seeds_kwargs["translate"] = labels_kwargs["translate"]
 
     # arrange data in format required by napari
-    labels_layer_data = (labels_data, labels_metadata, labels_layer_type)
-    seeds_layer_data = (seeds_data, seeds_metadata, seeds_layer_type)
+    labels_layer_data = (labels_data, labels_kwargs, labels_layer_type)
+    seeds_layer_data = (seeds_data, seeds_kwargs, seeds_layer_type)
 
     return [seeds_layer_data, labels_layer_data]
+
+
+def _load_cell_statistics():
+    """Load cell staistics associated with sample segmentation"""
+
+    stats_path = (
+        Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-stats.csv"
+    )
+    stats = pd.read_csv(stats_path)
+
+    return stats
