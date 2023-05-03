@@ -17,7 +17,7 @@ from PartSegImage.image import DEFAULT_SCALE_FACTOR
 
 import napari
 
-import napari_epitools.widgets.dialogue
+import epitools.widgets.dialogue
 
 TWO_DIMENSIONAL = 2
 THREE_DIMENSIONAL = 3
@@ -69,7 +69,7 @@ def _get_axes_dimensions(ndim: int, name: str) -> str | None:
         # or images with >5 dimensions
         return None
 
-    selected = napari_epitools.widgets.dialogue.select_option(
+    selected = epitools.widgets.dialogue.select_option(
         options=options.keys(),
         title=title,
         prompt=prompt,
