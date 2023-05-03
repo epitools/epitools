@@ -62,7 +62,7 @@ def test_projection_widget_run_button(
 
 
 def test_calculate_projection(test_image):
-    with patch("napari_epitools.analysis.projection._interpolate") as interp:
+    with patch("epitools.analysis.projection._interpolate") as interp:
         mock_interpolation = np.zeros(
             (test_image.data.shape[2], test_image.data.shape[3])
         )
