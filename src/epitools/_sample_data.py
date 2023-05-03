@@ -42,7 +42,7 @@ def load_segmented_data():
     )[0]
 
     labels_kwargs["name"] = "Cells"
-    labels_kwargs["metadata"] = _load_cell_statistics()
+    labels_kwargs["metadata"]["cell_statistics"] = _load_cell_statistics()
 
     # Load seeds
     seeds_path = (
@@ -62,12 +62,20 @@ def load_segmented_data():
     return [seeds_layer_data, labels_layer_data]
 
 
-def _load_cell_statistics():
+def _load_cell_statistics() -> list[dict]:
     """Load cell staistics associated with sample segmentation"""
 
     stats_path = (
         Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-stats.csv"
     )
-    stats = pd.read_csv(stats_path)
+    stats = pd.read_csv(
+        stats_path,
+        index_col=[0, 1],  # indices are given by (frame, label)
+    )
 
-    return stats
+    # Split the MultiIndex DataFrame into a list of DataFrames - one per frame
+    stats_by_frame = [
+        stats.xs(frame, level="frame") for frame in stats.index.unique(level="frame")
+    ]
+
+    return stats_by_frame
