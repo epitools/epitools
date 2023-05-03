@@ -34,12 +34,6 @@ def seeds_and_labels(
 
 
 @pytest.fixture(scope="function")
-def labels() -> napari.layers.Labels:
-    data, kwargs, layer_type = epitools._sample_data.load_segmented_data()[0]
-    return napari.layers.Labels(data, **kwargs)
-
-
-@pytest.fixture(scope="function")
 def viewer_with_image(make_napari_viewer, projected_image) -> napari.Viewer:
     viewer = make_napari_viewer()
     viewer.add_layer(projected_image)
