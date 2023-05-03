@@ -23,6 +23,12 @@ def test_image() -> napari.layers.Image:
 
 
 @pytest.fixture(scope="function")
+def test_projected_image() -> napari.layers.Image:
+    data, metadata, layer_type = epitools._sample_data.load_projected_data()[0]
+    return napari.layers.Image(data, **metadata)
+
+
+@pytest.fixture(scope="function")
 def viewer_with_test_image(make_napari_viewer, test_image) -> napari.Viewer:
     viewer = make_napari_viewer()
     viewer.add_layer(test_image)
@@ -45,12 +51,20 @@ def test_add_projection_widget(make_napari_viewer):
 
 def test_projection_widget_run_button(
     viewer_with_test_image,
+    test_projected_image,
 ):
     dock_widget, container = viewer_with_test_image.window.add_plugin_dock_widget(
         plugin_name="epitools",
         widget_name="Projection (selective plane)",
     )
-    container.run.clicked()
+
+    # use saved image data so we don't run the projection analysis
+    # when the button is pressed
+    with patch(
+        "epitools.analysis.projection.calculate_projection"
+    ) as calculate_projection:
+        calculate_projection.return_value = test_projected_image.data
+        container.run.clicked()
 
     assert len(viewer_with_test_image.layers) == 2  # noqa: PLR2004
 
