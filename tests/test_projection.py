@@ -47,7 +47,7 @@ def test_projection_widget_run_button(
     viewer_with_test_image,
 ):
     dock_widget, container = viewer_with_test_image.window.add_plugin_dock_widget(
-        plugin_name="napari-epitools",
+        plugin_name="epitools",
         widget_name="Projection (selective plane)",
     )
     container.run.clicked()
