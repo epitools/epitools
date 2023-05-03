@@ -55,7 +55,7 @@ jobs:
       - name: Coverage
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: coverage.xml
+          file: coverage.lcov
 
   deploy:
     # this will run when you have tagged a commit, starting with "v*"
