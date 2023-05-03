@@ -1,48 +1,46 @@
-# This workflows will upload a Python Package using Twine when a release is created
-# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
-
-name: tests
+name: Tests
 
 on:
   push:
     branches:
       - main
-    tags:
-      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
   pull_request:
-    branches:
-      - main
-  workflow_dispatch:
 
 jobs:
   test:
     name: ${{ matrix.platform }} py${{ matrix.python-version }}
     runs-on: ${{ matrix.platform }}
     strategy:
-      fail-fast: true
       matrix:
-        platform: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.8", "3.9", "3.10"]
-
+        os: [ubuntu-latest]
+        include:
+          - os: macos-latest
+            python-version: "3.10"
+          - os: windows-latest
+            python-version: "3.10"
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout source
+        uses: actions/checkout@v3
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Cache tox
+        uses: actions/cache@v3
+        with:
+          path: .tox
+          key: test-${{ hashFiles('pyproject.toml') }}
+
+      - name: Set up python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: "pip"
+          cache-dependency-path: "pyproject.toml"
 
       # these libraries enable testing on Qt on linux
       - uses: tlambert03/setup-qt-libs@v1.4
 
-      # note: if you need dependencies from conda, considering using
-      # setup-miniconda: https://github.com/conda-incubator/setup-miniconda
-      # and
-      # tox-conda: https://github.com/tox-dev/tox-conda
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install setuptools tox tox-gh-actions
+        run: python -m pip install tox tox-gh-actions
 
       # this runs the platform-specific tests declared in tox.ini
       - name: Test with tox
