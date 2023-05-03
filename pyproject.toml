@@ -64,6 +64,7 @@ run = {branch = true, parallel = true, source = [
 paths.source = [
     "src",
     ".tox*/*/lib/python*/site-packages",
+    ".tox*\\*\\Lib\\site-packages",
 ]
 
 [tool.mypy]
