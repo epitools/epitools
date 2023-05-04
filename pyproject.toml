@@ -15,7 +15,6 @@ authors = [
     {email = "y.mao@ucl.ac.uk", name = "Yanlan Mao"},
 ]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
     "Framework :: napari",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
