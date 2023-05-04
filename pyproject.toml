@@ -125,6 +125,7 @@ select = [
     "W",
     "YTT",
 ]
+target-version = "py39"
 isort.known-first-party = [
     "epitools",
 ]
@@ -143,6 +144,8 @@ isort.sections.napari = [
 mccabe.max-complexity = 18
 
 [tool.setuptools_scm]
+local_scheme = "no-local-version"
+write_to = "src/epitools/_version.py"
 
 [tool.tomlsort]
 all = true
