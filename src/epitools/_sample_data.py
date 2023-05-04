@@ -9,15 +9,19 @@ Replace code below according to your needs.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 
 import epitools._reader
 
-LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
+if TYPE_CHECKING:
+    from typing import Any, Dict, Tuple
+
+    import numpy.typing as npt
+
+    LAYER_DATA = Tuple[npt.ArrayLike, Dict[str, Any], str]
 
 
 def load_sample_data() -> list[LAYER_DATA]:

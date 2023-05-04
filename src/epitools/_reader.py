@@ -8,14 +8,18 @@ https://napari.org/plugins/guides.html?#readers
 from __future__ import annotations
 
 import pathlib
-from typing import Any, Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
-import numpy.typing as npt
 import PartSegCore.analysis.load_functions
 import PartSegCore.napari_plugins.loader
 
-LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
+if TYPE_CHECKING:
+    from typing import Any, Callable, Dict, Tuple
+
+    import numpy.typing as npt
+
+    LAYER_DATA = Tuple[npt.ArrayLike, Dict[str, Any], str]
 
 
 def napari_get_reader(
