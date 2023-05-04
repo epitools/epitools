@@ -5,15 +5,26 @@ It implements the Reader specification, but your plugin may choose to
 implement multiple readers or even other plugin contributions. see:
 https://napari.org/plugins/guides.html?#readers
 """
+from __future__ import annotations
 
 import pathlib
+from typing import TYPE_CHECKING
 
 import numpy as np
 import PartSegCore.analysis.load_functions
 import PartSegCore.napari_plugins.loader
 
+if TYPE_CHECKING:
+    from typing import Any, Callable
 
-def napari_get_reader(path):
+    import numpy.typing as npt
+
+    LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
+
+
+def napari_get_reader(
+    path: str | list[str],
+) -> Callable | None:
     """A basic implementation of a Reader contribution.
 
     Parameters
@@ -45,7 +56,9 @@ def napari_get_reader(path):
     )
 
 
-def reader_function(path):
+def reader_function(
+    path: str | list[str],
+) -> list[LAYER_DATA]:
     """Take a path or list of paths and return a list of LayerData tuples.
 
     Readers are expected to return data as a list of tuples, where each tuple

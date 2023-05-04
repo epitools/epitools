@@ -1,7 +1,6 @@
-from ._skeletonize import skeletonize  # noqa F401
+from .cell_statistics import calculate_cell_statistics
 from .projection import calculate_projection
 from .segmentation import calculate_segmentation
-from .cell_statistics import calculate_cell_statistics
 
 __all__ = [
     "calculate_projection",
