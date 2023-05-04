@@ -58,9 +58,8 @@ def test_segmentation_widget_run_button(
 
     assert isinstance(cells_layer, napari.layers.Labels)
     assert cells_layer.name == "Cells"
-    assert (
-        cells_layer.data.shape[-2:] == original_layer.data.shape[-2:]
-    )  # yx dimensions
+    # yx dimensions
+    assert cells_layer.data.shape[-2:] == original_layer.data.shape[-2:]
 
     assert isinstance(seeds_layer, napari.layers.Points)
     assert seeds_layer.name == "Seeds"
