@@ -17,11 +17,11 @@ import pandas as pd
 import epitools._reader
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, Tuple
+    from typing import Any
 
     import numpy.typing as npt
 
-    LAYER_DATA = Tuple[npt.ArrayLike, Dict[str, Any], str]
+    LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
 
 
 def load_sample_data() -> list[LAYER_DATA]:

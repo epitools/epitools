@@ -15,11 +15,11 @@ import PartSegCore.analysis.load_functions
 import PartSegCore.napari_plugins.loader
 
 if TYPE_CHECKING:
-    from typing import Any, Callable, Dict, Tuple
+    from typing import Any, Callable
 
     import numpy.typing as npt
 
-    LAYER_DATA = Tuple[npt.ArrayLike, Dict[str, Any], str]
+    LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
 
 
 def napari_get_reader(
