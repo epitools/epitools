@@ -47,7 +47,7 @@ def test_segmentation_widget_run_button(
     # Check cells layer has no features (i.e. no cell stats)
     # before pressing the 'Run' button
     image_layer, cells_layer, seeds_layer = viewer_with_segmentation.layers
-    assert not viewer_with_segmentation.layers["Cells"].features.size
+    assert viewer_with_segmentation.layers["Cells"].features.size == 0
 
     # use saved image data so we don't run the segmentation analysis
     # when the button is pressed
