@@ -53,11 +53,11 @@ def load_segmented_data() -> list[LAYER_DATA]:
         Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-seeds.npy"
     )
     seeds_data = np.load(seeds_path)
-    seeds_kwargs = {"name": "Seeds", "translate": labels_kwargs["translate"]}
+    seeds_kwargs = {
+        "name": "Seeds",
+        "translate": labels_kwargs["translate"],
+    }
     seeds_layer_type = "points"
-
-    seeds_kwargs["name"] = "Seeds"
-    seeds_kwargs["translate"] = labels_kwargs["translate"]
 
     # arrange data in format required by napari
     labels_layer_data = (labels_data, labels_kwargs, labels_layer_type)
