@@ -63,7 +63,7 @@ optional-dependencies = {dev = [
 readme = "README.md"
 requires-python = ">=3.9"
 entry-points."napari.manifest".epitools = "epitools:napari.yaml"
-license.file = "LICENSE"
+license.file = "LICENCE.md"
 
 [tool.coverage]
 report = {skip_covered = true, sort = "cover"}
