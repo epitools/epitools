@@ -13,14 +13,14 @@ The recommended way to install `EpiTools` is via
 [pip](https://pypi.org/project/pip)
 
 ```sh
-pip install epitools
+python -m pip install epitools
 ```
 
 To install the latest development version of `EpiTools` clone this repository
 and run
 
 ```sh
-pip install -e .
+python -m pip install -e .
 ```
 
 ## Contributing
