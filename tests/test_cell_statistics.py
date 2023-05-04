@@ -1,14 +1,19 @@
 from __future__ import annotations
 
+from typing import Callable
 from unittest.mock import patch
 
 import numpy as np
 import pytest
 
+import napari
+
 from epitools.analysis import calculate_cell_statistics
 
 
-def test_add_cell_statistics_widget(make_napari_viewer):
+def test_add_cell_statistics_widget(
+    make_napari_viewer: Callable,
+):
     """Checks that the cell statistics widget can be added inside a dock widget."""
 
     viewer = make_napari_viewer()
@@ -22,8 +27,8 @@ def test_add_cell_statistics_widget(make_napari_viewer):
 
 
 def test_segmentation_widget_run_button(
-    viewer_with_segmentation,
-    seeds_and_labels,
+    viewer_with_segmentation: napari.Viewer,
+    seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
 ):
     """
     Check that pressing the 'Run' button calculates cell statistics
@@ -67,7 +72,10 @@ def test_segmentation_widget_run_button(
     reason="This test should be fixed by the changes in PR #67",
     stict=True,
 )
-def test_calculate_cell_statistics(projected_image, seeds_and_labels):
+def test_calculate_cell_statistics(
+    projected_image: napari.layers.Image,
+    seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
+):
     reference_seeds, reference_labels = seeds_and_labels
     reference_stats = reference_labels.metadata["cell_statistics"]
 

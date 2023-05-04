@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Callable
 from unittest.mock import patch
 
 import numpy as np
@@ -14,7 +15,9 @@ OUTLINE_SIGMA = 3.0
 THRESHOLD = 3.0
 
 
-def test_add_segmentation_widget(make_napari_viewer):
+def test_add_segmentation_widget(
+    make_napari_viewer: Callable,
+):
     """Checks that the segmentation widget can be added inside a dock widget."""
 
     viewer = make_napari_viewer()
@@ -28,8 +31,8 @@ def test_add_segmentation_widget(make_napari_viewer):
 
 
 def test_segmentation_widget_run_button(
-    viewer_with_projected_image,
-    seeds_and_labels,
+    viewer_with_projected_image: napari.Viewer,
+    seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
 ):
     """
     Check that pressing the 'Run' button performs segmentation of the selected
@@ -66,8 +69,8 @@ def test_segmentation_widget_run_button(
 
 
 def test_calculate_segmentation(
-    projected_image,
-    seeds_and_labels,
+    projected_image: napari.layers.Image,
+    seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
 ):
     seeds_layer, labels_layer = seeds_and_labels
 
@@ -77,6 +80,7 @@ def test_calculate_segmentation(
         outline_sigma=OUTLINE_SIGMA,
         threshold=THRESHOLD,
     )
+
     assert labels_data.ndim == projected_image.ndim
     assert labels_data.shape == projected_image.data.shape
     assert_allclose(labels_data, labels_layer.data)

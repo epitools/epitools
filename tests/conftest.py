@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Callable
+
 import pytest
 
 import napari
@@ -32,7 +34,7 @@ def projected_image() -> napari.layers.Image:
 
 @pytest.fixture(scope="function")
 def seeds_and_labels(
-    make_napari_viewer,
+    make_napari_viewer: Callable,
 ) -> tuple[napari.layers.Points, napari.layers.Labels]:
     """Load a sample segmentaiton and the seeds use in generating the segmentation.
 
@@ -53,7 +55,10 @@ def seeds_and_labels(
 
 
 @pytest.fixture(scope="function")
-def viewer_with_image(make_napari_viewer, image) -> napari.Viewer:
+def viewer_with_image(
+    make_napari_viewer: Callable,
+    image: napari.layers.Image,
+) -> napari.Viewer:
     """Create a Napari Viewer with a sample Image layer added to it."""
 
     viewer = make_napari_viewer()
@@ -63,7 +68,10 @@ def viewer_with_image(make_napari_viewer, image) -> napari.Viewer:
 
 
 @pytest.fixture(scope="function")
-def viewer_with_projected_image(make_napari_viewer, projected_image) -> napari.Viewer:
+def viewer_with_projected_image(
+    make_napari_viewer: Callable,
+    projected_image: napari.layers.Image,
+) -> napari.Viewer:
     """Create a Napari Viewer with a sample Image layer added to it.
 
     The Image layer is a 2D projection of a 3D image.
@@ -76,9 +84,9 @@ def viewer_with_projected_image(make_napari_viewer, projected_image) -> napari.V
 
 @pytest.fixture(scope="function")
 def viewer_with_segmentation(
-    make_napari_viewer,
-    projected_image,
-    seeds_and_labels,
+    make_napari_viewer: Callable,
+    projected_image: napari.layers.Image,
+    seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
 ) -> napari.Viewer:
     """Create a Napari Viewer with a sample segmented dataset added to it.
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Callable
 from unittest.mock import patch
 
 import napari
@@ -13,7 +14,9 @@ CUT_OFF_DISTANCE = 20
 PROJECTION_NDIM = 3
 
 
-def test_add_projection_widget(make_napari_viewer):
+def test_add_projection_widget(
+    make_napari_viewer: Callable,
+):
     """Checks that the projection widget can be added inside a dock widget."""
 
     viewer = make_napari_viewer()
@@ -27,8 +30,8 @@ def test_add_projection_widget(make_napari_viewer):
 
 
 def test_projection_widget_run_button(
-    viewer_with_image,
-    projected_image,
+    viewer_with_image: napari.Viewer,
+    projected_image: napari.layers.Image,
 ):
     """
     Check that pressing the 'Run' button performs projection of the selected
@@ -55,7 +58,9 @@ def test_projection_widget_run_button(
     assert new_layer.data.shape[-2:] == original_layer.data.shape[-2:]  # yx dimensions
 
 
-def test_calculate_projection(image):
+def test_calculate_projection(
+    image: napari.layers.Image,
+):
     projection = calculate_projection(
         image.data,
         SMOOTHING_RADIUS,
