@@ -1,4 +1,4 @@
-# epitools
+# EpiTools
 
 [![Licence](https://img.shields.io/pypi/l/epitools.svg?color=green)](https://raw.githubusercontent.com/epitools/epitools/main/LICENCE.md)
 [![PyPI](https://img.shields.io/pypi/v/epitools.svg?color=green)](https://pypi.org/project/epitools)
@@ -7,30 +7,20 @@
 [![coverage](https://coveralls.io/repos/github/epitools/epitools/badge.svg?branch=main)](https://coveralls.io/github/epitools/epitools?branch=main)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/epitools)](https://napari-hub.org/plugins/epitools)
 
-EpiTools Plugin
-
----
-
-This [napari] plugin was generated with [Cookiecutter] using [@napari]'s [cookiecutter-napari-plugin] template.
-
-<!--
-Don't miss the full getting started guide to set up your new package:
-https://github.com/napari/cookiecutter-napari-plugin#getting-started
-
-and review the napari docs for plugin developers:
-https://napari.org/plugins/index.html
--->
-
 ## Installation
 
-`epitools` is not yet available to install from PyPI or napari-hub.
+The recommended way to install `EpiTools` is via
+[pip](https://pypi.org/project/pip)
 
-To install, please clone the repository and do a local install using `pip`:
-
+```sh
+pip install epitools
 ```
-git clone https://github.com/epitools/epitools.git
-cd epitools
-python -m pip install .
+
+To install the latest development version of `EpiTools` clone this repository
+and run
+
+```sh
+pip install -e .
 ```
 
 ## Contributing
