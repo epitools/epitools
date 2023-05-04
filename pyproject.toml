@@ -19,7 +19,6 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Visualization",
 ]
@@ -156,7 +155,6 @@ legacy_tox_ini = """
     python =
         3.9: py39
         3.10: py310
-        3.11: py311
 
     [gh-actions:env]
     PLATFORM =
@@ -189,6 +187,6 @@ legacy_tox_ini = """
     commands = pytest --cov --cov-report=lcov
 
     [tox]
-    envlist = py3{9,10,11}-{linux,macos,windows}
+    envlist = py3{9,10}-{linux,macos,windows}
     isolated_build=true
 """
