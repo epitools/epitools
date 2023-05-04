@@ -83,6 +83,5 @@ def _load_cell_statistics() -> list[pd.DataFrame]:
 
     # Split the MultiIndex DataFrame into a list of DataFrames - one per frame
     return [
-        stats.xs(frame, level="frame")
-        for frame in stats.index.unique(level="frame")
+        stats.xs(frame, level="frame") for frame in stats.index.unique(level="frame")
     ]
