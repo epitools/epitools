@@ -20,13 +20,13 @@ def test_add_projection_widget(
     """Checks that the projection widget can be added inside a dock widget."""
 
     viewer = make_napari_viewer()
-    num_dw = len(list(viewer.window._dock_widgets))
+    num_dw = len(viewer.window._dock_widgets)
     viewer.window.add_plugin_dock_widget(
         plugin_name="epitools",
         widget_name="Projection (selective plane)",
     )
 
-    assert len(list(viewer.window._dock_widgets)) == num_dw + 1
+    assert len(viewer.window._dock_widgets) == num_dw + 1
 
 
 def test_projection_widget_run_button(

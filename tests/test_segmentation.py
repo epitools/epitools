@@ -21,13 +21,13 @@ def test_add_segmentation_widget(
     """Checks that the segmentation widget can be added inside a dock widget."""
 
     viewer = make_napari_viewer()
-    num_dw = len(list(viewer.window._dock_widgets))
+    num_dw = len(viewer.window._dock_widgets)
     viewer.window.add_plugin_dock_widget(
         plugin_name="epitools",
         widget_name="Segmentation (local minima seeded watershed)",
     )
 
-    assert len(list(viewer.window._dock_widgets)) == num_dw + 1
+    assert len(viewer.window._dock_widgets) == num_dw + 1
 
 
 def test_segmentation_widget_run_button(
