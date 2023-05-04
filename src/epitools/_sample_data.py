@@ -9,28 +9,32 @@ Replace code below according to your needs.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 
 import epitools._reader
 
+LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
 
-def load_sample_data():
+
+def load_sample_data() -> list[LAYER_DATA]:
     """Load a sample dataset"""
 
     img_path = Path("sample_data") / "8bitDataset" / "test_image.tif"
     return epitools._reader.reader_function(path=img_path.as_posix())
 
 
-def load_projected_data():
+def load_projected_data() -> list[LAYER_DATA]:
     """Load a smaple projected dataset"""
 
     img_path = Path("sample_data") / "8bitDataset" / "test_image-projected.tif"
     return epitools._reader.reader_function(path=img_path.as_posix())
 
 
-def load_segmented_data():
+def load_segmented_data() -> list[LAYER_DATA]:
     """Load a sample segmented dataset"""
 
     # Load labels
@@ -62,7 +66,7 @@ def load_segmented_data():
     return [seeds_layer_data, labels_layer_data]
 
 
-def _load_cell_statistics() -> list[dict]:
+def _load_cell_statistics() -> list[pd.DataFrame]:
     """Load cell staistics associated with sample segmentation"""
 
     stats_path = (
