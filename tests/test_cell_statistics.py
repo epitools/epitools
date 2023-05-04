@@ -58,10 +58,8 @@ def test_segmentation_widget_run_button(
     with patch(
         "epitools.analysis.calculate_cell_statistics"
     ) as calculate_cell_statistics:
-        calculate_cell_statistics.return_value = (
-            reference_stats,
-            None,
-        )  # ignore graph data
+        # return the cell stats, but ignore graph data as we're not using it
+        calculate_cell_statistics.return_value = (reference_stats, None)
         container.run.clicked()
 
     assert cells_layer.features.size == reference_stats[0].size
