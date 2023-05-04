@@ -75,9 +75,8 @@ def _get_axes_dimensions(ndim: int, name: str) -> str | None:
         prompt=prompt,
         parent=parent,
     )
-    axes_order = selected if selected is None else options[selected]
 
-    return axes_order
+    return selected if selected is None else options[selected]
 
 
 def write_single_image(path: str | pathlib.Path, data: Any, meta: dict):

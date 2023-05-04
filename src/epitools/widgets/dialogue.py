@@ -43,7 +43,6 @@ def select_option(
     -------
     Optional[Any]
         Selected value if accepted, or ``None`` if cancelled.
-
     """
 
     options_box = magicgui.widgets.ComboBox(choices=options)

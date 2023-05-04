@@ -91,11 +91,14 @@ def reader_function(
         project_info=image_stack,
     )
 
+    # Add the YX pixel spacing for all layers - we need this for regionprops
+    # calculations
+    # The slice [-2:] is taken as this corresponds to ZYX[-2:]
     for layer in image_layers:
         layer_data, layer_kwargs, layer_type = layer
         layer_kwargs["metadata"] = {
             "yx_spacing": np.asarray(
                 image_stack.image.spacing[-2:],
-            ),  # (Z)YX[-2:], we need this spacing for regionprops
+            ),
         }
     return image_layers

@@ -121,9 +121,9 @@ def calculate_projection(
     t_size, z_size, y_size, x_size = input_image.shape
     smoothed_imstack = _smooth(input_image.astype(np.float64), smoothing_radius)
 
-    t_interp = np.zeros(
-        (t_size, SINGLE_SLICE, y_size, x_size)
-    )  # single slice in the Z dimension
+    # We will always have a single slice in the Z dimension
+    t_interp = np.zeros((t_size, SINGLE_SLICE, y_size, x_size))
+
     for t in range(t_size):
         smoothed_t = smoothed_imstack[t]
         max_intensity = smoothed_t.max(axis=0)
