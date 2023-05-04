@@ -39,11 +39,7 @@ dynamic = [
     "version",
 ]
 name = "epitools"
-readme = "README.md"
-requires-python = ">=3.9"
-entry-points."napari.manifest".epitools = "epitools:napari.yaml"
-license.file = "LICENSE"
-optional-dependencies.dev = [
+optional-dependencies = {dev = [
     "black",
     "flake8",
     "isort",
@@ -54,7 +50,17 @@ optional-dependencies.dev = [
     "pytest-cov",
     "pytest-qt",
     "tox",
-]
+], pyqt = [
+    "PyQt5 >= 5.12.3, != 5.15.0",
+], pyside = [
+    "PySide2 >= 5.13.2, != 5.15.0",
+], qt = [
+    "epitools[pyside]",
+]}
+readme = "README.md"
+requires-python = ">=3.9"
+entry-points."napari.manifest".epitools = "epitools:napari.yaml"
+license.file = "LICENSE"
 
 [tool.coverage]
 report = {skip_covered = true, sort = "cover"}
@@ -174,11 +180,12 @@ legacy_tox_ini = """
         imageio[ffmpeg]
         magicgui
         napari
-        PySide2
+        pyqt5
         pytest
         pytest-cov
         pytest-qt
         pytest-xvfb ; sys_platform == 'linux'
+        qtpy
     commands = pytest --cov --cov-report=lcov
 
     [tox]
