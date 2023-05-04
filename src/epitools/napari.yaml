@@ -3,7 +3,7 @@ display_name: EpiTools
 contributions:
   commands:
     - id: epitools.get_reader
-      python_name: epitools._reader:get_reader
+      python_name: epitools._reader:napari_get_reader
       title: Open data with EpiTools
     - id: epitools.write_single_image
       python_name: epitools._writer:write_single_image
