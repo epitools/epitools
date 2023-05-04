@@ -84,10 +84,10 @@ def test_calculate_cell_statistics(
     cell_statistics, graphs = calculate_cell_statistics(
         image=projected_image.data,
         labels=reference_labels.data,
-        pixel_spacing=reference_labels.metadata["spacing"],
+        pixel_spacing=reference_labels.metadata["yx_spacing"],
     )
 
     assert np.allclose(
         pd.DataFrame.from_dict(cell_statistics[0]).set_index("index").to_numpy(),
-        reference_stats.to_numpy(),
+        reference_stats[0].to_numpy(),
     )
