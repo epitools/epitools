@@ -130,7 +130,7 @@ def run_segmentation(
     outline_sigma: float,
     threshold: float,
 ) -> None:
-    """Segment a 3d timeserise (TYZ) at each frame"""
+    """Segment a 3D timeserise (TZYX) at each frame"""
 
     seeds_data, labels_data = epitools.analysis.calculate_segmentation(
         projection=image.data,
@@ -151,13 +151,12 @@ def run_segmentation(
     viewer.add_points(
         data=seeds_data,
         name="Seeds",
-        size=3 * image.scale[1],
+        size=3 * image.scale[-2:].mean(),
         edge_color="red",
         face_color="red",
         scale=image.scale,
         translate=image.translate,
         rotate=image.rotate,
-        plane=image.plane,
     )
 
 
