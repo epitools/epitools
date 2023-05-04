@@ -3,43 +3,15 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import numpy as np
-import pytest
 from numpy.testing import assert_allclose
 
 import napari
 
-import epitools._sample_data
 from epitools.analysis import calculate_segmentation
 
 SPOT_SIGMA = 4.0
 OUTLINE_SIGMA = 3.0
 THRESHOLD = 3.0
-
-
-@pytest.fixture(scope="function")
-def projected_image() -> napari.layers.Image:
-    data, kwargs, layer_type = epitools._sample_data.load_projected_data()[0]
-    return napari.layers.Image(data, **kwargs)
-
-
-@pytest.fixture(scope="function")
-def seeds_and_labels(
-    make_napari_viewer,
-) -> tuple[napari.layers.Points, napari.layers.Labels]:
-    seeds_layer_data, labels_layer_data = epitools._sample_data.load_segmented_data()
-    seeds_data, seeds_kwargs, _ = seeds_layer_data
-    labels_data, labels_kwargs, _ = labels_layer_data
-    return (
-        napari.layers.Points(seeds_data, **seeds_kwargs),
-        napari.layers.Labels(labels_data, **labels_kwargs),
-    )
-
-
-@pytest.fixture(scope="function")
-def viewer_with_image(make_napari_viewer, projected_image) -> napari.Viewer:
-    viewer = make_napari_viewer()
-    viewer.add_layer(projected_image)
-    return viewer
 
 
 def test_add_segmentation_widget(make_napari_viewer):
@@ -56,7 +28,7 @@ def test_add_segmentation_widget(make_napari_viewer):
 
 
 def test_segmentation_widget_run_button(
-    viewer_with_image,
+    viewer_with_projected_image,
     seeds_and_labels,
 ):
     """
@@ -64,7 +36,7 @@ def test_segmentation_widget_run_button(
     image and adds two new layers (cells and seeds) to the viewer
     """
 
-    dock_widget, container = viewer_with_image.window.add_plugin_dock_widget(
+    dock_widget, container = viewer_with_projected_image.window.add_plugin_dock_widget(
         plugin_name="epitools",
         widget_name="Segmentation (local minima seeded watershed)",
     )
@@ -77,9 +49,9 @@ def test_segmentation_widget_run_button(
         calculate_segmentation.return_value = (seeds.data, labels.data)
         container.run.clicked()
 
-    assert len(viewer_with_image.layers) == 3  # noqa: PLR2004
+    assert len(viewer_with_projected_image.layers) == 3  # noqa: PLR2004
 
-    original_layer, cells_layer, seeds_layer = viewer_with_image.layers
+    original_layer, cells_layer, seeds_layer = viewer_with_projected_image.layers
 
     assert isinstance(cells_layer, napari.layers.Labels)
     assert cells_layer.name == "Cells"

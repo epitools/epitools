@@ -2,11 +2,8 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-import pytest
-
 import napari
 
-import epitools._sample_data
 from epitools.analysis import calculate_projection
 
 SMOOTHING_RADIUS = 0.2
@@ -14,27 +11,6 @@ SURFACE_SMOOTHNESS_1 = 50
 SURFACE_SMOOTHNESS_2 = 50
 CUT_OFF_DISTANCE = 20
 PROJECTION_NDIM = 3
-
-
-@pytest.fixture(scope="function")
-def image() -> napari.layers.Image:
-    data, metadata, layer_type = epitools._sample_data.load_sample_data()[0]
-    metadata["name"] = "Test Image"
-    return napari.layers.Image(data, **metadata)
-
-
-@pytest.fixture(scope="function")
-def projected_image() -> napari.layers.Image:
-    data, metadata, layer_type = epitools._sample_data.load_projected_data()[0]
-    return napari.layers.Image(data, **metadata)
-
-
-@pytest.fixture(scope="function")
-def viewer_with_image(make_napari_viewer, image) -> napari.Viewer:
-    viewer = make_napari_viewer()
-    viewer.add_layer(image)
-
-    return viewer
 
 
 def test_add_projection_widget(make_napari_viewer):
