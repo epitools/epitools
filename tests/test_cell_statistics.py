@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import numpy as np
+import pandas as pd
 import pytest
 
-import napari
-
 from epitools.analysis import calculate_cell_statistics
+
+if TYPE_CHECKING:
+    from typing import Callable
+
+    import napari
 
 
 def test_add_cell_statistics_widget(
@@ -77,7 +81,7 @@ def test_calculate_cell_statistics(
     seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
 ):
     reference_seeds, reference_labels = seeds_and_labels
-    reference_stats = reference_labels.metadata["cell_statistics"]
+    reference_stats: pd.DataFrame = reference_labels.metadata["cell_statistics"]
 
     cell_statistics, graphs = calculate_cell_statistics(
         image=projected_image.data,
@@ -86,6 +90,6 @@ def test_calculate_cell_statistics(
     )
 
     assert np.allclose(
-        cell_statistics,
+        pd.DataFrame.from_dict(cell_statistics[0]).set_index("index").to_numpy(),
         reference_stats.to_numpy(),
     )
