@@ -7,10 +7,14 @@ requires = [
 
 [project]
 authors = [
-    {email = "yourname@example.com", name = "Napari Developer"},
+    {email = "d.matthews@ucl.ac.uk", name = "Daniel R. Matthews"},
+    {email = "g.paci@ucl.ac.uk", name = "Giulia Paci"},
+    {email = "p.munuera@ucl.ac.uk", name = "Pablo V. Munuera"},
+    {email = "patrick.roddy@ucl.ac.uk", name = "Patrick J. Roddy"},
+    {email = "paul.j.smith@ucl.ac.uk", name = "Paul J. Smith"},
+    {email = "y.mao@ucl.ac.uk", name = "Yanlan Mao"},
 ]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
     "Framework :: napari",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: BSD License",
@@ -40,14 +44,10 @@ dynamic = [
 name = "epitools"
 optional-dependencies = {dev = [
     "black",
-    "flake8",
-    "isort",
-    "napari",
+    "mypy",
     "pre-commit",
     "pyqt5",
-    "pytest",
-    "pytest-cov",
-    "pytest-qt",
+    "ruff",
     "tox",
 ], pyqt = [
     "PyQt5 >= 5.12.3, != 5.15.0",
@@ -58,8 +58,9 @@ optional-dependencies = {dev = [
 ]}
 readme = "README.md"
 requires-python = ">=3.9"
+urls = {Code = "https://github.com/epitools/epitools", Download = "https://pypi.org/project/epitools", Homepage = "https://github.com/epitools/epitools", Issues = "https://github.com/epitools/epitools/issues"}
 entry-points."napari.manifest".epitools = "epitools:napari.yaml"
-license.file = "LICENSE"
+license.file = "LICENCE.md"
 
 [tool.coverage]
 report = {skip_covered = true, sort = "cover"}
@@ -122,6 +123,7 @@ select = [
     "W",
     "YTT",
 ]
+target-version = "py39"
 isort.known-first-party = [
     "epitools",
 ]
@@ -140,6 +142,8 @@ isort.sections.napari = [
 mccabe.max-complexity = 18
 
 [tool.setuptools_scm]
+local_scheme = "no-local-version"
+write_to = "src/epitools/_version.py"
 
 [tool.tomlsort]
 all = true
