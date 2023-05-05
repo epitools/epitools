@@ -242,7 +242,7 @@ def run_cell_statistics(
 
     pixel_spacing = (
         image.metadata["yx_spacing"]
-        if "spacing" in image.metadata
+        if "yx_spacing" in image.metadata
         else DEFAULT_PIXEL_SPACING
     )
 
