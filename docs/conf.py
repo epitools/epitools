@@ -29,7 +29,7 @@ copyright = f"2023-{year}, {author}"  # noqa: A001
 
 # The full version, including alpha/beta/rc tags
 release = f"v{epitools.__version__}"
-version = "dev" if "dev" in release else release
+release = version
 
 # -- General configuration ---------------------------------------------------
 
