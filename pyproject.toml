@@ -44,13 +44,11 @@ dynamic = [
 name = "epitools"
 optional-dependencies = {dev = [
     "black",
-    "build",
     "mypy",
     "pre-commit",
     "pyqt5",
     "ruff",
     "tox",
-    "twine",
 ], pyqt = [
     "PyQt5 >= 5.12.3, != 5.15.0",
 ], pyside = [
