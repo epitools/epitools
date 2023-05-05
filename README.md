@@ -23,6 +23,12 @@ and run
 python -m pip install -e .
 ```
 
+## Issues
+
+If you encounter any problems, please
+[file an issue](https://github.com/epitools/epitools/issues) along with a
+detailed description.
+
 ## Contributing
 
 Contributions are very welcome. Tests can be run with [tox](https://tox.wiki),
