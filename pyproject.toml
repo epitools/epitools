@@ -50,7 +50,8 @@ optional-dependencies = {dev = [
     "ruff",
     "tox",
 ], docs = [
-    "napari-sphinx-theme",
+    "myst-parser",
+    "pydata-sphinx-theme",
     "sphinx-autobuild",
     "sphinx<5",
     "sphinx_autodoc_typehints",
