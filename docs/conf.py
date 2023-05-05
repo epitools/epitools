@@ -69,6 +69,7 @@ source_suffix = {
 html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "navbar_end": ["search-field.html"],
+    "navbar_persistent": [],  # remove the search icon
 }
 html_context = {
     "default_mode": "light",
@@ -81,3 +82,8 @@ html_static_path = ["_static"]
 
 html_short_title = f"{project}-{version}"
 html_show_sourcelink = False
+
+
+# Automatically extract typehints when specified and place them in
+# descriptions of the relevant function/method.
+autodoc_typehints = "description"

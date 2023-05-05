@@ -1,6 +1,9 @@
-"""
+"""Calculate cell statistics --- :mod:`epitools.analysis.cell_statistics`
+=========================================================================
+
 This module contains functions for calculating region-based properties
 of labelled images using skimage.
+
 """
 
 from __future__ import annotations
@@ -31,7 +34,45 @@ def calculate_cell_statistics(
     labels: napari.types.LabelsData,
     pixel_spacing: tuple[float],
 ) -> tuple[list[dict[str, npt.NDArray]], list[skimage.graph.RAG]]:
-    """Calculate the region based properties of a segmented image"""
+    """Calculate the region based properties of a timeseries of segmented images.
+
+    Currently the following statistics are calculated for each frame of the timeseries:
+        - area
+        - perimeter
+        - number of neighbours
+
+    ``skimage.measure.regionprops_table`` is used to calculated the area
+    and perimeter.
+
+    ``skimage.graph.RAG`` is used to create a graph of neighbouring cells
+    at each frame, from which the number of neighbours of each cell is
+    calculated.
+
+    Args:
+        image :
+            Timeseries of images (TYX or TZYX) for which to calculate the cell
+            statistics.
+        labels :
+            Labelled input image, must be the same shape as ``image``.
+            Labels with value 0 are ignored.
+        pixel_spacing :
+
+
+    Note:
+        It is assumed that the first dimension of both ``image`` and ``labels``
+        corresponds to time.
+
+    Returns:
+        list[dict[str, np.NDArray]]
+            List of dictionaries, where each dictionary contains the cell statistics
+            for a single frame. The dictionary keys are:
+                - area
+                - perimeter
+                - neighbours
+        list[skimage.graph.RAG]
+            List of the network graphs constructed for each frame of the timeseries
+
+    """
 
     # Calculate cell statistics for each frame
     cell_statistics = _calculate_cell_statistics(image, labels, pixel_spacing)

@@ -9,12 +9,23 @@
 .. include:: ../README.md
    :parser: myst_parser.sphinx_
 
+
+Napari plugin
+=============
+
+When you install EpiTools, both napari and the EpiTools
+plugin will also be installed. See :ref:`napari_plugin` for guidance on using the plugin.
+
+
+Python API
+==========
+
+See the :ref:`python_api` pages for the full API of the analysis modules in EpiTools.
+EpiTools currently contains to following analysis modules:
+
 .. toctree::
    :maxdepth: 1
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
+   api/projection
+   api/segmentation
+   api/cell_statistics
