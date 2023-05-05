@@ -4,16 +4,16 @@ contributions:
   commands:
     - id: epitools.get_reader
       python_name: epitools._reader:napari_get_reader
-      title: Open data with napari EpiTools
-    - id: epitools.write_multiple
-      python_name: epitools._writer:write_multiple
-      title: Save multi-layer data with napari EpiTools
+      title: Open data with EpiTools
     - id: epitools.write_single_image
       python_name: epitools._writer:write_single_image
-      title: Save image data with napari EpiTools
+      title: Save an image layer with EpiTools
+    - id: epitools.write_single_labels
+      python_name: epitools._writer:write_single_labels
+      title: Save a labels layer with EpiTools
     - id: epitools.load_sample_data
       python_name: epitools._sample_data:load_sample_data
-      title: Load sample data from napari EpiTools
+      title: Load sample data from EpiTools
     - id: epitools.projection_widget
       python_name: epitools.main:create_projection_widget
       title: Epitools Projection Widget
@@ -28,19 +28,19 @@ contributions:
       accepts_directories: false
       filename_patterns: ["*.tif", "*.tiff"]
   writers:
-    - command: epitools.write_multiple
-      layer_types: ["image*", "labels*"]
-      filename_extensions: []
     - command: epitools.write_single_image
       layer_types: ["image"]
-      filename_extensions: [".npy"]
+      filename_extensions: [".tif", ".tiff"]
+    - command: epitools.write_single_labels
+      layer_types: ["labels"]
+      filename_extensions: [".tif", ".tiff"]
   sample_data:
     - command: epitools.load_sample_data
-      display_name: napari EpiTools
+      display_name: EpiTools
       key: test_image
   widgets:
     - command: epitools.projection_widget
-      # autogenerate: true <- for use with napari-assistant
+      # autogenerate: true <- for use with assistant
       display_name: Projection (selective plane)
     - command: epitools.segmentation_widget
       display_name: Segmentation (local minima seeded watershed)
