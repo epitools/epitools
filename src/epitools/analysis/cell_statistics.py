@@ -65,10 +65,7 @@ def calculate_cell_statistics(
     Returns:
         list[dict[str, np.NDArray]]
             List of dictionaries, where each dictionary contains the cell statistics
-            for a single frame. The dictionary keys are:
-                - area
-                - perimeter
-                - neighbours
+            for a single frame. The dictionary keys are: area; perimeter; neighbours.
         list[skimage.graph.RAG]
             List of the network graphs constructed for each frame of the timeseries
 
