@@ -52,9 +52,11 @@ optional-dependencies = {dev = [
 ], docs = [
     "myst-parser",
     "pydata-sphinx-theme",
+    "pytz",
     "sphinx-autobuild",
     "sphinx<5",
     "sphinx_autodoc_typehints",
+    "types-pytz",
 ], pyqt = [
     "PyQt5 >= 5.12.3, != 5.15.0",
 ], pyside = [
