@@ -56,6 +56,7 @@ optional-dependencies = {dev = [
     "sphinx-autobuild",
     "sphinx<5",
     "sphinx_autodoc_typehints",
+    "sphinxcontrib-video",
     "types-pytz",
 ], pyqt = [
     "PyQt5 >= 5.12.3, != 5.15.0",
