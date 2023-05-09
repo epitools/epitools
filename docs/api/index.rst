@@ -1,3 +1,5 @@
+:orphan:
+
 .. _python_api:
 
 Python API
