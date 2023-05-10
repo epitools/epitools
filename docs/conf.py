@@ -41,10 +41,11 @@ autosummary_imported_members = True
 # ones.
 extensions = [
     "myst_parser",
-    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.napoleon",
+    "sphinxcontrib.video",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
