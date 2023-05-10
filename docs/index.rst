@@ -13,15 +13,15 @@
 Napari plugin
 =============
 
-When you install EpiTools, both napari and the EpiTools
+When you install ``EpiTools``, both ``napari`` and the ``EpiTools``
 plugin will also be installed. See :ref:`napari_plugin` for guidance on using the plugin.
 
 
 Python API
 ==========
 
-See the :ref:`python_api` pages for the full API of the analysis modules in EpiTools.
-EpiTools currently contains to following analysis modules:
+See the :ref:`python_api` pages for the full API of the analysis modules in
+``EpiTools``. ``EpiTools`` currently contains to following analysis modules:
 
 .. toctree::
     :maxdepth: 1

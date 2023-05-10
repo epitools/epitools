@@ -2,29 +2,63 @@
 
 .. _napari_plugin:
 
-Using the EpiTools plugin for napari
+Using the ``EpiTools`` plugin for ``napari``
 ====================================
 
-The typical EpiTools workflow is
+The following steps are part of the typical ``EpiTools`` workflow.
 
-1. Projection
+1. **Projection**
 
-.. video:: _static/epitools-projection.mp4
+The following video demonstrates how the projection step can be performed.
 
-2. Segmentation
+.. video:: ../_static/epitools-projection.mp4
+    :alt: EpiTools Projection Step
+    :height: 400
 
-.. video:: _static/epitools-segmentation.mp4
+2. **Segmentation**
 
-3. Correcting Segmentation
+The following video demonstrates how the segmentation step can be performed.
 
-4. Tracking
+.. video:: ../_static/epitools-segmentation.mp4
+    :alt: EpiTools Segmentation Step
+    :height: 400
 
-5. Correction Tracking
+3. **Correcting Segmentation**
 
-6. Cell Statistics
+If the segmentation output needs correction we would recommend the
+`segment blobs and things with membranes <https://www.napari-hub.org/plugins/napari-segment-blobs-and-things-with-membranes#manual-split-and-merge-labels>`_
+plugin. This allows one to manually split and merge labels.
 
-.. video:: _static/epitools-cell-stats.mp4
+4. **Tracking**
 
-.. video:: _static/epitools-colourmaps.mp4
+To perform tracking we would recommend the
+`brack <https://www.napari-hub.org/plugins/btrack>`_ plugin.
 
-.. video:: _static/epitools-export.mp4
+5. **Correction Tracking**
+
+This is not currently possible with ``EpiTools``/``btrack``.
+
+6. **Cell Statistics**
+
+``EpiTools`` includes methods to extract a variety of statistics from the cells.
+
+The first video demonstrates how to view the statistics of a given cell via
+tooltips.
+
+.. video:: ../_static/epitools-cell-stats.mp4
+    :alt: EpiTools Cell Statistics Tooltips
+    :height: 400
+
+The second video shows how to have a colour map for a given cell property,
+i.e. area.
+
+.. video:: ../_static/epitools-colourmaps.mp4
+    :alt: EpiTools Cell Statistics Colour Maps
+    :height: 400
+
+Finally, this video demonstrates how to export and save the cell statistics
+output.
+
+.. video:: ../_static/epitools-export.mp4
+    :alt: EpiTools Cell Statistics Export
+    :height: 400
