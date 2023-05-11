@@ -157,6 +157,7 @@ def _calculate_cell_statistics(
         frame_stats["index"] = frame_stats.pop("label")
         # TODO: required for these to work as maps, otherwise all the same colour
         # however, this means that the CSV has that value also
+        # https://github.com/epitools/epitools/issues/97
         """
         frame_stats["perimeter"] *= 1e6  # convert to um
         frame_stats["area"] *= 1e12  # convert to um2
