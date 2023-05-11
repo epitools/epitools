@@ -30,6 +30,36 @@ and run
 python -m pip install -e .
 ```
 
+If working on Apple Silicon make sure to also install the following package from
+[conda-forge](https://conda-forge.org).
+
+```sh
+conda install -c conda-forge pyqt
+```
+
+### Recommended Companion Napari Plugins
+
+To also install the recommended plugins for the `EpiTools` workflow run
+
+```sh
+python -m pip install epitools[wf]
+```
+
+and
+
+```sh
+python -m pip install -e .[wf]
+```
+
+If working on Apple Silicon make sure to also install the following package from
+[conda-forge](https://conda-forge.org)
+
+```sh
+conda install -c conda-forge cvxopt
+```
+
+which is required for [btrack](https://github.com/quantumjot/btrack).
+
 ## Issues
 
 If you encounter any problems, please
