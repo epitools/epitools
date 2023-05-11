@@ -43,6 +43,7 @@ This is not currently possible with ``EpiTools``/``btrack``.
 ``EpiTools`` includes methods to extract a variety of statistics from the cells.
 
 .. TODO: restore this video if tooltips are reinstated
+.. https://github.com/epitools/epitools/issues/96
 ..
     This video demonstrates how to view the statistics of a given cell via
     tooltips.
