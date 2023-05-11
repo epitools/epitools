@@ -3,7 +3,7 @@
 .. _napari_plugin:
 
 Using the ``EpiTools`` plugin for ``napari``
-====================================
+============================================
 
 The following steps are part of the typical ``EpiTools`` workflow.
 
@@ -43,12 +43,13 @@ This is not currently possible with ``EpiTools``/``btrack``.
 ``EpiTools`` includes methods to extract a variety of statistics from the cells.
 
 .. TODO: restore this video if tooltips are reinstated
-.. This video demonstrates how to view the statistics of a given cell via
-.. tooltips.
+..
+    This video demonstrates how to view the statistics of a given cell via
+    tooltips.
 
-.. .. video:: ../_static/epitools-cell-stats.mp4
-..     :alt: EpiTools Cell Statistics Tooltips
-..     :height: 400
+    .. video:: ../_static/epitools-cell-stats.mp4
+        :alt: EpiTools Cell Statistics Tooltips
+        :height: 400
 
 This video shows how to have a colour map for a given cell property,
 i.e. neighbours.
