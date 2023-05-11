@@ -34,7 +34,7 @@ plugin. This allows one to manually split and merge labels.
 To perform tracking we would recommend the
 `brack <https://www.napari-hub.org/plugins/btrack>`_ plugin.
 
-5. **Correction Tracking**
+5. **Correcting Tracking**
 
 This is not currently possible with ``EpiTools``/``btrack``.
 
