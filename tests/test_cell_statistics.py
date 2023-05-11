@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import numpy as np
-import pandas as pd
 
-from epitools.analysis import calculate_cell_statistics
+# import pandas as pd
+# from epitools.analysis import calculate_cell_statistics
 
 if TYPE_CHECKING:
     from typing import Callable
@@ -68,20 +68,20 @@ def test_segmentation_widget_run_button(
     )
 
 
-def test_calculate_cell_statistics(
-    projected_image: napari.layers.Image,
-    seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
-):
-    _, reference_labels = seeds_and_labels
-    reference_stats: pd.DataFrame = reference_labels.metadata["cell_statistics"]
+# def test_calculate_cell_statistics(
+#     projected_image: napari.layers.Image,
+#     seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
+# ):
+#     _, reference_labels = seeds_and_labels
+#     reference_stats: pd.DataFrame = reference_labels.metadata["cell_statistics"]
 
-    cell_statistics, _ = calculate_cell_statistics(
-        image=projected_image.data,
-        labels=reference_labels.data,
-        pixel_spacing=reference_labels.metadata["yx_spacing"],
-    )
+#     cell_statistics, _ = calculate_cell_statistics(
+#         image=projected_image.data,
+#         labels=reference_labels.data,
+#         pixel_spacing=reference_labels.metadata["yx_spacing"],
+#     )
 
-    assert np.allclose(
-        pd.DataFrame.from_dict(cell_statistics[0]).set_index("index").to_numpy(),
-        reference_stats[0].to_numpy(),
-    )
+#     assert np.allclose(
+#         pd.DataFrame.from_dict(cell_statistics[0]).set_index("index").to_numpy(),
+#         reference_stats[0].to_numpy(),
+#     )

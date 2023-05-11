@@ -341,7 +341,7 @@ def create_colourmaps(
     if "cell_statistics" not in labels.metadata:
         _msg = (
             "Cannot create colourmaps - "
-            "the selected Labels layer has no cell staistics."
+            "the selected Labels layer has no cell statistics."
         )
         napari.utils.notifications.show_error(_msg)
         return
