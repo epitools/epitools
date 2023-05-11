@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import skimage.measure._regionprops
-
 import magicgui.widgets
 import napari
 from magicgui.widgets import Widget
+
+import epitools._regionprops
 
 __all__ = [
     "create_cell_statistics_widget",
@@ -90,7 +90,7 @@ def _create_colour_labels_widgets() -> list[Widget]:
         label="statistic",
         widget_type="ComboBox",
         options={
-            "choices": {"id"} | skimage.measure._regionprops.PROP_VALS,
+            "choices": ["id", *epitools._regionprops.REGIONPROPS_OPTIONS],
             "tooltip": statisitc_tooltip,
         },
     )

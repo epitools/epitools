@@ -72,10 +72,10 @@ def test_calculate_cell_statistics(
     projected_image: napari.layers.Image,
     seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
 ):
-    reference_seeds, reference_labels = seeds_and_labels
+    _, reference_labels = seeds_and_labels
     reference_stats: pd.DataFrame = reference_labels.metadata["cell_statistics"]
 
-    cell_statistics, graphs = calculate_cell_statistics(
+    cell_statistics, _ = calculate_cell_statistics(
         image=projected_image.data,
         labels=reference_labels.data,
         pixel_spacing=reference_labels.metadata["yx_spacing"],

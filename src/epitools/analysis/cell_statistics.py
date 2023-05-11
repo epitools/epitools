@@ -20,9 +20,10 @@ import networkx.exception
 import numpy as np
 import skimage.graph
 import skimage.measure
-import skimage.measure._regionprops
 
 import napari
+
+import epitools._regionprops
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +104,7 @@ def _calculate_cell_statistics(
         skimage.measure.regionprops_table(
             label_image=frame_labels,
             intensity_image=frame_image,
-            properties=skimage.measure._regionprops.PROP_VALS,
+            properties=epitools._regionprops.REGIONPROPS_OPTIONS,
             spacing=pixel_spacing,
         )
         for frame_labels, frame_image in zip(labels, image)
