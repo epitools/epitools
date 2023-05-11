@@ -94,8 +94,9 @@ def _calculate_cell_statistics(
 ) -> list[dict[str, npt.NDArray]]:
     """Calculate cell properties using skimage regionprops"""
 
-    # contents of `skimage.measure._regionprops.PROP_VALS`
     # TODO: fix the commented out properties
+    # https://github.com/epitools/epitools/issues/98
+    # contents of `skimage.measure._regionprops.PROP_VALS`
     properties = [
         "area_bbox",
         "area_convex",
