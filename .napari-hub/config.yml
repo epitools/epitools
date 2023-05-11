@@ -1,0 +1,7 @@
+labels:
+  ontology: EDAM-BIOIMAGING:alpha06
+  terms:
+    - 4D Image
+    - Cell projection
+    - Cell segmentation
+    - Cell statistics
