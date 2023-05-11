@@ -2,15 +2,23 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-# from unittest.mock import patch
-# import numpy as np
-# import pandas as pd
-# from epitools.analysis import calculate_cell_statistics
+# TODO: needed for tests
+"""
+from unittest.mock import patch
+
+import numpy as np
+import pandas as pd
+
+from epitools.analysis import calculate_cell_statistics
+"""
 
 if TYPE_CHECKING:
     from typing import Callable
 
-    # import napari
+    # TODO: needed for tests
+    """
+    import napari
+    """
 
 
 def test_add_cell_statistics_widget(
