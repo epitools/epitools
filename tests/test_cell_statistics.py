@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 # TODO: needed for tests
+# https://github.com/epitools/epitools/issues/96
 """
 from unittest.mock import patch
 
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
     from typing import Callable
 
     # TODO: needed for tests
+    # https://github.com/epitools/epitools/issues/96
     """
     import napari
     """
@@ -37,6 +39,7 @@ def test_add_cell_statistics_widget(
 
 
 # TODO: restore test once tooltips are back in
+# https://github.com/epitools/epitools/issues/96
 '''
 def test_segmentation_widget_run_button(
     viewer_with_segmentation: napari.Viewer,
@@ -79,6 +82,7 @@ def test_segmentation_widget_run_button(
 
 
 # TODO: restore test once tooltips are back in
+# https://github.com/epitools/epitools/issues/96
 """
 def test_calculate_cell_statistics(
     projected_image: napari.layers.Image,

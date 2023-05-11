@@ -261,6 +261,7 @@ def run_cell_statistics(
     napari.utils.notifications.show_info(message)
 
     # TODO: too many regionprops options crashes the client, is there a way to fix this?
+    # https://github.com/epitools/epitools/issues/96
     """
     # Set cell stats for the current frame
     viewer = napari.current_viewer()
