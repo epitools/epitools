@@ -4,8 +4,6 @@ import magicgui.widgets
 import napari
 from magicgui.widgets import Widget
 
-import epitools._regionprops
-
 __all__ = [
     "create_cell_statistics_widget",
 ]
@@ -90,7 +88,7 @@ def _create_colour_labels_widgets() -> list[Widget]:
         label="statistic",
         widget_type="ComboBox",
         options={
-            "choices": ["id", *epitools._regionprops.REGIONPROPS_OPTIONS],
+            "choices": ["id", "area", "perimeter", "orientation", "neighbours"],
             "tooltip": statisitc_tooltip,
         },
     )
