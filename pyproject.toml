@@ -64,6 +64,9 @@ optional-dependencies = {dev = [
     "PySide2 >= 5.13.2, != 5.15.0",
 ], qt = [
     "epitools[pyside]",
+], wf = [
+    "btrack[napari]",
+    "napari-segment-blobs-and-things-with-membranes",
 ]}
 readme = "README.md"
 requires-python = ">=3.9"
