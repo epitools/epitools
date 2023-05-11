@@ -88,7 +88,7 @@ def _create_colour_labels_widgets() -> list[Widget]:
         label="statistic",
         widget_type="ComboBox",
         options={
-            "choices": ["id", "area", "perimeter", "orientation", "neighbours"],
+            "choices": ["id", "orientation", "neighbours"],
             "tooltip": statisitc_tooltip,
         },
     )
