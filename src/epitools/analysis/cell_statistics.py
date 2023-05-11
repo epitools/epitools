@@ -20,6 +20,7 @@ import networkx.exception
 import numpy as np
 import skimage.graph
 import skimage.measure
+import skimage.measure._regionprops
 
 import napari
 
@@ -94,8 +95,6 @@ def _calculate_cell_statistics(
 ) -> list[dict[str, npt.NDArray]]:
     """Calculate cell properties using skimage regionprops"""
 
-    properties = ["label", "area", "perimeter", "orientation"]
-
     # remove z axis if necessary
     image = image[:, 0] if image.ndim == FOUR_DIMENSIONAL else image
     labels = labels[:, 0] if labels.ndim == FOUR_DIMENSIONAL else labels
@@ -104,7 +103,7 @@ def _calculate_cell_statistics(
         skimage.measure.regionprops_table(
             label_image=frame_labels,
             intensity_image=frame_image,
-            properties=properties,
+            properties=skimage.measure._regionprops.PROP_VALS,
             spacing=pixel_spacing,
         )
         for frame_labels, frame_image in zip(labels, image)
@@ -113,8 +112,6 @@ def _calculate_cell_statistics(
     # skimage uses 'label' for what napari calls 'index'
     for frame_stats in cell_statistics:
         frame_stats["index"] = frame_stats.pop("label")
-        frame_stats["perimeter"] *= 1e6  # convert to um
-        frame_stats["area"] *= 1e12  # convert to um2
 
     return cell_statistics
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import skimage.measure._regionprops
+
 import magicgui.widgets
 import napari
 from magicgui.widgets import Widget
@@ -88,7 +90,7 @@ def _create_colour_labels_widgets() -> list[Widget]:
         label="statistic",
         widget_type="ComboBox",
         options={
-            "choices": ["id", "area", "perimeter", "orientation", "neighbours"],
+            "choices": {"id"} | skimage.measure._regionprops.PROP_VALS,
             "tooltip": statisitc_tooltip,
         },
     )
