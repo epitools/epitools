@@ -155,6 +155,12 @@ def _calculate_cell_statistics(
     # skimage uses 'label' for what napari calls 'index'
     for frame_stats in cell_statistics:
         frame_stats["index"] = frame_stats.pop("label")
+        # TODO: required for these to work as maps, otherwise all the same colour
+        # however, this means that the CSV has that value also
+        """
+        frame_stats["perimeter"] *= 1e6  # convert to um
+        frame_stats["area"] *= 1e12  # convert to um2
+        """
 
     return cell_statistics
 
