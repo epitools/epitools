@@ -68,6 +68,7 @@ def test_segmentation_widget_run_button(
     )
 
 
+# TODO: restore test
 # def test_calculate_cell_statistics(
 #     projected_image: napari.layers.Image,
 #     seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
