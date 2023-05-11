@@ -86,3 +86,5 @@ venv/
 # direnv
 .direnv
 .envrc
+
+*.csv

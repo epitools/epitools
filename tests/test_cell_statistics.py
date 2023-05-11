@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
-import pytest
 
 from epitools.analysis import calculate_cell_statistics
 
@@ -69,11 +68,6 @@ def test_segmentation_widget_run_button(
     )
 
 
-@pytest.mark.xfail(
-    raises=NotImplementedError,
-    reason="This test should be fixed by the changes in PR #67",
-    stict=True,
-)
 def test_calculate_cell_statistics(
     projected_image: napari.layers.Image,
     seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
@@ -84,10 +78,10 @@ def test_calculate_cell_statistics(
     cell_statistics, graphs = calculate_cell_statistics(
         image=projected_image.data,
         labels=reference_labels.data,
-        pixel_spacing=reference_labels.metadata["spacing"],
+        pixel_spacing=reference_labels.metadata["yx_spacing"],
     )
 
     assert np.allclose(
         pd.DataFrame.from_dict(cell_statistics[0]).set_index("index").to_numpy(),
-        reference_stats.to_numpy(),
+        reference_stats[0].to_numpy(),
     )

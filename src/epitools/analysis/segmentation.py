@@ -1,3 +1,11 @@
+"""Cell segmentation --- :mod:`epitools.analysis.segmentation`
+==============================================================
+
+This module contains functions for segmenting 3D (ZYX) and 4D (TZXY)
+images.
+
+"""
+
 from __future__ import annotations
 
 from typing import Any
@@ -83,21 +91,34 @@ def calculate_segmentation(
     outline_sigma: float,
     threshold: float,
 ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int64]]:
-    """Segment a 4D projected image using
-    `thresholded_local_minima_seeded_watershed`.
+    """Segment an image using a thresholded local-minima-seeded watershed algorith.
+
+    This will segment cells in images with marked membranes that have a high signal
+    intensity.
+
+    The two sigma parameters allow tuning the segmentation result. Under the hood, this
+    algorithm first applies two Gaussian blurs, then uses a local minima detection and
+    seeded watershed. Afterwards, all objects are removed that have an average intensity
+    below a given threshold.
 
     Args:
         projection:
             A projected image stack processed using Epitools.
         spot_sigma:
-            Controls how close segmented cells can be.
+            Controls how close segmented cells can be - larger values result in more
+            seeds used in the segmentation
         outline_sigma:
-            Controls how precisely segmented cells are outlined.
+            Controls how precisely segmented cells are outlined - larger values result
+            in more precise (rougher) cell boundaries.
         threshold:
-            Cells with an average intensity below `threshold` are ignored.
+            Cells with an average intensity below `threshold` are will be removed from
+            the segmentation and treated as background.
 
     Returns:
-        Tuple of segmented seed points and labels.
+        np.NDArray
+            Seeds used in the segmentated
+        np.NDArray
+            Labels of the segmented image (0 corresponds to background)
     """
     t_size = projection.shape[0]
 

@@ -1,3 +1,10 @@
+"""Projection along Z --- :mod:`epitools.analysis.projection`
+=============================================================
+
+This module contains functions to project 4D (TZYX) and 3D (ZYX) images
+along the z-dimension.
+"""
+
 import itertools
 
 import numpy as np
@@ -6,6 +13,7 @@ from scipy.interpolate import griddata
 from skimage.filters import gaussian
 
 THREE_DIMENSIONAL = 3
+SINGLE_SLICE = 1
 
 
 def _smooth(
@@ -97,20 +105,37 @@ def calculate_projection(
 ) -> npt.NDArray[np.float64]:
     """Z projection using image interpolation.
 
+     Perfrom an iterative projection of 3D points along the z axis.
+
+     An initial projection is performed to obtain the 'first estimated surface'.
+     Points furtherthan ``cut_off_distance`` from the first estimated surface will
+     be ignored in the second projection step. This reduces noise from point that are
+     far from the projected plane.
+
     Args:
         input_image:
-            Numpy ndarray representation of 3D image stack.
+            Numpy ndarray representation of 4D or 3D image stack. ``input_image`` is
+            assumed to have dimensions that correspond to TZYX or ZYX if it is 4D or 3D,
+            respectively.
+
         smoothing_radius:
             Kernel radius for gaussian blur to apply before estimating the surface.
-        surface_smoothness_1:
-            Surface smoothness for 1st griddata estimation, larger means smoother.
-        surface_smoothness_2:
-            Surface smoothness for 3nd gridFit(c) estimation, larger means smoother.
-        cut_off_distance:
-            Cutoff distance in z-planes from the 1st estimated surface.
 
+        surface_smoothness_1:
+            Surface smoothness for 1st griddata estimation. Larger values will produce
+            greater smoothing.
+
+        surface_smoothness_2:
+            Surface smoothness for 2nd iteration of smoothing. Again, larger values
+            will produce greater smoothing.
+
+        cut_off_distance:
+            Cutoff distance in z-planes from the first estimated surface.
     Returns:
-        Stack projected onto a single plane.
+        np.NDArray
+            Timeseries of the image stack projected onto a single plane in z. The
+            returned data will always be 4D - if the original data was 3D then there
+            will be a single time slice and a single z slice.
     """
     if input_image.ndim == THREE_DIMENSIONAL:
         # Assume we have a stack of images at a single point in time (ZYX)
@@ -120,7 +145,9 @@ def calculate_projection(
     t_size, z_size, y_size, x_size = input_image.shape
     smoothed_imstack = _smooth(input_image.astype(np.float64), smoothing_radius)
 
-    t_interp = np.zeros((t_size, y_size, x_size))  # remove the z-axis when projecting
+    # We will always have a single slice in the Z dimension
+    t_interp = np.zeros((t_size, SINGLE_SLICE, y_size, x_size))
+
     for t in range(t_size):
         smoothed_t = smoothed_imstack[t]
         max_intensity = smoothed_t.max(axis=0)

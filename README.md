@@ -1,63 +1,72 @@
-# epitools
-
-[![License](https://img.shields.io/pypi/l/epitools.svg?color=green)](https://raw.githubusercontent.com/epitools/epitools/main/LICENSE)
+[![Licence](https://img.shields.io/pypi/l/epitools.svg?color=green)](https://raw.githubusercontent.com/epitools/epitools/main/LICENCE.md)
 [![PyPI](https://img.shields.io/pypi/v/epitools.svg?color=green)](https://pypi.org/project/epitools)
 [![Python Version](https://img.shields.io/pypi/pyversions/epitools.svg?color=green)](https://python.org)
 [![tests](https://github.com/epitools/epitools/actions/workflows/test.yml/badge.svg)](https://github.com/epitools/epitools/actions/workflows/test.yml)
+[![Documentation](https://readthedocs.org/projects/epitools/badge/?version=latest)](https://epitools.readthedocs.io/en/latest/?badge=latest)
 [![coverage](https://coveralls.io/repos/github/epitools/epitools/badge.svg?branch=main)](https://coveralls.io/github/epitools/epitools?branch=main)
 [![napari hub](https://img.shields.io/endpoint?url=https://api.napari-hub.org/shields/epitools)](https://napari-hub.org/plugins/epitools)
 
-EpiTools Plugin
+# Welcome to EpiTools!
 
----
+EpiTools is a Python package and associated [napari](https://napari.org/stable/) plugin to extract the membrane signal from epithelial tissues and analyze it with the aid of computer vision.
 
-This [napari] plugin was generated with [Cookiecutter] using [@napari]'s [cookiecutter-napari-plugin] template.
+The development of EpiTools was inspired by the challenges in analyzing time-lapses of growing Drosophila imaginal discs.
 
-<!--
-Don't miss the full getting started guide to set up your new package:
-https://github.com/napari/cookiecutter-napari-plugin#getting-started
-
-and review the napari docs for plugin developers:
-https://napari.org/plugins/index.html
--->
+The folded morphology, the very small apical cell surfaces and the long time series required a new automated cell recognition to accurately study growth dynamics.
 
 ## Installation
 
-`epitools` is not yet available to install from PyPI or napari-hub.
+The recommended way to install `EpiTools` is via
+[pip](https://pypi.org/project/pip)
 
-To install, please clone the repository and do a local install using `pip`:
-
-```
-git clone https://github.com/epitools/epitools.git
-cd epitools
-python -m pip install .
+```sh
+python -m pip install epitools
 ```
 
-## Contributing
+To install the latest development version of `EpiTools` clone this repository
+and run
 
-Contributions are very welcome. Tests can be run with [tox], please ensure
-the coverage at least stays the same before you submit a pull request.
+```sh
+python -m pip install -e .
+```
 
-## License
+If working on Apple Silicon make sure to also install the following package from
+[conda-forge](https://conda-forge.org).
 
-Distributed under the terms of the [BSD-3] license,
-"epitools" is free and open source software
+```sh
+conda install -c conda-forge pyqt
+```
+
+### Recommended Companion Napari Plugins
+
+To also install the recommended plugins for the `EpiTools` workflow run
+
+```sh
+python -m pip install epitools[wf]
+```
+
+and
+
+```sh
+python -m pip install -e .[wf]
+```
+
+If working on Apple Silicon make sure to also install the following package from
+[conda-forge](https://conda-forge.org)
+
+```sh
+conda install -c conda-forge cvxopt
+```
+
+which is required for [btrack](https://github.com/quantumjot/btrack).
 
 ## Issues
 
-If you encounter any problems, please [file an issue] along with a detailed description.
+If you encounter any problems, please
+[file an issue](https://github.com/epitools/epitools/issues) along with a
+detailed description.
 
-[napari]: https://github.com/napari/napari
-[cookiecutter]: https://github.com/audreyr/cookiecutter
-[@napari]: https://github.com/napari
-[mit]: http://opensource.org/licenses/MIT
-[bsd-3]: http://opensource.org/licenses/BSD-3-Clause
-[gnu gpl v3.0]: http://www.gnu.org/licenses/gpl-3.0.txt
-[gnu lgpl v3.0]: http://www.gnu.org/licenses/lgpl-3.0.txt
-[apache software license 2.0]: http://www.apache.org/licenses/LICENSE-2.0
-[mozilla public license 2.0]: https://www.mozilla.org/media/MPL/2.0/index.txt
-[cookiecutter-napari-plugin]: https://github.com/napari/cookiecutter-napari-plugin
-[napari]: https://github.com/napari/napari
-[tox]: https://tox.readthedocs.io/en/latest/
-[pip]: https://pypi.org/project/pip/
-[pypi]: https://pypi.org/
+## Contributing
+
+Contributions are very welcome. Tests can be run with [tox](https://tox.wiki),
+please ensure the coverage at least stays the same before you submit a pull request.
