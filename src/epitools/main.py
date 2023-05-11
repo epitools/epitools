@@ -261,16 +261,18 @@ def run_cell_statistics(
     napari.utils.notifications.show_info(message)
 
     # TODO: too many regionprops options crashes the client, is there a way to fix this?
+    """
     # Set cell stats for the current frame
-    # viewer = napari.current_viewer()
-    # current_frame = viewer.dims.current_step[0]
-    # try:
-    #     labels.features = cell_statistics[current_frame]
-    # except IndexError:
-    #     message = (
-    #         f"No cell statistics to load for {labels.name} at frame {current_frame}"
-    #     )
-    #     logger.debug(message)
+    viewer = napari.current_viewer()
+    current_frame = viewer.dims.current_step[0]
+    try:
+        labels.features = cell_statistics[current_frame]
+    except IndexError:
+        message = (
+            f"No cell statistics to load for {labels.name} at frame {current_frame}"
+        )
+        logger.debug(message)
+    """
 
 
 def export_cell_statistics(
