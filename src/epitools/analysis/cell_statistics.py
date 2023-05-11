@@ -23,8 +23,6 @@ import skimage.measure
 
 import napari
 
-import epitools._regionprops
-
 logger = logging.getLogger(__name__)
 
 
@@ -104,7 +102,49 @@ def _calculate_cell_statistics(
         skimage.measure.regionprops_table(
             label_image=frame_labels,
             intensity_image=frame_image,
-            properties=epitools._regionprops.REGIONPROPS_OPTIONS,
+            # contents of `skimage.measure._regionprops.PROP_VALS`
+            # TODO: fix the commented out properties
+            properties=[
+                "area_bbox",
+                "area_convex",
+                "area_filled",
+                "area",
+                "axis_major_length",
+                "axis_minor_length",
+                "bbox",
+                "centroid_local",
+                "centroid_weighted_local",
+                "centroid_weighted",
+                "centroid",
+                # 'coords',
+                "eccentricity",
+                "equivalent_diameter_area",
+                "euler_number",
+                "extent",
+                "feret_diameter_max",
+                # 'image_convex',
+                # 'image_filled',
+                # 'image_intensity',
+                # 'image',
+                "inertia_tensor_eigvals",
+                "inertia_tensor",
+                "intensity_max",
+                "intensity_mean",
+                "intensity_min",
+                "label",
+                "moments_central",
+                "moments_normalized",
+                "moments_weighted_central",
+                # 'moments_weighted_hu',
+                "moments_weighted_normalized",
+                "moments_weighted",
+                "moments",
+                "orientation",
+                "perimeter_crofton",
+                "perimeter",
+                # 'slice',
+                "solidity",
+            ],
             spacing=pixel_spacing,
         )
         for frame_labels, frame_image in zip(labels, image)
