@@ -42,21 +42,14 @@ This is not currently possible with ``EpiTools``/``btrack``.
 
 ``EpiTools`` includes methods to extract a variety of statistics from the cells.
 
-The first video demonstrates how to view the statistics of a given cell via
-tooltips.
-
-.. video:: ../_static/epitools-cell-stats.mp4
-    :alt: EpiTools Cell Statistics Tooltips
-    :height: 400
-
-The second video shows how to have a colour map for a given cell property,
+This video shows how to have a colour map for a given cell property,
 i.e. area.
 
 .. video:: ../_static/epitools-colourmaps.mp4
     :alt: EpiTools Cell Statistics Colour Maps
     :height: 400
 
-Finally, this video demonstrates how to export and save the cell statistics
+This video demonstrates how to export and save the cell statistics
 output.
 
 .. video:: ../_static/epitools-export.mp4
