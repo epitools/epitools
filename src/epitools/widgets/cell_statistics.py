@@ -88,7 +88,9 @@ def _create_colour_labels_widgets() -> list[Widget]:
         label="statistic",
         widget_type="ComboBox",
         options={
-            "choices": ["id", "area", "perimeter", "orientation", "neighbours"],
+            # TODO: add more colour map options here
+            # https://github.com/epitools/epitools/issues/97
+            "choices": ["id", "orientation", "neighbours"],
             "tooltip": statisitc_tooltip,
         },
     )

@@ -3,7 +3,7 @@
 .. _napari_plugin:
 
 Using the ``EpiTools`` plugin for ``napari``
-====================================
+============================================
 
 The following steps are part of the typical ``EpiTools`` workflow.
 
@@ -34,7 +34,7 @@ plugin. This allows one to manually split and merge labels.
 To perform tracking we would recommend the
 `brack <https://www.napari-hub.org/plugins/btrack>`_ plugin.
 
-5. **Correction Tracking**
+5. **Correcting Tracking**
 
 This is not currently possible with ``EpiTools``/``btrack``.
 
@@ -42,21 +42,24 @@ This is not currently possible with ``EpiTools``/``btrack``.
 
 ``EpiTools`` includes methods to extract a variety of statistics from the cells.
 
-The first video demonstrates how to view the statistics of a given cell via
-tooltips.
+.. TODO: restore this video if tooltips are reinstated
+.. https://github.com/epitools/epitools/issues/96
+..
+    This video demonstrates how to view the statistics of a given cell via
+    tooltips.
 
-.. video:: ../_static/epitools-cell-stats.mp4
-    :alt: EpiTools Cell Statistics Tooltips
-    :height: 400
+    .. video:: ../_static/epitools-cell-stats.mp4
+        :alt: EpiTools Cell Statistics Tooltips
+        :height: 400
 
-The second video shows how to have a colour map for a given cell property,
-i.e. area.
+This video shows how to have a colour map for a given cell property,
+i.e. neighbours.
 
 .. video:: ../_static/epitools-colourmaps.mp4
     :alt: EpiTools Cell Statistics Colour Maps
     :height: 400
 
-Finally, this video demonstrates how to export and save the cell statistics
+This video demonstrates how to export and save the cell statistics
 output.
 
 .. video:: ../_static/epitools-export.mp4

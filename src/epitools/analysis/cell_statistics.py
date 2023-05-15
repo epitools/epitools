@@ -94,7 +94,50 @@ def _calculate_cell_statistics(
 ) -> list[dict[str, npt.NDArray]]:
     """Calculate cell properties using skimage regionprops"""
 
-    properties = ["label", "area", "perimeter", "orientation"]
+    # TODO: fix the commented out properties
+    # https://github.com/epitools/epitools/issues/98
+    # contents of `skimage.measure._regionprops.PROP_VALS`
+    properties = [
+        "area_bbox",
+        "area_convex",
+        "area_filled",
+        "area",
+        "axis_major_length",
+        "axis_minor_length",
+        "bbox",
+        "centroid_local",
+        "centroid_weighted_local",
+        "centroid_weighted",
+        "centroid",
+        # 'coords',
+        "eccentricity",
+        "equivalent_diameter_area",
+        "euler_number",
+        "extent",
+        "feret_diameter_max",
+        # 'image_convex',
+        # 'image_filled',
+        # 'image_intensity',
+        # 'image',
+        "inertia_tensor_eigvals",
+        "inertia_tensor",
+        "intensity_max",
+        "intensity_mean",
+        "intensity_min",
+        "label",
+        "moments_central",
+        "moments_normalized",
+        "moments_weighted_central",
+        # 'moments_weighted_hu',
+        "moments_weighted_normalized",
+        "moments_weighted",
+        "moments",
+        "orientation",
+        "perimeter_crofton",
+        "perimeter",
+        # 'slice',
+        "solidity",
+    ]
 
     # remove z axis if necessary
     image = image[:, 0] if image.ndim == FOUR_DIMENSIONAL else image
@@ -113,8 +156,13 @@ def _calculate_cell_statistics(
     # skimage uses 'label' for what napari calls 'index'
     for frame_stats in cell_statistics:
         frame_stats["index"] = frame_stats.pop("label")
+        # TODO: required for these to work as maps, otherwise all the same colour
+        # however, this means that the CSV has that value also
+        # https://github.com/epitools/epitools/issues/97
+        """
         frame_stats["perimeter"] *= 1e6  # convert to um
         frame_stats["area"] *= 1e12  # convert to um2
+        """
 
     return cell_statistics
 

@@ -260,6 +260,9 @@ def run_cell_statistics(
     message = f"Finished calculating cell statistics for '{labels.name}'"
     napari.utils.notifications.show_info(message)
 
+    # TODO: too many regionprops options crashes the client, is there a way to fix this?
+    # https://github.com/epitools/epitools/issues/96
+    """
     # Set cell stats for the current frame
     viewer = napari.current_viewer()
     current_frame = viewer.dims.current_step[0]
@@ -270,6 +273,7 @@ def run_cell_statistics(
             f"No cell statistics to load for {labels.name} at frame {current_frame}"
         )
         logger.debug(message)
+    """
 
 
 def export_cell_statistics(
@@ -341,7 +345,7 @@ def create_colourmaps(
     if "cell_statistics" not in labels.metadata:
         _msg = (
             "Cannot create colourmaps - "
-            "the selected Labels layer has no cell staistics."
+            "the selected Labels layer has no cell statistics."
         )
         napari.utils.notifications.show_error(_msg)
         return

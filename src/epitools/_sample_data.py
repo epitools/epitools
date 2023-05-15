@@ -71,7 +71,7 @@ def load_segmented_data() -> list[LAYER_DATA]:
 
 
 def _load_cell_statistics() -> list[pd.DataFrame]:
-    """Load cell staistics associated with sample segmentation"""
+    """Load cell statistics associated with sample segmentation"""
 
     stats_path = (
         Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-stats.csv"
