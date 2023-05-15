@@ -2,14 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-# TODO: needed for tests
-# https://github.com/epitools/epitools/issues/96
-
 if TYPE_CHECKING:
     from typing import Callable
-
-    # TODO: needed for tests
-    # https://github.com/epitools/epitools/issues/96
 
 
 def test_add_cell_statistics_widget(
