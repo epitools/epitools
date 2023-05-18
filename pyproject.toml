@@ -184,6 +184,7 @@ legacy_tox_ini = """
         PYVISTA_OFF_SCREEN
         XAUTHORITY
     deps =
+        pyqt5
         pytest-cov
         pytest-qt
     commands = pytest --cov --cov-report=lcov
