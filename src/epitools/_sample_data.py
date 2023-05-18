@@ -23,9 +23,7 @@ if TYPE_CHECKING:
 
     LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
 
-_file_location = Path(__file__).resolve()
-_sample_data = _file_location.parent / "_datasets"
-_test_data = _file_location.parents[2] / "sample_data"
+_sample_data = Path(__file__).resolve().parent / "_datasets"
 
 
 def load_sample_data() -> list[LAYER_DATA]:
@@ -38,7 +36,7 @@ def load_sample_data() -> list[LAYER_DATA]:
 def load_projected_data() -> list[LAYER_DATA]:
     """Load a smaple projected dataset"""
 
-    img_path = _test_data / "8bitDataset" / "test_image-projected.tif"
+    img_path = Path("sample_data") / "8bitDataset" / "test_image-projected.tif"
     return epitools._reader.reader_function(path=img_path.as_posix())
 
 
@@ -46,7 +44,9 @@ def load_segmented_data() -> list[LAYER_DATA]:
     """Load a sample segmented dataset"""
 
     # Load labels
-    labels_path = _test_data / "8bitDataset" / "test_image-projected-segmented.tif"
+    labels_path = (
+        Path("sample_data") / "8bitDataset" / "test_image-projected-segmented.tif"
+    )
     labels_data, labels_kwargs, labels_layer_type = epitools._reader.reader_function(
         path=labels_path.as_posix(),
     )[0]
@@ -55,7 +55,9 @@ def load_segmented_data() -> list[LAYER_DATA]:
     labels_kwargs["metadata"]["cell_statistics"] = _load_cell_statistics()
 
     # Load seeds
-    seeds_path = _test_data / "8bitDataset" / "test_image-projected-segmented-seeds.npy"
+    seeds_path = (
+        Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-seeds.npy"
+    )
     seeds_data = np.load(seeds_path)
     seeds_kwargs = {
         "name": "Seeds",
@@ -73,7 +75,9 @@ def load_segmented_data() -> list[LAYER_DATA]:
 def _load_cell_statistics() -> list[pd.DataFrame]:
     """Load cell statistics associated with sample segmentation"""
 
-    stats_path = _test_data / "8bitDataset" / "test_image-projected-segmented-stats.csv"
+    stats_path = (
+        Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-stats.csv"
+    )
     stats = pd.read_csv(
         stats_path,
         index_col=[0, 1],  # indices are given by (frame, label)
