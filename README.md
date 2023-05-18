@@ -16,6 +16,8 @@ The folded morphology, the very small apical cell surfaces and the long time ser
 
 ## Installation
 
+First, install [napari](https://napari.org/index.html#installation).
+
 The recommended way to install `EpiTools` is via
 [pip](https://pypi.org/project/pip)
 
