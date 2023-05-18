@@ -183,6 +183,11 @@ legacy_tox_ini = """
         NUMPY_EXPERIMENTAL_ARRAY_FUNCTION
         PYVISTA_OFF_SCREEN
         XAUTHORITY
+    deps =
+        pytest
+        pytest-cov
+        pytest-qt
+        pytest-xvfb ; sys_platform == 'linux'
     commands = pytest --cov --cov-report=lcov
 
     [tox]
