@@ -23,18 +23,20 @@ if TYPE_CHECKING:
 
     LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
 
+_sample_data = Path(__file__).resolve().parents[2] / "sample_data"
+
 
 def load_sample_data() -> list[LAYER_DATA]:
     """Load a sample dataset"""
 
-    img_path = Path("sample_data") / "8bitDataset" / "test_image.tif"
+    img_path = _sample_data / "8bitDataset" / "test_image.tif"
     return epitools._reader.reader_function(path=img_path.as_posix())
 
 
 def load_projected_data() -> list[LAYER_DATA]:
     """Load a smaple projected dataset"""
 
-    img_path = Path("sample_data") / "8bitDataset" / "test_image-projected.tif"
+    img_path = _sample_data / "8bitDataset" / "test_image-projected.tif"
     return epitools._reader.reader_function(path=img_path.as_posix())
 
 
@@ -42,9 +44,7 @@ def load_segmented_data() -> list[LAYER_DATA]:
     """Load a sample segmented dataset"""
 
     # Load labels
-    labels_path = (
-        Path("sample_data") / "8bitDataset" / "test_image-projected-segmented.tif"
-    )
+    labels_path = _sample_data / "8bitDataset" / "test_image-projected-segmented.tif"
     labels_data, labels_kwargs, labels_layer_type = epitools._reader.reader_function(
         path=labels_path.as_posix(),
     )[0]
@@ -54,7 +54,7 @@ def load_segmented_data() -> list[LAYER_DATA]:
 
     # Load seeds
     seeds_path = (
-        Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-seeds.npy"
+        _sample_data / "8bitDataset" / "test_image-projected-segmented-seeds.npy"
     )
     seeds_data = np.load(seeds_path)
     seeds_kwargs = {
@@ -74,7 +74,7 @@ def _load_cell_statistics() -> list[pd.DataFrame]:
     """Load cell statistics associated with sample segmentation"""
 
     stats_path = (
-        Path("sample_data") / "8bitDataset" / "test_image-projected-segmented-stats.csv"
+        _sample_data / "8bitDataset" / "test_image-projected-segmented-stats.csv"
     )
     stats = pd.read_csv(
         stats_path,

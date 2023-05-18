@@ -30,7 +30,7 @@ dependencies = [
     "PartSeg",
     "magicgui",
     "matplotlib",
-    "napari[all]",
+    "napari",
     "numpy",
     "pandas",
     "scikit-image>=0.20",
