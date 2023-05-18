@@ -23,13 +23,13 @@ if TYPE_CHECKING:
 
     LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
 
-_sample_data = Path(__file__).resolve().parent / "_datasets"
+_file_location = Path(__file__).resolve()
 
 
 def load_sample_data() -> list[LAYER_DATA]:
     """Load a sample dataset"""
 
-    img_path = _sample_data / "8bitDataset" / "test_image.tif"
+    img_path = _file_location.parent / "_datasets" / "8bitDataset" / "test_image.tif"
     return epitools._reader.reader_function(path=img_path.as_posix())
 
 
