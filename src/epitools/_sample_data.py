@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     LAYER_DATA = tuple[npt.ArrayLike, dict[str, Any], str]
 
 _file_location = Path(__file__).resolve()
-_sample_data = _file_location.parent / "_datasets"
+_sample_data = _file_location / "_datasets"
 _test_data = _file_location.parents[2] / "sample_data"
 
 
