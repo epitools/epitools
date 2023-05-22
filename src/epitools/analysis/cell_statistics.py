@@ -191,7 +191,7 @@ def _calculate_graph_statistics(
     cell_statistics: list[dict[str, npt.NDArray]],
     graphs: skimage.graph._rag.RAG,
 ) -> None:
-    """Calcualte additional cell statistics from graphs.
+    """Calculate additional cell statistics from graphs.
 
     Adds results directly to 'cell_statistics' dictionaries.
     """
@@ -200,4 +200,9 @@ def _calculate_graph_statistics(
         indices = stats["index"]
 
         num_neighbours = np.asarray([len(graph[index]) for index in indices])
-        cell_statistics[frame]["neighbours"] = num_neighbours
+        cell_statistics[frame]["num_neighbours"] = num_neighbours
+
+        id_neighbours = [list(graph.neighbors(index)) for index in indices]
+        cell_statistics[frame]["id_neighbours"] = id_neighbours
+
+
