@@ -203,6 +203,6 @@ def _calculate_graph_statistics(
         cell_statistics[frame]["num_neighbours"] = num_neighbours
 
         id_neighbours = [list(graph.neighbors(index)) for index in indices]
-        cell_statistics[frame]["id_neighbours"] = id_neighbours
-
-
+        id_neighbours_arr = np.empty(len(id_neighbours), dtype=object)
+        id_neighbours_arr[:] = id_neighbours
+        cell_statistics[frame]["id_neighbours"] = id_neighbours_arr
