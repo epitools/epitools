@@ -1,7 +1,11 @@
+# From 
+# https://github.com/chanzuckerberg/napari-hub/blob/main/backend/category/data/EDAM-BIOIMAGING/hub-mapping-alpha06.json
 labels:
   ontology: EDAM-BIOIMAGING:alpha06
   terms:
-    - 4D Image
-    - Cell projection
-    - Cell segmentation
-    - Cell statistics
+    - Fluorescence microscopy
+    - Confocal microscopy
+    - 3D image
+    - Image time series
+    - Image segmentation
+    - Visualisation
