@@ -7,12 +7,12 @@ requires = [
 
 [project]
 authors = [
+    {email = "y.mao@ucl.ac.uk", name = "Yanlan Mao"},
     {email = "d.matthews@ucl.ac.uk", name = "Daniel R. Matthews"},
     {email = "g.paci@ucl.ac.uk", name = "Giulia Paci"},
     {email = "p.munuera@ucl.ac.uk", name = "Pablo Vicente Munuera"},
     {email = "patrick.roddy@ucl.ac.uk", name = "Patrick J. Roddy"},
     {email = "paul.j.smith@ucl.ac.uk", name = "Paul J. Smith"},
-    {email = "y.mao@ucl.ac.uk", name = "Yanlan Mao"},
 ]
 classifiers = [
     "Framework :: napari",
@@ -24,7 +24,17 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python",
-    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+keywords = [
+    "cell",
+    "biology",
+    "topology",
+    "tissue",
+    "mechanics",
+    "shape",
 ]
 dependencies = [
     "PartSeg",
