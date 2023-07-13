@@ -24,7 +24,9 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python",
-    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 dependencies = [
     "PartSeg",
@@ -39,6 +41,14 @@ dependencies = [
 description = "Quantifying 2D cell shape and epithelial tissue dynamics"
 dynamic = [
     "version",
+]
+keywords = [
+    "biology",
+    "cell",
+    "mechanics",
+    "shape",
+    "tissue",
+    "topology",
 ]
 name = "epitools"
 optional-dependencies = {dev = [
