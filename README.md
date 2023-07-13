@@ -53,6 +53,12 @@ and
 python -m pip install -e .[wf]
 ```
 
+When installing with Apple Mac OS X terminal, you might need to add '"' to [wf] as in:
+
+```sh
+python -m pip install -e ."[wf]"
+```
+
 If working on Apple Silicon make sure to also install the following package from
 [conda-forge](https://conda-forge.org)
 
