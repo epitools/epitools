@@ -61,7 +61,7 @@ def test_projection_widget_run_button(
 def test_calculate_projection(
     image: napari.layers.Image,
 ):
-    projection = calculate_projection(
+    projection, _ = calculate_projection(
         image.data,
         SMOOTHING_RADIUS,
         SURFACE_SMOOTHNESS_1,
