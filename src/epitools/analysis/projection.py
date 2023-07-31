@@ -6,6 +6,7 @@ along the z-dimension.
 """
 
 import itertools
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -102,8 +103,8 @@ def calculate_projection(
     surface_smoothness_1: int,
     surface_smoothness_2: int,
     cut_off_distance: int,
-    input_image_2: npt.NDArray[np.float64] | None = None,
-) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64] | None]:
+    input_image_2: Union[npt.NDArray[np.float64], None] = None,
+) -> tuple[npt.NDArray[np.float64], Union[npt.NDArray[np.float64], None]]:
     """Z projection using image interpolation.
 
      Perform an iterative projection of 3D points along the z axis.
@@ -156,7 +157,9 @@ def calculate_projection(
 
     # We will always have a single slice in the Z dimension
     t_interp = np.zeros((t_size, SINGLE_SLICE, y_size, x_size))
-    t_interp_2: npt.NDArray | None = np.zeros((t_size, SINGLE_SLICE, y_size, x_size))
+    t_interp_2: Union[npt.NDArray, None] = np.zeros(
+        (t_size, SINGLE_SLICE, y_size, x_size)
+    )
 
     for t in range(t_size):
         smoothed_t = smoothed_imstack[t]

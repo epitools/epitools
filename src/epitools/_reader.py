@@ -15,7 +15,8 @@ import PartSegCore.analysis.load_functions
 import PartSegCore.napari_plugins.loader
 
 if TYPE_CHECKING:
-    from typing import Any, Callable
+    from collections.abc import Callable
+    from typing import Any
 
     import numpy.typing as npt
 
