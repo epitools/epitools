@@ -7,7 +7,8 @@ __all__ = [
 
 
 def create_projection_2ch_widget() -> magicgui.widgets.Container:
-    """Create a widget for projecting a 2 channel, 3d timeseries to a 2d timeseries based on a reference channel"""
+    """Create a widget for projecting a 2 channel, 3d timeseries to a
+    2d timeseries based on a reference channel"""
 
     refchannel_tooltip = (
         "Select a 'Reference' channel to project along the z-dimension."
@@ -19,7 +20,8 @@ def create_projection_2ch_widget() -> magicgui.widgets.Container:
         options={"tooltip": refchannel_tooltip},
     )
 
-    channel_tooltip = "Select a second channel to project along the z-dimension based on the 'Reference'."
+    channel_tooltip = "Select a second channel to project along the \
+    z-dimension based on the 'Reference'."
     channel = magicgui.widgets.create_widget(
         annotation=napari.layers.Image,
         name="channel",
