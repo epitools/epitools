@@ -17,6 +17,9 @@ contributions:
     - id: epitools.projection_widget
       python_name: epitools.main:create_projection_widget
       title: Epitools Projection Widget
+    - id: epitools.projection_2ch_widget
+      python_name: epitools.main:create_projection_2ch_widget
+      title: Epitools Projection Widget 2 Channels
     - id: epitools.segmentation_widget
       python_name: epitools.main:create_segmentation_widget
       title: Epitools Segmentation Widget
@@ -42,6 +45,8 @@ contributions:
     - command: epitools.projection_widget
       # autogenerate: true <- for use with assistant
       display_name: Projection (selective plane)
+    - command: epitools.projection_2ch_widget
+      display_name: Projection (2 channel with reference channel)
     - command: epitools.segmentation_widget
       display_name: Segmentation (local minima seeded watershed)
     - command: epitools.cell_statistics_widget

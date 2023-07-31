@@ -6,6 +6,7 @@ along the z-dimension.
 """
 
 import itertools
+from typing import Union
 
 import numpy as np
 import numpy.typing as npt
@@ -99,13 +100,13 @@ def _calculate_projected_image(
 def calculate_projection(
     input_image: npt.NDArray[np.float64],
     smoothing_radius: float,
-    surface_smoothness_1: int,
-    surface_smoothness_2: int,
+    surface_smoothness: list[int],
     cut_off_distance: int,
-) -> npt.NDArray[np.float64]:
+    input_image_2: Union[npt.NDArray[np.float64], None] = None,
+) -> tuple[npt.NDArray[np.float64], Union[npt.NDArray[np.float64], None]]:
     """Z projection using image interpolation.
 
-     Perfrom an iterative projection of 3D points along the z axis.
+     Perform an iterative projection of 3D points along the z axis.
 
      An initial projection is performed to obtain the 'first estimated surface'.
      Points furtherthan ``cut_off_distance`` from the first estimated surface will
@@ -121,16 +122,20 @@ def calculate_projection(
         smoothing_radius:
             Kernel radius for gaussian blur to apply before estimating the surface.
 
-        surface_smoothness_1:
-            Surface smoothness for 1st griddata estimation. Larger values will produce
-            greater smoothing.
-
-        surface_smoothness_2:
-            Surface smoothness for 2nd iteration of smoothing. Again, larger values
-            will produce greater smoothing.
+        surface_smoothness:
+            Surface smoothness for 1st and 2nd griddata estimation.
+            Larger values will produce greater smoothing.
 
         cut_off_distance:
             Cutoff distance in z-planes from the first estimated surface.
+
+        input_image_2:
+            if a second image is passed as argument the function will project a 2
+            channel image based on a reference channel (assumed to be the first image)
+            Numpy ndarray representation of 4D or 3D image stack. ``input_image`` is
+            assumed to have dimensions that correspond to TZYX or ZYX if it is 4D or 3D,
+            respectively.
+
     Returns:
         np.NDArray
             Timeseries of the image stack projected onto a single plane in z. The
@@ -147,6 +152,9 @@ def calculate_projection(
 
     # We will always have a single slice in the Z dimension
     t_interp = np.zeros((t_size, SINGLE_SLICE, y_size, x_size))
+    t_interp_2: Union[npt.NDArray, None] = np.zeros(
+        (t_size, SINGLE_SLICE, y_size, x_size)
+    )
 
     for t in range(t_size):
         smoothed_t = smoothed_imstack[t]
@@ -162,7 +170,7 @@ def calculate_projection(
         mask = confidencemap > confthres
         max_indices_confthres = max_indices * mask
         z_interp = _interpolate(
-            max_indices_confthres, x_size, y_size, surface_smoothness_1
+            max_indices_confthres, x_size, y_size, surface_smoothness[0]
         )
 
         # given the height locations of the surface (z_interp) compute the difference
@@ -180,8 +188,14 @@ def calculate_projection(
         # (max_indices_cut) this is to make sure that the highest intensity points will
         # be selected from the correct surface (The coarse grained estimate could
         # potentially approximate the origin of the point to another plane)
-        z_interp = _interpolate(max_indices_cut, x_size, y_size, surface_smoothness_2)
+        z_interp = _interpolate(max_indices_cut, x_size, y_size, surface_smoothness[1])
 
         t_interp[t] = _calculate_projected_image(input_image[t], z_interp)
 
-    return t_interp
+    if input_image_2 is None or t_interp_2 is None:
+        t_interp_2 = None
+    else:
+        # second channel projected based on the first one (reference channel)
+        t_interp_2[t] = _calculate_projected_image(input_image_2[t], z_interp)
+
+    return t_interp, t_interp_2

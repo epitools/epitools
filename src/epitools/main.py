@@ -19,6 +19,7 @@ import epitools.widgets
 __all__ = [
     "create_projection_widget",
     "create_segmentation_widget",
+    "create_projection_2ch_widget",
     "create_cell_statistics_widget",
 ]
 
@@ -40,8 +41,10 @@ def create_projection_widget() -> magicgui.widgets.Container:
         lambda: run_projection(
             image=projection_widget.input_image.value,
             smoothing_radius=projection_widget.smoothing_radius.value,
-            surface_smoothness_1=projection_widget.surface_smoothness_1.value,
-            surface_smoothness_2=projection_widget.surface_smoothness_2.value,
+            surface_smoothness=[
+                projection_widget.surface_smoothness_1.value,
+                projection_widget.surface_smoothness_2.value,
+            ],
             cutoff_distance=projection_widget.cutoff_distance.value,
         ),
     )
@@ -49,33 +52,87 @@ def create_projection_widget() -> magicgui.widgets.Container:
     return projection_widget
 
 
+def create_projection_2ch_widget() -> magicgui.widgets.Container:
+    """Create a widget to project a 2 channel, 4d timeseries (TZYX)
+    along the z dimension based on a reference channel"""
+
+    projection_2ch_widget = epitools.widgets.create_projection_2ch_widget()
+
+    # Project the timeseries when pressing the 'Run' button
+    projection_2ch_widget.run.changed.connect(
+        lambda: run_projection(
+            image=projection_2ch_widget.refchannel.value,
+            smoothing_radius=projection_2ch_widget.smoothing_radius.value,
+            surface_smoothness=[
+                projection_2ch_widget.surface_smoothness_1.value,
+                projection_2ch_widget.surface_smoothness_2.value,
+            ],
+            cutoff_distance=projection_2ch_widget.cutoff_distance.value,
+            second_image=projection_2ch_widget.channel.value,
+        ),
+    )
+
+    return projection_2ch_widget
+
+
 def run_projection(
     image: napari.layers.Image,
     smoothing_radius,
-    surface_smoothness_1,
-    surface_smoothness_2,
+    surface_smoothness,
     cutoff_distance,
+    second_image: napari.layers.Image | None = None,
 ) -> None:
     """Project a 4d timeseries along the z dimension"""
 
-    projected_data = epitools.analysis.calculate_projection(
-        image.data,
-        smoothing_radius,
-        surface_smoothness_1,
-        surface_smoothness_2,
-        cutoff_distance,
-    )
+    "If second_image is not empty, project 2 channels based on reference channel"
+    if second_image is not None:
+        projected_data_1, projected_data_2 = epitools.analysis.calculate_projection(
+            image.data,
+            smoothing_radius,
+            surface_smoothness,
+            cutoff_distance,
+            second_image.data,
+        )
 
-    viewer = napari.current_viewer()
-    viewer.add_image(
-        data=projected_data,
-        name="Projection",
-        scale=image.scale,
-        translate=image.translate,
-        rotate=image.rotate,
-        plane=image.plane,
-        metadata=image.metadata,
-    )
+        viewer = napari.current_viewer()
+        viewer.add_image(
+            data=projected_data_1,
+            name="Projection_ch1",
+            scale=image.scale,
+            translate=image.translate,
+            rotate=image.rotate,
+            plane=image.plane,
+            metadata=image.metadata,
+        )
+
+        viewer.add_image(
+            data=projected_data_2,
+            name="Projection_ch2",
+            scale=image.scale,
+            translate=image.translate,
+            rotate=image.rotate,
+            plane=image.plane,
+            metadata=image.metadata,
+        )
+
+    else:
+        projected_data, _ = epitools.analysis.calculate_projection(
+            image.data,
+            smoothing_radius,
+            surface_smoothness,
+            cutoff_distance,
+        )
+
+        viewer = napari.current_viewer()
+        viewer.add_image(
+            data=projected_data,
+            name="Projection",
+            scale=image.scale,
+            translate=image.translate,
+            rotate=image.rotate,
+            plane=image.plane,
+            metadata=image.metadata,
+        )
 
 
 def create_segmentation_widget() -> magicgui.widgets.Container:
