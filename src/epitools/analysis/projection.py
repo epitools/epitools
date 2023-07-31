@@ -197,7 +197,7 @@ def calculate_projection(
 
         t_interp[t] = _calculate_projected_image(input_image[t], z_interp)
 
-    if input_image_2 is None:
+    if input_image_2 is None or t_interp_2 is None:
         t_interp_2 = None
     else:
         # second channel projected based on the first one (reference channel)
