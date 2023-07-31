@@ -8,8 +8,7 @@ import napari
 from epitools.analysis import calculate_projection
 
 SMOOTHING_RADIUS = 0.2
-SURFACE_SMOOTHNESS_1 = 50
-SURFACE_SMOOTHNESS_2 = 50
+SURFACE_SMOOTHNESS = [50, 50]
 CUT_OFF_DISTANCE = 20
 PROJECTION_NDIM = 4
 
@@ -64,8 +63,7 @@ def test_calculate_projection(
     projection, _ = calculate_projection(
         image.data,
         SMOOTHING_RADIUS,
-        SURFACE_SMOOTHNESS_1,
-        SURFACE_SMOOTHNESS_2,
+        SURFACE_SMOOTHNESS,
         CUT_OFF_DISTANCE,
     )
 

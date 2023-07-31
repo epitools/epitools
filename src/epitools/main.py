@@ -41,8 +41,10 @@ def create_projection_widget() -> magicgui.widgets.Container:
         lambda: run_projection(
             image=projection_widget.input_image.value,
             smoothing_radius=projection_widget.smoothing_radius.value,
-            surface_smoothness_1=projection_widget.surface_smoothness_1.value,
-            surface_smoothness_2=projection_widget.surface_smoothness_2.value,
+            surface_smoothness=[
+                projection_widget.surface_smoothness_1.value,
+                projection_widget.surface_smoothness_2.value,
+            ],
             cutoff_distance=projection_widget.cutoff_distance.value,
         ),
     )
@@ -61,8 +63,10 @@ def create_projection_2ch_widget() -> magicgui.widgets.Container:
         lambda: run_projection(
             image=projection_2ch_widget.refchannel.value,
             smoothing_radius=projection_2ch_widget.smoothing_radius.value,
-            surface_smoothness_1=projection_2ch_widget.surface_smoothness_1.value,
-            surface_smoothness_2=projection_2ch_widget.surface_smoothness_2.value,
+            surface_smoothness=[
+                projection_2ch_widget.surface_smoothness_1.value,
+                projection_2ch_widget.surface_smoothness_2.value,
+            ],
             cutoff_distance=projection_2ch_widget.cutoff_distance.value,
             second_image=projection_2ch_widget.channel.value,
         ),
@@ -74,8 +78,7 @@ def create_projection_2ch_widget() -> magicgui.widgets.Container:
 def run_projection(
     image: napari.layers.Image,
     smoothing_radius,
-    surface_smoothness_1,
-    surface_smoothness_2,
+    surface_smoothness,
     cutoff_distance,
     second_image: napari.layers.Image | None = None,
 ) -> None:
@@ -86,8 +89,7 @@ def run_projection(
         projected_data_1, projected_data_2 = epitools.analysis.calculate_projection(
             image.data,
             smoothing_radius,
-            surface_smoothness_1,
-            surface_smoothness_2,
+            surface_smoothness,
             cutoff_distance,
             second_image.data,
         )
@@ -117,8 +119,7 @@ def run_projection(
         projected_data, _ = epitools.analysis.calculate_projection(
             image.data,
             smoothing_radius,
-            surface_smoothness_1,
-            surface_smoothness_2,
+            surface_smoothness,
             cutoff_distance,
         )
 

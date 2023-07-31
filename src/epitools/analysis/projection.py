@@ -100,8 +100,7 @@ def _calculate_projected_image(
 def calculate_projection(
     input_image: npt.NDArray[np.float64],
     smoothing_radius: float,
-    surface_smoothness_1: int,
-    surface_smoothness_2: int,
+    surface_smoothness: list[int],
     cut_off_distance: int,
     input_image_2: Union[npt.NDArray[np.float64], None] = None,
 ) -> tuple[npt.NDArray[np.float64], Union[npt.NDArray[np.float64], None]]:
@@ -123,13 +122,9 @@ def calculate_projection(
         smoothing_radius:
             Kernel radius for gaussian blur to apply before estimating the surface.
 
-        surface_smoothness_1:
-            Surface smoothness for 1st griddata estimation. Larger values will produce
-            greater smoothing.
-
-        surface_smoothness_2:
-            Surface smoothness for 2nd iteration of smoothing. Again, larger values
-            will produce greater smoothing.
+        surface_smoothness:
+            Surface smoothness for 1st and 2nd griddata estimation.
+            Larger values will produce greater smoothing.
 
         cut_off_distance:
             Cutoff distance in z-planes from the first estimated surface.
@@ -175,7 +170,7 @@ def calculate_projection(
         mask = confidencemap > confthres
         max_indices_confthres = max_indices * mask
         z_interp = _interpolate(
-            max_indices_confthres, x_size, y_size, surface_smoothness_1
+            max_indices_confthres, x_size, y_size, surface_smoothness[0]
         )
 
         # given the height locations of the surface (z_interp) compute the difference
@@ -193,7 +188,7 @@ def calculate_projection(
         # (max_indices_cut) this is to make sure that the highest intensity points will
         # be selected from the correct surface (The coarse grained estimate could
         # potentially approximate the origin of the point to another plane)
-        z_interp = _interpolate(max_indices_cut, x_size, y_size, surface_smoothness_2)
+        z_interp = _interpolate(max_indices_cut, x_size, y_size, surface_smoothness[1])
 
         t_interp[t] = _calculate_projected_image(input_image[t], z_interp)
 
