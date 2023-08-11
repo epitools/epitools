@@ -20,6 +20,17 @@ def image() -> napari.layers.Image:
     metadata["name"] = "Test Image"
     return napari.layers.Image(data, **metadata)
 
+@pytest.fixture(scope="function")
+def image_2() -> napari.layers.Image:
+    """Load an sample 3D image from a tif file and convert to a Napari Image layer.
+
+    Note, the Napari Image will be 4D (TZYX) with a single frame in the
+    time dimension.
+    """
+    data, metadata, layer_type = epitools._sample_data.load_sample_data()[0]
+    metadata["name"] = "Test Image"
+    return napari.layers.Image(data, **metadata)
+
 
 @pytest.fixture(scope="function")
 def projected_image() -> napari.layers.Image:
@@ -31,6 +42,15 @@ def projected_image() -> napari.layers.Image:
     data, metadata, layer_type = epitools._sample_data.load_projected_data()[0]
     return napari.layers.Image(data, **metadata)
 
+@pytest.fixture(scope="function")
+def projected_image_channel2() -> napari.layers.Image:
+    """Load a sample 2D image from a tif file and convert to a Napari Image layer.
+
+    Note, the Napari Image will be 4D (TZYX) with single frame in the time dimension
+    and a single slice in Z.
+    """
+    data, metadata, layer_type = epitools._sample_data.load_projected_data()[0]
+    return napari.layers.Image(data, **metadata)
 
 @pytest.fixture(scope="function")
 def seeds_and_labels(
@@ -63,6 +83,21 @@ def viewer_with_image(
 
     viewer = make_napari_viewer()
     viewer.add_layer(image)
+
+    return viewer
+
+
+@pytest.fixture(scope="function")
+def viewer_with_2_images(
+    make_napari_viewer: Callable,
+    image: napari.layers.Image,
+    image_2: napari.layers.Image
+) -> napari.Viewer:
+    """Create a Napari Viewer with 2 sample Image layer added to it."""
+
+    viewer = make_napari_viewer()
+    viewer.add_layer(image)
+    viewer.add_layer(image_2)
 
     return viewer
 
