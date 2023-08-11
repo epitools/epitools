@@ -20,6 +20,7 @@ def image() -> napari.layers.Image:
     metadata["name"] = "Test Image"
     return napari.layers.Image(data, **metadata)
 
+
 @pytest.fixture(scope="function")
 def image_2() -> napari.layers.Image:
     """Load an sample 3D image from a tif file and convert to a Napari Image layer.
@@ -42,6 +43,7 @@ def projected_image() -> napari.layers.Image:
     data, metadata, layer_type = epitools._sample_data.load_projected_data()[0]
     return napari.layers.Image(data, **metadata)
 
+
 @pytest.fixture(scope="function")
 def projected_image_channel2() -> napari.layers.Image:
     """Load a sample 2D image from a tif file and convert to a Napari Image layer.
@@ -51,6 +53,7 @@ def projected_image_channel2() -> napari.layers.Image:
     """
     data, metadata, layer_type = epitools._sample_data.load_projected_data()[0]
     return napari.layers.Image(data, **metadata)
+
 
 @pytest.fixture(scope="function")
 def seeds_and_labels(
@@ -91,7 +94,7 @@ def viewer_with_image(
 def viewer_with_2_images(
     make_napari_viewer: Callable,
     image: napari.layers.Image,
-    image_2: napari.layers.Image
+    image_2: napari.layers.Image,
 ) -> napari.Viewer:
     """Create a Napari Viewer with 2 sample Image layer added to it."""
 

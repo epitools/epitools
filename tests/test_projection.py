@@ -45,7 +45,7 @@ def test_projection_widget_run_button(
     # use saved image data so we don't run the projection analysis
     # when the button is pressed
     with patch("epitools.analysis.calculate_projection") as calculate_projection:
-        calculate_projection.return_value = projected_image.data
+        calculate_projection.return_value = (projected_image.data, None)
         container.run.clicked()
 
     assert len(viewer_with_image.layers) == 2  # noqa: PLR2004
@@ -60,13 +60,14 @@ def test_projection_widget_run_button(
 def test_calculate_projection(
     image: napari.layers.Image,
 ):
-    projection, _ = calculate_projection(
+    projection, projection_ch2 = calculate_projection(
         image.data,
         SMOOTHING_RADIUS,
         SURFACE_SMOOTHNESS,
         CUT_OFF_DISTANCE,
     )
 
+    assert projection_ch2 is None
     assert projection.ndim == PROJECTION_NDIM
     assert projection.shape == (
         1,  # single frame in the timeseries
@@ -80,7 +81,7 @@ def test_calculate_projection(
         SMOOTHING_RADIUS,
         SURFACE_SMOOTHNESS,
         CUT_OFF_DISTANCE,
-        image.data,
+        input_image_2=image.data,
     )
 
     assert projection_ch1.ndim == PROJECTION_NDIM
@@ -90,7 +91,7 @@ def test_calculate_projection(
         image.data.shape[2],
         image.data.shape[3],
     )
-
+    assert projection_ch2 is not None
     assert projection_ch2.ndim == PROJECTION_NDIM
     assert projection_ch2.shape == (
         1,  # single frame in the timeseries
@@ -98,6 +99,7 @@ def test_calculate_projection(
         image.data.shape[2],
         image.data.shape[3],
     )
+
 
 def test_projection_2ch_widget_run_button(
     viewer_with_2_images: napari.Viewer,
@@ -117,16 +119,26 @@ def test_projection_2ch_widget_run_button(
     # use saved image data so we don't run the projection analysis
     # when the button is pressed
     with patch("epitools.analysis.calculate_projection") as calculate_projection:
-        calculate_projection.return_value = (projected_image.data, projected_image_channel2.data)
+        calculate_projection.return_value = (
+            projected_image.data,
+            projected_image_channel2.data,
+        )
         container.run.clicked()
 
     assert len(viewer_with_2_images.layers) == 4  # noqa: PLR2004
 
-    ref_layer, second_layer, new_layer_ref, new_layer_second = viewer_with_2_images.layers
+    (
+        ref_layer,
+        second_layer,
+        new_layer_ref,
+        new_layer_second,
+    ) = viewer_with_2_images.layers
 
     assert isinstance(new_layer_ref, napari.layers.Image)
     assert isinstance(new_layer_second, napari.layers.Image)
     assert new_layer_ref.name == "Projection_ch1"
     assert new_layer_second.name == "Projection_ch2"
-    assert new_layer_second.data.shape[-2:] == second_layer.data.shape[-2:]  # yx dimensions
+    assert (
+        new_layer_second.data.shape[-2:] == second_layer.data.shape[-2:]
+    )  # yx dimensions
     assert new_layer_ref.data.shape[-2:] == ref_layer.data.shape[-2:]  # yx dimensions
