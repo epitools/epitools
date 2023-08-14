@@ -45,7 +45,7 @@ def test_projection_widget_run_button(
     # use saved image data so we don't run the projection analysis
     # when the button is pressed
     with patch("epitools.analysis.calculate_projection") as calculate_projection:
-        calculate_projection.return_value = projected_image.data
+        calculate_projection.return_value = (projected_image.data, None)
         container.run.clicked()
 
     assert len(viewer_with_image.layers) == 2  # noqa: PLR2004
