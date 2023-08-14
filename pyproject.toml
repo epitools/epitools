@@ -33,6 +33,7 @@ dependencies = [
     "magicgui",
     "matplotlib",
     "napari",
+    "networkx",
     "numpy",
     "pandas",
     "scikit-image>=0.20",
