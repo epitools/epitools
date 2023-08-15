@@ -198,7 +198,10 @@ legacy_tox_ini = """
         pyqt5
         pytest-cov
         pytest-qt
-    commands = pytest --cov --cov-report=lcov
+        coverage
+    commands =
+        pytest --cov --cov-report=lcov
+        coverage report
 
     [tox]
     envlist = py3{9,10}-{linux,macos,windows}
