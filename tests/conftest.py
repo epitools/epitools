@@ -56,9 +56,7 @@ def projected_image_channel2() -> napari.layers.Image:
 
 
 @pytest.fixture(scope="function")
-def seeds_and_labels(
-    make_napari_viewer: Callable,
-) -> tuple[napari.layers.Points, napari.layers.Labels]:
+def seeds_and_labels() -> tuple[napari.layers.Points, napari.layers.Labels]:
     """Load a sample segmentaiton and the seeds use in generating the segmentation.
 
     Load sample cells and seeds and convert to Napari Points and Labels layers,
@@ -75,6 +73,28 @@ def seeds_and_labels(
         napari.layers.Points(seeds_data, **seeds_kwargs),
         napari.layers.Labels(labels_data, **labels_kwargs),
     )
+
+
+@pytest.fixture(scope="function")
+def viewer_with_labels(
+    make_napari_viewer: Callable,
+    seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
+) -> napari.Viewer:
+    """Load a sample segmentation and the seeds use in generating the segmentation.
+
+    Load sample cells and seeds and convert to Napari Points and Labels layers,
+    respectively.
+
+    Note, the Napari Labels will be 4D (TZYX) with a single frame in the time dimension
+    and a single slice in Z.
+    """
+
+    seeds, labels = seeds_and_labels
+
+    viewer = make_napari_viewer()
+    viewer.add_layer(labels)
+
+    return viewer
 
 
 @pytest.fixture(scope="function")

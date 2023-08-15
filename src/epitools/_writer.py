@@ -123,7 +123,9 @@ def write_single_image(
     return [path]
 
 
-def write_single_labels(path: str | pathlib.Path, data: Any, meta: dict):
+def write_single_labels(
+    path: str | pathlib.Path, data: Any, meta: dict, axes_order: str | None
+):
     """Writes a single labels layer"""
 
     path = pathlib.Path(path)
@@ -133,9 +135,10 @@ def write_single_labels(path: str | pathlib.Path, data: Any, meta: dict):
     if path.suffix not in [".tif", ".tiff"]:
         return []
 
-    axes_order = _get_axes_dimensions(ndim=data.ndim, name=meta["name"])
     if axes_order is None:
-        return []
+        axes_order = _get_axes_dimensions(ndim=data.ndim, name=meta["name"])
+        if axes_order is None:
+            return []
 
     axes_order_mask = AXES_ORDER_MASKS[axes_order]
 
