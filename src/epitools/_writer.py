@@ -79,7 +79,9 @@ def _get_axes_dimensions(ndim: int, name: str) -> str | None:
     return selected if selected is None else options[selected]
 
 
-def write_single_image(path: str | pathlib.Path, data: Any, meta: dict):
+def write_single_image(
+    path: str | pathlib.Path, data: Any, meta: dict, axes_order: str | None
+):
     """Writes a single image layer"""
 
     path = pathlib.Path(path)
@@ -89,9 +91,10 @@ def write_single_image(path: str | pathlib.Path, data: Any, meta: dict):
     if path.suffix not in [".tif", ".tiff"]:
         return []
 
-    axes_order = _get_axes_dimensions(ndim=data.ndim, name=meta["name"])
     if axes_order is None:
-        return []
+        axes_order = _get_axes_dimensions(ndim=data.ndim, name=meta["name"])
+        if axes_order is None:
+            return []
 
     axes_order_mask = AXES_ORDER_MASKS[axes_order]
 
