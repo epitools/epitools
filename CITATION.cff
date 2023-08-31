@@ -1,0 +1,62 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Epitools
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Paddy
+    family-names: Roddy
+    affiliation: >-
+      Advanced Research Computing, University College
+      London, London
+  - given-names: Daniel
+    family-names: Matthews
+    affiliation: >-
+      Advanced Research Computing, University College      
+      London, London
+  - given-names: Paul
+    name-particle: J
+    family-names: Smith
+    affiliation: >-
+      Advanced Research Computing, University College
+      London, London
+  - given-names: Alessandro
+    family-names: Felder
+    affiliation: >-
+      Advanced Research Computing, University College
+      London, London
+  - given-names: Pablo
+    family-names: Vicente Munuera
+    email: p.munuera@ucl.ac.uk
+    affiliation: " \uFEFFLaboratory for Molecular Cell Biology, University College London, London"
+    orcid: 'https://orcid.org/0000-0001-5402-7637'
+  - given-names: Giulia
+    family-names: Paci
+    email: g.paci@ucl.ac.uk
+    affiliation: "\uFEFFLaboratory for Molecular Cell Biology, University College London, London"
+    orcid: 'https://orcid.org/0000-0003-0565-4356'
+  - given-names: Yanlan
+    family-names: Mao
+    email: y.mao@ucl.ac.uk
+    affiliation: >-
+      Laboratory for Molecular Cell Biology, University
+      College London, London
+    orcid: 'https://orcid.org/0000-0002-8722-4992'
+repository-code: 'https://github.com/epitools/epitools'
+url: 'https://www.napari-hub.org/plugins/epitools'
+repository: 'https://pypi.org/project/epitools/'
+abstract: Quantifying 2D cell shape and epithelial tissue dynamics.
+keywords:
+  - Image analysis
+  - Cell
+  - Epithelial tissue
+  - Segmentation
+  - Dynamics
+license: BSD-3-Clause
+commit: cee4109bbb2680f3e026f9f484aa8419fb4fe8cb
+version: 0.0.12
+date-released: '2023-08-15'
