@@ -12,7 +12,7 @@ from epitools.analysis import calculate_segmentation
 
 SPOT_SIGMA = 4.0
 OUTLINE_SIGMA = 3.0
-THRESHOLD = 3.0
+THRESHOLD = 0.04
 
 
 def test_add_segmentation_widget(

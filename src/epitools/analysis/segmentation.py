@@ -52,7 +52,7 @@ def thresholded_local_minima_seeded_watershed(
     image: npt.NDArray[np.float64],
     spot_sigma: float = 3,
     outline_sigma: float = 0,
-    minimum_intensity: float = 500,
+    minimum_intensity: float = 0.01,
 ) -> tuple[list[list[Any]], npt.NDArray[np.uint32]]:
     """
     Segment cells in images with marked membranes that have a high signal intensity.
@@ -63,6 +63,7 @@ def thresholded_local_minima_seeded_watershed(
     Afterwards, all objects are removed that have an average intensity below a given
     minimum_intensity
     """
+
     spots, labels = local_minima_seeded_watershed(
         image, spot_sigma=spot_sigma, outline_sigma=outline_sigma
     )
@@ -74,6 +75,9 @@ def thresholded_local_minima_seeded_watershed(
     # measure intensities
     stats = regionprops(labels, image)
     intensities = [r.mean_intensity for r in stats]
+
+    # Normalise intensities based on the max
+    minimum_intensity = minimum_intensity * max(np.asarray(intensities))
 
     # filter labels with low intensity
     new_label_indices, _, _ = relabel_sequential(

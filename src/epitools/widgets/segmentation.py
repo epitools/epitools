@@ -41,12 +41,13 @@ def create_segmentation_widget() -> magicgui.widgets.Container:
 
     threshold_tooltip = "Cells with an average intensity below `threshold` are ignored."
     threshold = magicgui.widgets.create_widget(
-        value=3.0,
+        value=0.01,
         name="threshold",
         label="threshold sigma",
         widget_type="FloatSpinBox",
         options={
             "tooltip": threshold_tooltip,
+            "max": 1.0,
         },
     )
 
