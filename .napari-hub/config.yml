@@ -8,4 +8,6 @@ labels:
     - 3D image
     - Image time series
     - Image segmentation
+    - Cell segmentation
+    - Cell_image_analysis
     - Visualisation
