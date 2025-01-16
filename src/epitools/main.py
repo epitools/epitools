@@ -135,6 +135,53 @@ def run_projection(
         )
 
 
+def create_quality_metrics_widget() -> magicgui.widgets.Container:
+    """
+    Create a widget to calculate quality metrics for a 3D (ZYX) or (TYX) timeseries
+    """
+
+    quality_metrics_widget = epitools.widgets.create_quality_metrics_widget()
+    viewer = napari.current_viewer()
+
+    # Calculate quality metrics when pressing the 'Run' button
+    quality_metrics_widget.run.changed.connect(
+        lambda: run_quality_metrics(
+            image=quality_metrics_widget.input_image.value,
+            labels=quality_metrics_widget.input_labels.value,
+            percentage_of_zslices=quality_metrics_widget.percentage_of_zslices.value,
+            run_metrics=quality_metrics_widget.run_metrics.value,
+            show_overlay=quality_metrics_widget.show_overlay.value,
+        ),
+    )
+
+    return quality_metrics_widget
+
+def run_quality_metrics(
+        image,
+        labels,
+        percentage_of_zslices,
+        run_metrics,
+        show_overlay) -> None:
+    """
+    Calculate quality metrics for a 3D (ZYX) or (TYX) timeseries
+    """
+    id_cells = epitools.analysis.calculate_quality_metrics(
+        labels=labels.data,
+        percentage_of_zslices=percentage_of_zslices,
+    )
+
+    if show_overlay:
+        # Create an overlay with the cells that fulfill the quality metrics
+        viewer = napari.current_viewer()
+
+    if run_metrics:
+        epitools.analysis.calculate_cell_statistics(
+            image=image.data,
+            labels=labels.data,
+            id_cells=id_cells,
+        )
+
+
 def create_segmentation_widget() -> magicgui.widgets.Container:
     """Create a widget to segment a 3d (TYZ) timeseries"""
 
