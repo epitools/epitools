@@ -11,6 +11,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+from scipy import ndimage
+
 if TYPE_CHECKING:
     import numpy.typing as npt
 
@@ -30,9 +32,10 @@ FOUR_DIMENSIONAL = 4
 
 
 def calculate_cell_statistics(
-    image: napari.types.ImageData,
-    labels: napari.types.LabelsData,
-    pixel_spacing: tuple[float],
+        image: napari.types.ImageData,
+        labels: napari.types.LabelsData,
+        pixel_spacing: tuple[float],
+        id_cells: list[int] = None,
 ) -> tuple[list[dict[str, npt.NDArray]], list[skimage.graph.RAG]]:
     """Calculate the region based properties of a timeseries of segmented images.
 
@@ -49,14 +52,17 @@ def calculate_cell_statistics(
     calculated.
 
     Args:
-        image :
+        image : napari.types.ImageData
             Timeseries of images (TYX or TZYX) for which to calculate the cell
             statistics.
-        labels :
+        labels : napari.types.LabelsData
             Labelled input image, must be the same shape as ``image``.
             Labels with value 0 are ignored.
-        pixel_spacing :
-
+        pixel_spacing : tuple[float]
+            The pixel spacing in each dimension of the image.
+        id_cells : list[int], optional
+            The cell IDs to calculate statistics for. If not provided, statistics
+            will be calculated for all cells.
 
     Note:
         It is assumed that the first dimension of both ``image`` and ``labels``
@@ -88,9 +94,10 @@ def calculate_cell_statistics(
 
 
 def _calculate_cell_statistics(
-    image: napari.types.ImageData,
-    labels: napari.types.LabelsData,
-    pixel_spacing: tuple[float],
+        image: napari.types.ImageData,
+        labels: napari.types.LabelsData,
+        pixel_spacing: tuple[float],
+        id_cells: list[int] = None,
 ) -> list[dict[str, npt.NDArray]]:
     """Calculate cell properties using skimage regionprops"""
 
@@ -168,7 +175,7 @@ def _calculate_cell_statistics(
 
 
 def _create_graphs(
-    labels: napari.types.LabelsData,
+        labels: napari.types.LabelsData,
 ) -> list[skimage.graph.RAG]:
     """Create graph of neighbouring cells"""
 
@@ -188,8 +195,8 @@ def _create_graphs(
 
 
 def _calculate_graph_statistics(
-    cell_statistics: list[dict[str, npt.NDArray]],
-    graphs: skimage.graph._rag.RAG,
+        cell_statistics: list[dict[str, npt.NDArray]],
+        graphs: skimage.graph._rag.RAG,
 ) -> None:
     """Calculate additional cell statistics from graphs.
 
@@ -204,3 +211,97 @@ def _calculate_graph_statistics(
 
         id_neighbours = [list(graph.neighbors(index)) for index in indices]
         cell_statistics[frame]["id_neighbours"] = np.array(id_neighbours, dtype=object)
+
+def calculate_quality_metrics(
+        labels: napari.types.LabelsData,
+        percentage_of_zslices: float,
+        show_overlay: bool = False,
+) -> tuple[dict[str, npt.NDArray], napari.types.LabelsData]:
+    """Calculate quality metrics for a 3D image.
+
+    The quality metric calculated is
+
+    Args:
+        labels : napari.types.LabelsData
+            Labelled input image, must be the same shape as ``image``.
+            Labels with value 0 are ignored.
+        percentage_of_zslices : float
+            Percentage of z-slices to use for calculating the quality metrics.
+        show_overlay : bool
+            If True, show the overlay of the correct labels on the image.
+
+    Returns:
+        dict[str, np.NDArray]
+            Dictionary containing the quality metrics.
+        napari.types.LabelsData
+            The labels overlayed on the image.
+
+    """
+
+
+
+    if show_overlay:
+        overlay = _show_overlay(image, labels)
+    else:
+        overlay = labels
+
+    return quality_metrics, overlay
+
+def _count_correct_cells(
+        labels: npt.ArrayLike,
+        min_percentage: float,
+) -> [list[int], list[int]]:
+    """
+    Count the number of cells that are present in a 'min_percentage' of slices.
+    Originally developed by Giulia Paci
+
+      Args:
+          labels : npt.ArrayLike
+              Labelled input image, must be the same shape as ``image``.
+              Labels with value 0 are ignored.
+          min_percentage : float
+              Percentage of z-slices to use for calculating the quality metrics.
+              The percentage of slices that a cell must be present in to be considered correct.
+
+      Returns:
+          [int, int]
+              Number of correct cells and number of incorrect cells.
+    """
+    z_planes = labels.shape[0]
+
+    # Minimum of number of slices for a cell to be correct
+    target_n_planes = (min_percentage / 100 ) * z_planes
+
+    # Count the number of good cells
+    unique_ids = np.unique(labels)
+    list_good = []
+    list_bad = []
+
+    # Loop
+    for cell_id in unique_ids:
+        if cell_id == 0:
+            continue
+
+        # Get the voxels of the current cell
+        current_img = labels == cell_id
+
+        # Get the position of the voxels
+        binary_img_pos = np.where(current_img)
+
+        # Check if they are connected by using connected components
+        _, num_objects = ndimage.label(current_img)
+
+        if num_objects > 2:
+            list_bad.append(cell_id)
+            continue
+
+        # Get only the unique Z position of the voxels
+        unique_z_position = np.unique(binary_img_pos[0])
+
+        # Count the number of slices that the cell is present in
+        if len(unique_z_position) > target_n_planes:
+            list_good.append(cell_id)
+        else:
+            list_bad.append(cell_id)
+
+    return list_good, list_bad

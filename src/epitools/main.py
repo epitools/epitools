@@ -168,11 +168,8 @@ def run_quality_metrics(
     id_cells = epitools.analysis.calculate_quality_metrics(
         labels=labels.data,
         percentage_of_zslices=percentage_of_zslices,
+        show_overlay=show_overlay,
     )
-
-    if show_overlay:
-        # Create an overlay with the cells that fulfill the quality metrics
-        viewer = napari.current_viewer()
 
     if run_metrics:
         epitools.analysis.calculate_cell_statistics(
