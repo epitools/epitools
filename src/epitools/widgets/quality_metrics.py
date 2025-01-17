@@ -22,7 +22,7 @@ def create_quality_metrics_widget() -> magicgui.widgets.Container:
 
     labels = magicgui.widgets.create_widget(
         annotation=napari.layers.Labels,
-        name="labels",
+        name="input_labels",
         label="labels",
         options={"tooltip": "Select a 'Labels' layer"},
     )

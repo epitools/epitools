@@ -26,7 +26,7 @@ contributions:
     - id: epitools.cell_statistics_widget
       python_name: epitools.main:create_cell_statistics_widget
       title: Epitools cell statistics widget
-    - id: epitools.create_quality_metrics_widget
+    - id: epitools.quality_metrics_widget
       python_name: epitools.main:create_quality_metrics_widget
       title: Calculate quality metrics
   readers:
@@ -53,5 +53,5 @@ contributions:
       display_name: Segmentation (local minima seeded watershed)
     - command: epitools.cell_statistics_widget
       display_name: Cell statistics
-    - command: epitools.calculate_quality_metrics_widget
+    - command: epitools.quality_metrics_widget
       display_name: Calculate quality metrics
