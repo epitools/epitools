@@ -9,9 +9,8 @@ of labelled images using skimage.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from numpy import ndarray
 from scipy import ndimage
 
 if TYPE_CHECKING:
@@ -33,10 +32,10 @@ FOUR_DIMENSIONAL = 4
 
 
 def calculate_cell_statistics(
-        image: napari.types.ImageData,
-        labels: napari.types.LabelsData,
-        pixel_spacing: tuple[float],
-        id_cells: list[int] = None,
+    image: napari.types.ImageData,
+    labels: napari.types.LabelsData,
+    pixel_spacing: tuple[float],
+    id_cells: list[int] | None = None,
 ) -> tuple[list[dict[str, npt.NDArray]], list[skimage.graph.RAG]]:
     """Calculate the region based properties of a timeseries of segmented images.
 
@@ -95,10 +94,10 @@ def calculate_cell_statistics(
 
 
 def _calculate_cell_statistics(
-        image: napari.types.ImageData,
-        labels: napari.types.LabelsData,
-        pixel_spacing: tuple[float],
-        id_cells: list[int] = None,
+    image: napari.types.ImageData,
+    labels: napari.types.LabelsData,
+    pixel_spacing: tuple[float],
+    id_cells: list[int] | None = None,
 ) -> list[dict[str, npt.NDArray]]:
     """Calculate cell properties using skimage regionprops"""
 
@@ -176,7 +175,7 @@ def _calculate_cell_statistics(
 
 
 def _create_graphs(
-        labels: napari.types.LabelsData,
+    labels: napari.types.LabelsData,
 ) -> list[skimage.graph.RAG]:
     """Create graph of neighbouring cells"""
 
@@ -196,8 +195,8 @@ def _create_graphs(
 
 
 def _calculate_graph_statistics(
-        cell_statistics: list[dict[str, npt.NDArray]],
-        graphs: skimage.graph._rag.RAG,
+    cell_statistics: list[dict[str, npt.NDArray]],
+    graphs: skimage.graph._rag.RAG,
 ) -> None:
     """Calculate additional cell statistics from graphs.
 
@@ -214,24 +213,10 @@ def _calculate_graph_statistics(
         cell_statistics[frame]["id_neighbours"] = np.array(id_neighbours, dtype=object)
 
 
-def _show_overlay(
-        labels: napari.types.LabelsData,
-        correct_cells: list[int],
-) -> napari.types.LabelsData:
-    """Show the overlay of the correct labels on the image"""
-
-    # Create overlay
-    overlay = np.zeros_like(labels)
-    for cell_id in correct_cells:
-        overlay[labels == cell_id] = cell_id
-
-    return overlay
-
 def calculate_quality_metrics(
-        labels: napari.types.LabelsData,
-        percentage_of_zslices: float,
-        show_overlay: bool = False,
-) -> tuple[dict[str, int], napari.types.LabelsData]:
+    labels: napari.types.LabelsData,
+    percentage_of_zslices: float,
+) -> dict[str, list[int]]:
     """Calculate quality metrics for a 3D image.
 
     The quality metric calculated is
@@ -242,37 +227,27 @@ def calculate_quality_metrics(
             Labels with value 0 are ignored.
         percentage_of_zslices : float
             Percentage of z-slices to use for calculating the quality metrics.
-        show_overlay : bool
-            If True, show the overlay of the correct labels on the image.
 
     Returns:
         dict[str, np.NDArray]
             Dictionary containing the quality metrics.
-        napari.types.LabelsData
-            The labels overlayed on the image.
 
     """
-
     quality_metrics = {}
 
     # Calculate the quality metrics
     correct_cells, wrong_cells = _count_correct_cells(labels, percentage_of_zslices)
     logger.info(f"Number of correct cells: {len(correct_cells)}")
     logger.info(f"Number of wrong cells: {len(wrong_cells)}")
-    quality_metrics["correct_cells"] = len(correct_cells)
-    quality_metrics["wrong_cells"] = len(wrong_cells)
+    quality_metrics["correct_cells"] = correct_cells
+    quality_metrics["wrong_cells"] = wrong_cells
 
-    # Create overlay
-    if show_overlay:
-        overlay = _show_overlay(labels, correct_cells)
-    else:
-        overlay = labels
+    return quality_metrics
 
-    return quality_metrics, overlay
 
 def _count_correct_cells(
-        labels: npt.ArrayLike,
-        min_percentage: float,
+    labels: npt.ArrayLike,
+    min_percentage: float,
 ) -> tuple[list[int], list[int]]:
     """
     Count the number of cells that are present in a 'min_percentage' of slices.
@@ -284,16 +259,21 @@ def _count_correct_cells(
               Labels with value 0 are ignored.
           min_percentage : float
               Percentage of z-slices to use for calculating the quality metrics.
-              The percentage of slices that a cell must be present in to be considered correct.
+              The percentage of slices that a cell must be present in to
+              be considered correct.
 
       Returns:
-          [int, int]
-              Number of correct cells and number of incorrect cells.
+          tuple[list[int], list[int]]
+                List of the correct cells and the wrong cells.
     """
-    z_planes = labels.shape[0]
+    # Define a constant for the magic value
+    max_num_objects = 2
+
+    if isinstance(labels, np.ndarray):
+        z_planes = labels.shape[0]
 
     # Minimum of number of slices for a cell to be correct
-    target_n_planes = (min_percentage / 100 ) * z_planes
+    target_n_planes = (min_percentage / 100) * z_planes
 
     # Count the number of good cells
     unique_ids = np.unique(labels)
@@ -314,7 +294,8 @@ def _count_correct_cells(
         # Check if they are connected by using connected components
         _, num_objects = ndimage.label(current_img)
 
-        if num_objects > 2:
+        # Use the constant in the comparison
+        if num_objects > max_num_objects:
             list_bad.append(cell_id)
             continue
 

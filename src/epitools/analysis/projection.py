@@ -60,6 +60,7 @@ def _interpolate(
     Returns:
         Interpolated z coordinates.
     """
+    indices: list[int] = []
     indices = np.nonzero(max_indices)
     if not np.any(indices):
         return max_indices

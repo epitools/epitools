@@ -4,7 +4,7 @@ import magicgui.widgets
 import napari
 
 __all__ = [
-    "calculate_quality_metrics",
+    "create_quality_metrics_widget",
 ]
 
 

@@ -21,6 +21,7 @@ __all__ = [
     "create_segmentation_widget",
     "create_projection_2ch_widget",
     "create_cell_statistics_widget",
+    "create_quality_metrics_widget",
 ]
 
 logger = logging.getLogger(__name__)
@@ -141,7 +142,7 @@ def create_quality_metrics_widget() -> magicgui.widgets.Container:
     """
 
     quality_metrics_widget = epitools.widgets.create_quality_metrics_widget()
-    viewer = napari.current_viewer()
+    napari.current_viewer()
 
     # Calculate quality metrics when pressing the 'Run' button
     quality_metrics_widget.run.changed.connect(
@@ -156,26 +157,39 @@ def create_quality_metrics_widget() -> magicgui.widgets.Container:
 
     return quality_metrics_widget
 
+
 def run_quality_metrics(
-        image,
-        labels,
-        percentage_of_zslices,
-        run_metrics,
-        show_overlay) -> None:
+    image, labels, percentage_of_zslices, run_metrics, show_overlay
+) -> None:
     """
     Calculate quality metrics for a 3D (ZYX) or (TYX) timeseries
     """
-    id_cells = epitools.analysis.calculate_quality_metrics(
+    quality_metrics = epitools.analysis.calculate_quality_metrics(
         labels=labels.data,
         percentage_of_zslices=percentage_of_zslices,
-        show_overlay=show_overlay,
     )
 
     if run_metrics:
         epitools.analysis.calculate_cell_statistics(
             image=image.data,
             labels=labels.data,
-            id_cells=id_cells,
+            pixel_spacing=image.scale,
+            id_cells=quality_metrics["correct_cells"],
+        )
+
+    if show_overlay:
+        overlay = show_overlay(
+            labels=labels.data,
+            correct_cells=quality_metrics["correct_cells"],
+        )
+        viewer = napari.current_viewer()
+        viewer.add_labels(
+            data=overlay,
+            scale=image.scale,
+            translate=image.translate,
+            rotate=image.rotate,
+            plane=image.plane,
+            name="Correct_cells",
         )
 
 
@@ -351,6 +365,7 @@ def run_cell_statistics(
         image=image.data,
         labels=labels.data,
         pixel_spacing=pixel_spacing,
+        id_cells=None,
     )
 
     # We will use these to update the cell stats at each frame
@@ -508,3 +523,29 @@ def _create_colourmap(
     colours = plt.cm.turbo(colourmap_data)
 
     return dict(zip(indices, colours))
+
+
+def show_overlay(
+    labels: napari.types.LabelsData,
+    correct_cells: list[int],
+) -> napari.types.LabelsData:
+    """
+    Create an overlay of correct cells in a Labels layer
+
+    Args:
+        labels : napari.types.LabelsData
+            Labelled image
+        correct_cells : list[int]
+            List of cell ids to highlight in the overlay
+
+    Returns:
+        napari.types.LabelsData
+            Overlay of correct cells
+    """
+
+    # Create overlay
+    overlay = np.zeros_like(labels)
+    for cell_id in correct_cells:
+        overlay[labels == cell_id] = cell_id
+
+    return overlay
