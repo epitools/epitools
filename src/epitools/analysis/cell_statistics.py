@@ -9,8 +9,9 @@ of labelled images using skimage.
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
+from numpy import ndarray
 from scipy import ndimage
 
 if TYPE_CHECKING:
@@ -212,11 +213,25 @@ def _calculate_graph_statistics(
         id_neighbours = [list(graph.neighbors(index)) for index in indices]
         cell_statistics[frame]["id_neighbours"] = np.array(id_neighbours, dtype=object)
 
+
+def _show_overlay(
+        labels: napari.types.LabelsData,
+        correct_cells: list[int],
+) -> napari.types.LabelsData:
+    """Show the overlay of the correct labels on the image"""
+
+    # Create overlay
+    overlay = np.zeros_like(labels)
+    for cell_id in correct_cells:
+        overlay[labels == cell_id] = cell_id
+
+    return overlay
+
 def calculate_quality_metrics(
         labels: napari.types.LabelsData,
         percentage_of_zslices: float,
         show_overlay: bool = False,
-) -> tuple[dict[str, npt.NDArray], napari.types.LabelsData]:
+) -> tuple[dict[str, int], napari.types.LabelsData]:
     """Calculate quality metrics for a 3D image.
 
     The quality metric calculated is
@@ -238,10 +253,18 @@ def calculate_quality_metrics(
 
     """
 
+    quality_metrics = {}
 
+    # Calculate the quality metrics
+    correct_cells, wrong_cells = _count_correct_cells(labels, percentage_of_zslices)
+    logger.info(f"Number of correct cells: {len(correct_cells)}")
+    logger.info(f"Number of wrong cells: {len(wrong_cells)}")
+    quality_metrics["correct_cells"] = len(correct_cells)
+    quality_metrics["wrong_cells"] = len(wrong_cells)
 
+    # Create overlay
     if show_overlay:
-        overlay = _show_overlay(image, labels)
+        overlay = _show_overlay(labels, correct_cells)
     else:
         overlay = labels
 
@@ -250,7 +273,7 @@ def calculate_quality_metrics(
 def _count_correct_cells(
         labels: npt.ArrayLike,
         min_percentage: float,
-) -> [list[int], list[int]]:
+) -> tuple[list[int], list[int]]:
     """
     Count the number of cells that are present in a 'min_percentage' of slices.
     Originally developed by Giulia Paci

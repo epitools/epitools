@@ -1,11 +1,11 @@
+from __future__ import annotations
+
 import magicgui.widgets
 import napari
 
 __all__ = [
-    "compute_quiality_metrics",
+    "calculate_quality_metrics",
 ]
-
-from fsspec.registry import default
 
 
 def create_quality_metrics_widget() -> magicgui.widgets.Container:
