@@ -178,7 +178,7 @@ def run_quality_metrics(
         )
 
     if show_overlay:
-        overlay = show_overlay(
+        overlay = _show_overlay(
             labels=labels.data,
             correct_cells=quality_metrics["correct_cells"],
         )
@@ -525,7 +525,7 @@ def _create_colourmap(
     return dict(zip(indices, colours))
 
 
-def show_overlay(
+def _show_overlay(
     labels: napari.types.LabelsData,
     correct_cells: list[int],
 ) -> napari.types.LabelsData:
