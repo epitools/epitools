@@ -96,59 +96,86 @@ def calculate_cell_statistics(
 def _calculate_cell_statistics(
     image: napari.types.ImageData,
     labels: napari.types.LabelsData,
-    pixel_spacing: tuple[float],
+    pixel_spacing: tuple[float, ...],
     id_cells: list[int] | None = None,
 ) -> list[dict[str, npt.NDArray]]:
     """Calculate cell properties using skimage regionprops"""
 
-    # TODO: fix the commented out properties
-    # https://github.com/epitools/epitools/issues/98
-    # contents of `skimage.measure._regionprops.PROP_VALS`
-    properties = [
-        "area_bbox",
-        "area_convex",
-        "area_filled",
-        "area",
-        "axis_major_length",
-        "axis_minor_length",
-        "bbox",
-        "centroid_local",
-        "centroid_weighted_local",
-        "centroid_weighted",
-        "centroid",
-        # 'coords',
-        "eccentricity",
-        "equivalent_diameter_area",
-        "euler_number",
-        "extent",
-        "feret_diameter_max",
-        # 'image_convex',
-        # 'image_filled',
-        # 'image_intensity',
-        # 'image',
-        "inertia_tensor_eigvals",
-        "inertia_tensor",
-        "intensity_max",
-        "intensity_mean",
-        "intensity_min",
-        "label",
-        "moments_central",
-        "moments_normalized",
-        "moments_weighted_central",
-        # 'moments_weighted_hu',
-        "moments_weighted_normalized",
-        "moments_weighted",
-        "moments",
-        "orientation",
-        "perimeter_crofton",
-        "perimeter",
-        # 'slice',
-        "solidity",
-    ]
+    # Analyse the image in 3D if it is 4D
+    if (
+        isinstance(image, np.ndarray)
+        and image.ndim == FOUR_DIMENSIONAL
+        and image.shape[1] > 1
+    ):
+        pixel_spacing = pixel_spacing[3:]
 
-    # remove z axis if necessary
-    image = image[:, 0] if image.ndim == FOUR_DIMENSIONAL else image
-    labels = labels[:, 0] if labels.ndim == FOUR_DIMENSIONAL else labels
+        # # Ensure that pixel_spacing id a sequence of floats
+        # if pixel_spacing.shape != (image.ndim,):
+        #     # Transform to a sequence of floats
+        #     pixel_spacing = tuple(float(value) for value in pixel_spacing)
+
+        # Properties to check in 3D
+        properties = [
+            "area",
+            "bbox",
+            "axis_major_length",
+            "axis_minor_length",
+            "euler_number",
+            "extent",
+            "label",
+            "perimeter",
+        ]
+    else:
+        # remove z axis if necessary
+        if isinstance(image, np.ndarray) and image.ndim == FOUR_DIMENSIONAL:
+            image = image[:, 0]
+        if isinstance(labels, np.ndarray) and labels.ndim == FOUR_DIMENSIONAL:
+            labels = labels[:, 0]
+
+        # TODO: fix the commented out properties
+        # https://github.com/epitools/epitools/issues/98
+        # contents of `skimage.measure._regionprops.PROP_VALS`
+        properties = [
+            "area_bbox",
+            "area_convex",
+            "area_filled",
+            "area",
+            "axis_major_length",
+            "axis_minor_length",
+            "bbox",
+            "centroid_local",
+            "centroid_weighted_local",
+            "centroid_weighted",
+            "centroid",
+            # 'coords',
+            "eccentricity",
+            "equivalent_diameter_area",
+            "euler_number",
+            "extent",
+            "feret_diameter_max",
+            # 'image_convex',
+            # 'image_filled',
+            # 'image_intensity',
+            # 'image',
+            "inertia_tensor_eigvals",
+            "inertia_tensor",
+            "intensity_max",
+            "intensity_mean",
+            "intensity_min",
+            "label",
+            "moments_central",
+            "moments_normalized",
+            "moments_weighted_central",
+            # 'moments_weighted_hu',
+            "moments_weighted_normalized",
+            "moments_weighted",
+            "moments",
+            "orientation",
+            "perimeter_crofton",
+            "perimeter",
+            # 'slice',
+            "solidity",
+        ]
 
     cell_statistics = [
         skimage.measure.regionprops_table(
@@ -246,7 +273,7 @@ def calculate_quality_metrics(
 
 
 def _count_correct_cells(
-    labels: npt.ArrayLike,
+    labels: napari.types.LabelsData,
     min_percentage: float,
 ) -> tuple[list[int], list[int]]:
     """
@@ -254,7 +281,7 @@ def _count_correct_cells(
     Originally developed by Giulia Paci
 
       Args:
-          labels : npt.ArrayLike
+          labels : napari.types.LabelsData
               Labelled input image, must be the same shape as ``image``.
               Labels with value 0 are ignored.
           min_percentage : float
@@ -269,8 +296,11 @@ def _count_correct_cells(
     # Define a constant for the magic value
     max_num_objects = 2
 
+    # Define the position of the Z axis
+    z_axis = 1 if labels.ndim == FOUR_DIMENSIONAL else 0
+
     if isinstance(labels, np.ndarray):
-        z_planes = labels.shape[0]
+        z_planes = labels.shape[z_axis]
 
     # Minimum of number of slices for a cell to be correct
     target_n_planes = (min_percentage / 100) * z_planes
@@ -300,7 +330,7 @@ def _count_correct_cells(
             continue
 
         # Get only the unique Z position of the voxels
-        unique_z_position = np.unique(binary_img_pos[0])
+        unique_z_position = np.unique(binary_img_pos[z_axis])
 
         # Count the number of slices that the cell is present in
         if len(unique_z_position) > target_n_planes:

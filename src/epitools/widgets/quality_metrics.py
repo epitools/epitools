@@ -35,18 +35,19 @@ def create_quality_metrics_widget() -> magicgui.widgets.Container:
         value=80.0,
     )
 
+    show_overlay = magicgui.widgets.create_widget(
+        name="show_overlay",
+        label="Show overlay",
+        widget_type="CheckBox",
+        value=True,
+        options={"tooltip": "Show overlay"},
+    )
+
     run_metrics = magicgui.widgets.create_widget(
         name="run_metrics",
         label="Run metrics",
         widget_type="CheckBox",
         options={"tooltip": "Compute cell statistics"},
-    )
-
-    show_overlay = magicgui.widgets.create_widget(
-        name="show_overlay",
-        label="Show overlay",
-        widget_type="CheckBox",
-        options={"tooltip": "Show overlay"},
     )
 
     run_buttom = magicgui.widgets.create_widget(
