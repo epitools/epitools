@@ -107,7 +107,7 @@ def _calculate_cell_statistics(
         and image.ndim == FOUR_DIMENSIONAL
         and image.shape[1] > 1
     ):
-        pixel_spacing = pixel_spacing[3:]
+        pixel_spacing = pixel_spacing[1:]
 
         # # Ensure that pixel_spacing id a sequence of floats
         # if pixel_spacing.shape != (image.ndim,):
@@ -117,13 +117,7 @@ def _calculate_cell_statistics(
         # Properties to check in 3D
         properties = [
             "area",
-            "bbox",
-            "axis_major_length",
-            "axis_minor_length",
-            "euler_number",
-            "extent",
             "label",
-            "perimeter",
         ]
     else:
         # remove z axis if necessary
