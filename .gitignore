@@ -88,3 +88,5 @@ venv/
 .envrc
 
 *.csv
+
+*.lcov

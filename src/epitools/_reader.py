@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import PartSegCore.analysis.load_functions
-import PartSegCore.napari_plugins.loader
+from PartSeg.plugins.napari_io.loader import project_to_layers
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -88,7 +88,7 @@ def reader_function(
     loader = PartSegCore.analysis.load_functions.LoadStackImage()
     image_stack = loader.load(load_locations=paths)
 
-    image_layers = PartSegCore.napari_plugins.loader.project_to_layers(
+    image_layers = project_to_layers(
         project_info=image_stack,
     )
 
