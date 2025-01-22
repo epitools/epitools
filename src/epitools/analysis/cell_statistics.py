@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING
 
 from scipy import ndimage
 
+from epitools.main import THREE_DIMENSIONAL
+
 if TYPE_CHECKING:
     import numpy.typing as npt
 
@@ -102,10 +104,9 @@ def _calculate_cell_statistics(
     """Calculate cell properties using skimage regionprops"""
 
     # Analyse the image in 3D if it is 4D
-    if (
-        isinstance(image, np.ndarray)
-        and image.ndim == FOUR_DIMENSIONAL
-        and image.shape[1] > 1
+    if isinstance(image, np.ndarray) and (
+        (image.ndim == FOUR_DIMENSIONAL and image.shape[1] > 1)
+        or (image.ndim == THREE_DIMENSIONAL and image.shape[0] > 1)
     ):
         pixel_spacing = pixel_spacing[1:]
 
@@ -230,7 +231,15 @@ def _calculate_graph_statistics(
         num_neighbours = np.asarray([len(graph[index]) for index in indices])
         cell_statistics[frame]["num_neighbours"] = num_neighbours
 
-        id_neighbours = [list(graph.neighbors(index)) for index in indices]
+        id_neighbours: list[list[int] | None] = []
+        for index in indices:
+            new_id_neighbours = list(graph.neighbors(index))
+
+            if len(new_id_neighbours) == 0:
+                id_neighbours.append(None)
+            else:
+                id_neighbours.append(list(graph.neighbors(index)))
+
         cell_statistics[frame]["id_neighbours"] = np.array(id_neighbours, dtype=object)
 
 
