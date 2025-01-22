@@ -22,6 +22,18 @@ def image() -> napari.layers.Image:
 
 
 @pytest.fixture(scope="function")
+def image_2() -> napari.layers.Image:
+    """Load an sample 3D image from a tif file and convert to a Napari Image layer.
+
+    Note, the Napari Image will be 4D (TZYX) with a single frame in the
+    time dimension.
+    """
+    data, metadata, layer_type = epitools._sample_data.load_sample_data()[0]
+    metadata["name"] = "Test Image"
+    return napari.layers.Image(data, **metadata)
+
+
+@pytest.fixture(scope="function")
 def projected_image() -> napari.layers.Image:
     """Load a sample 2D image from a tif file and convert to a Napari Image layer.
 
@@ -33,9 +45,18 @@ def projected_image() -> napari.layers.Image:
 
 
 @pytest.fixture(scope="function")
-def seeds_and_labels(
-    make_napari_viewer: Callable,
-) -> tuple[napari.layers.Points, napari.layers.Labels]:
+def projected_image_channel2() -> napari.layers.Image:
+    """Load a sample 2D image from a tif file and convert to a Napari Image layer.
+
+    Note, the Napari Image will be 4D (TZYX) with single frame in the time dimension
+    and a single slice in Z.
+    """
+    data, metadata, layer_type = epitools._sample_data.load_projected_data()[0]
+    return napari.layers.Image(data, **metadata)
+
+
+@pytest.fixture(scope="function")
+def seeds_and_labels() -> tuple[napari.layers.Points, napari.layers.Labels]:
     """Load a sample segmentaiton and the seeds use in generating the segmentation.
 
     Load sample cells and seeds and convert to Napari Points and Labels layers,
@@ -55,6 +76,28 @@ def seeds_and_labels(
 
 
 @pytest.fixture(scope="function")
+def viewer_with_labels(
+    make_napari_viewer: Callable,
+    seeds_and_labels: tuple[napari.layers.Points, napari.layers.Labels],
+) -> napari.Viewer:
+    """Load a sample segmentation and the seeds use in generating the segmentation.
+
+    Load sample cells and seeds and convert to Napari Points and Labels layers,
+    respectively.
+
+    Note, the Napari Labels will be 4D (TZYX) with a single frame in the time dimension
+    and a single slice in Z.
+    """
+
+    seeds, labels = seeds_and_labels
+
+    viewer = make_napari_viewer()
+    viewer.add_layer(labels)
+
+    return viewer
+
+
+@pytest.fixture(scope="function")
 def viewer_with_image(
     make_napari_viewer: Callable,
     image: napari.layers.Image,
@@ -63,6 +106,21 @@ def viewer_with_image(
 
     viewer = make_napari_viewer()
     viewer.add_layer(image)
+
+    return viewer
+
+
+@pytest.fixture(scope="function")
+def viewer_with_2_images(
+    make_napari_viewer: Callable,
+    image: napari.layers.Image,
+    image_2: napari.layers.Image,
+) -> napari.Viewer:
+    """Create a Napari Viewer with 2 sample Image layer added to it."""
+
+    viewer = make_napari_viewer()
+    viewer.add_layer(image)
+    viewer.add_layer(image_2)
 
     return viewer
 
