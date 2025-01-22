@@ -57,6 +57,16 @@ def create_quality_metrics_widget() -> magicgui.widgets.Container:
         options={"tooltip": "Compute quality metrics"},
     )
 
+    export_tooltip = (
+        "Export the cell statistics for the selected Image and Labels to a CSV file"
+    )
+    export = magicgui.widgets.create_widget(
+        name="export",
+        label="Export statistics",
+        widget_type="PushButton",
+        options={"tooltip": export_tooltip},
+    )
+
     return magicgui.widgets.Container(
         widgets=[
             image,
@@ -65,6 +75,7 @@ def create_quality_metrics_widget() -> magicgui.widgets.Container:
             run_metrics,
             show_overlay,
             run_buttom,
+            export,
         ],
         scrollable=False,
     )

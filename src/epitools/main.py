@@ -12,6 +12,7 @@ import magicgui.widgets
 import napari.layers
 import napari.qt.threading
 from magicgui.types import FileDialogMode
+from napari.utils import progress
 
 import epitools.analysis
 import epitools.widgets
@@ -155,6 +156,13 @@ def create_quality_metrics_widget() -> magicgui.widgets.Container:
         ),
     )
 
+    # write the cell_statistics to CSV
+    quality_metrics_widget.export.changed.connect(
+        lambda: export_cell_statistics(
+            labels=quality_metrics_widget.input_labels.value,
+        ),
+    )
+
     return quality_metrics_widget
 
 
@@ -164,12 +172,19 @@ def run_quality_metrics(
     """
     Calculate quality metrics for a 3D (ZYX) or (TYX) timeseries
     """
+
+    pbr = progress(total=3)
+    pbr.set_description("Quality metrics calculation in progress")
+    pbr.update(0)
+
     quality_metrics = epitools.analysis.calculate_quality_metrics(
         labels=labels.data,
         percentage_of_zslices=percentage_of_zslices,
     )
 
+    pbr.update(1)
     if run_metrics:
+        pbr.set_description("Calculating cell statistics in progress")
         epitools.analysis.calculate_cell_statistics(
             image=image.data,
             labels=labels.data,
@@ -178,6 +193,8 @@ def run_quality_metrics(
         )
 
     if show_overlay:
+        pbr.update(2)
+        pbr.set_description("Creating overlay in progress")
         overlay = _show_overlay(
             labels=labels.data,
             correct_cells=quality_metrics["correct_cells"],
@@ -191,6 +208,21 @@ def run_quality_metrics(
             plane=image.plane,
             name="Correct_cells",
         )
+    pbr.update(3)
+
+    pbr.set_description("Quality metrics calculation complete")
+
+    # must call pbr.close() when using outside for loop
+    # or context manager
+    pbr.close()
+
+    # Display quality metrics
+    message = (
+        f"Quality metrics for '{labels.name}':\n"
+        f"Correct cells: {len(quality_metrics['correct_cells'])}\n"
+        f"Wrong cells: {len(quality_metrics['wrong_cells'])}\n"
+    )
+    napari.utils.notifications.show_info(message)
 
 
 def create_segmentation_widget() -> magicgui.widgets.Container:
