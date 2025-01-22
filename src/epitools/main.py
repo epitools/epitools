@@ -183,22 +183,14 @@ def run_quality_metrics(
     )
 
     pbr.update(1)
-    if run_metrics:
-        pbr.set_description("Calculating cell statistics in progress")
-        epitools.analysis.calculate_cell_statistics(
-            image=image.data,
-            labels=labels.data,
-            pixel_spacing=image.scale,
-            id_cells=quality_metrics["correct_cells"],
-        )
+
+    overlay = _show_overlay(
+        labels=labels.data,
+        correct_cells=quality_metrics["correct_cells"],
+    )
 
     if show_overlay:
-        pbr.update(2)
         pbr.set_description("Creating overlay in progress")
-        overlay = _show_overlay(
-            labels=labels.data,
-            correct_cells=quality_metrics["correct_cells"],
-        )
         viewer = napari.current_viewer()
         viewer.add_labels(
             data=overlay,
@@ -208,6 +200,20 @@ def run_quality_metrics(
             plane=image.plane,
             name="Correct_cells",
         )
+
+    pbr.update(2)
+
+    if run_metrics:
+        pbr.set_description("Calculating cell statistics in progress")
+        [cell_statistics, graphs] = epitools.analysis.calculate_cell_statistics(
+            image=image.data,
+            labels=overlay,
+            pixel_spacing=image.scale,
+            id_cells=quality_metrics["correct_cells"],
+        )
+        labels.metadata["cell_statistics"] = cell_statistics
+        labels.metadata["graphs"] = graphs
+
     pbr.update(3)
 
     pbr.set_description("Quality metrics calculation complete")
