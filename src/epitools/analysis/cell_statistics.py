@@ -13,8 +13,6 @@ from typing import TYPE_CHECKING
 
 from scipy import ndimage
 
-from epitools.main import THREE_DIMENSIONAL
-
 if TYPE_CHECKING:
     import numpy.typing as npt
 
@@ -31,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 FOUR_DIMENSIONAL = 4
+THREE_DIMENSIONAL = 3
 
 
 def calculate_cell_statistics(
