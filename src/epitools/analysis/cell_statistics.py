@@ -296,7 +296,7 @@ def _count_correct_cells(
                 List of the correct cells and the wrong cells.
     """
     # Define a constant for the magic value
-    max_num_objects = 2
+    max_num_objects = 3
 
     # Define the position of the Z axis
     z_axis = 1 if labels.ndim == FOUR_DIMENSIONAL else 0
@@ -312,6 +312,9 @@ def _count_correct_cells(
     list_good = []
     list_bad = []
 
+    # Precompute the structure array
+    structure = np.ones((3, 3, 3))
+
     # Loop
     for cell_id in unique_ids:
         if cell_id == 0:
@@ -320,19 +323,23 @@ def _count_correct_cells(
         # Get the voxels of the current cell
         current_img = labels == cell_id
 
-        # Get the position of the voxels
-        binary_img_pos = np.where(current_img)
-
         # Check if they are connected by using connected components
-        _, num_objects = ndimage.label(current_img)
+        _, num_objects = ndimage.label(current_img, structure=structure)
 
         # Use the constant in the comparison
         if num_objects > max_num_objects:
-            list_bad.append(cell_id)
-            continue
+            # Remove small objects from current_img
+            current_img = ndimage.binary_opening(current_img, structure=structure)
+            # and recompute the connected components
+            _, num_objects = ndimage.label(current_img, structure=structure)
 
-        # Get only the unique Z position of the voxels
-        unique_z_position = np.unique(binary_img_pos[z_axis])
+            # Check again
+            if num_objects > max_num_objects:
+                list_bad.append(cell_id)
+                continue
+
+        # Get the unique Z position of the voxels
+        unique_z_position = np.unique(np.where(current_img)[z_axis])
 
         # Count the number of slices that the cell is present in
         if len(unique_z_position) > target_n_planes:
