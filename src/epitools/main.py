@@ -12,6 +12,7 @@ import magicgui.widgets
 import napari.layers
 import napari.qt.threading
 from magicgui.types import FileDialogMode
+from napari.utils import progress
 
 import epitools.analysis
 import epitools.widgets
@@ -21,6 +22,7 @@ __all__ = [
     "create_segmentation_widget",
     "create_projection_2ch_widget",
     "create_cell_statistics_widget",
+    "create_quality_metrics_widget",
 ]
 
 logger = logging.getLogger(__name__)
@@ -133,6 +135,100 @@ def run_projection(
             plane=image.plane,
             metadata=image.metadata,
         )
+
+
+def create_quality_metrics_widget() -> magicgui.widgets.Container:
+    """
+    Create a widget to calculate quality metrics for a 3D (ZYX) or (TYX) timeseries
+    """
+
+    quality_metrics_widget = epitools.widgets.create_quality_metrics_widget()
+    napari.current_viewer()
+
+    # Calculate quality metrics when pressing the 'Run' button
+    quality_metrics_widget.run.changed.connect(
+        lambda: run_quality_metrics(
+            image=quality_metrics_widget.input_image.value,
+            labels=quality_metrics_widget.input_labels.value,
+            percentage_of_zslices=quality_metrics_widget.percentage_of_zslices.value,
+            run_metrics=quality_metrics_widget.run_metrics.value,
+            show_overlay=quality_metrics_widget.show_overlay.value,
+        ),
+    )
+
+    # write the cell_statistics to CSV
+    quality_metrics_widget.export.changed.connect(
+        lambda: export_cell_statistics(
+            labels=quality_metrics_widget.input_labels.value,
+        ),
+    )
+
+    return quality_metrics_widget
+
+
+def run_quality_metrics(
+    image, labels, percentage_of_zslices, run_metrics, show_overlay
+) -> None:
+    """
+    Calculate quality metrics for a 3D (ZYX) or (TYX) timeseries
+    """
+
+    pbr = progress(total=3)
+    pbr.set_description("Quality metrics calculation in progress")
+    pbr.update(0)
+
+    quality_metrics = epitools.analysis.calculate_quality_metrics(
+        labels=labels.data,
+        percentage_of_zslices=percentage_of_zslices,
+    )
+
+    pbr.update(1)
+
+    overlay = _show_overlay(
+        labels=labels.data,
+        correct_cells=quality_metrics["correct_cells"],
+    )
+
+    if show_overlay:
+        pbr.set_description("Creating overlay in progress")
+        viewer = napari.current_viewer()
+        viewer.add_labels(
+            data=overlay,
+            scale=image.scale,
+            translate=image.translate,
+            rotate=image.rotate,
+            plane=image.plane,
+            name="Correct_cells",
+        )
+
+    pbr.update(2)
+
+    if run_metrics:
+        pbr.set_description("Calculating cell statistics in progress")
+        [cell_statistics, graphs] = epitools.analysis.calculate_cell_statistics(
+            image=image.data,
+            labels=overlay,
+            pixel_spacing=image.scale,
+            id_cells=quality_metrics["correct_cells"],
+        )
+        labels.metadata["cell_statistics"] = cell_statistics
+        labels.metadata["graphs"] = graphs
+
+    pbr.update(3)
+
+    pbr.set_description("Quality metrics calculation complete")
+
+    # must call pbr.close() when using outside for loop
+    # or context manager
+    pbr.close()
+
+    # Display quality metrics
+    message = (
+        f"Quality metrics for '{labels.name}':\n"
+        f"Correct cells: {len(quality_metrics['correct_cells'])}\n"
+        f"Wrong cells: {len(quality_metrics['wrong_cells'])}\n"
+    )
+    napari.utils.notifications.show_info(message)
 
 
 def create_segmentation_widget() -> magicgui.widgets.Container:
@@ -307,6 +403,7 @@ def run_cell_statistics(
         image=image.data,
         labels=labels.data,
         pixel_spacing=pixel_spacing,
+        id_cells=None,
     )
 
     # We will use these to update the cell stats at each frame
@@ -370,6 +467,15 @@ def _cell_statistics_to_csv(
         message = f"'{labels.name}' has no cell statistics to export"
         napari.utils.notifications.show_error(message)
         return
+
+    # Convert np.int64 to regular integers
+    for frame_stats in cell_statistics:
+        for stat in frame_stats:
+            if isinstance(frame_stats[stat], list) and "id_neighbours" in stat:
+                frame_stats[stat] = [
+                    int(x) if isinstance(x, np.integer) else x
+                    for x in frame_stats[stat]
+                ]
 
     df = pd.concat(
         [pd.DataFrame.from_dict(stats).set_index("index") for stats in cell_statistics],
@@ -464,3 +570,29 @@ def _create_colourmap(
     colours = plt.cm.turbo(colourmap_data)
 
     return dict(zip(indices, colours))
+
+
+def _show_overlay(
+    labels: napari.types.LabelsData,
+    correct_cells: list[int],
+) -> napari.types.LabelsData:
+    """
+    Create an overlay of correct cells in a Labels layer
+
+    Args:
+        labels : napari.types.LabelsData
+            Labelled image
+        correct_cells : list[int]
+            List of cell ids to highlight in the overlay
+
+    Returns:
+        napari.types.LabelsData
+            Overlay of correct cells
+    """
+
+    # Create overlay
+    overlay = np.zeros_like(labels)
+    for cell_id in correct_cells:
+        overlay[labels == cell_id] = cell_id
+
+    return overlay
