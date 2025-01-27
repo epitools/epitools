@@ -468,6 +468,15 @@ def _cell_statistics_to_csv(
         napari.utils.notifications.show_error(message)
         return
 
+    # Convert np.int64 to regular integers
+    for frame_stats in cell_statistics:
+        for stat in frame_stats:
+            if isinstance(frame_stats[stat], list) and "id_neighbours" in stat:
+                frame_stats[stat] = [
+                    int(x) if isinstance(x, np.integer) else x
+                    for x in frame_stats[stat]
+                ]
+
     df = pd.concat(
         [pd.DataFrame.from_dict(stats).set_index("index") for stats in cell_statistics],
         keys=list(range(len(cell_statistics))),
