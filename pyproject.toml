@@ -23,6 +23,8 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
@@ -65,6 +67,7 @@ optional-dependencies = {dev = [
     "pytz",
     "sphinx",
     "sphinx-autobuild",
+    "sphinx",
     "sphinx_autodoc_typehints",
     "sphinxcontrib-video",
     "types-pytz",
@@ -175,6 +178,8 @@ legacy_tox_ini = """
     python =
         3.9: py39
         3.10: py310
+        3.11: py311
+        3.12: py312
 
     [gh-actions:env]
     PLATFORM =
@@ -204,6 +209,6 @@ legacy_tox_ini = """
         coverage report
 
     [tox]
-    envlist = py3{9,10}-{linux,macos,windows}
+    envlist = py3{9,10,11,12}-{linux,macos,windows}
     isolated_build=true
 """
