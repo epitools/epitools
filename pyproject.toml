@@ -34,7 +34,7 @@ dependencies = [
     "PartSeg",
     "magicgui",
     "matplotlib",
-    "napari",
+    "napari>=0.5.0",
     "networkx",
     "numpy",
     "pandas",
