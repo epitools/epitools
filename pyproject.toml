@@ -22,6 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
@@ -156,6 +157,7 @@ legacy_tox_ini = """
         3.10: py310
         3.11: py311
         3.12: py312
+        3.13: py313
 
     [gh-actions:env]
     PLATFORM =
