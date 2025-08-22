@@ -305,7 +305,7 @@ def run_segmentation(
         data=seeds_data,
         name="Seeds",
         size=3 * image.scale[-2:].mean(),
-        edge_color="red",
+        border_color="red",
         face_color="red",
         scale=image.scale,
         translate=image.translate,
