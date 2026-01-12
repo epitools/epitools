@@ -4,6 +4,7 @@
 This module contains functions to project 4D (TZYX) and 3D (ZYX) images
 along the z-dimension.
 """
+from __future__ import annotations
 
 import itertools
 
