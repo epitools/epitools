@@ -35,6 +35,7 @@ dependencies = [
     "PartSeg",
     "magicgui",
     "matplotlib",
+    "napari-easytrack",
     "napari>=0.5.0",
     "networkx",
     "numpy",
@@ -72,7 +73,6 @@ optional-dependencies = {dev = [
     "sphinxcontrib-video",
     "types-pytz",
 ], wf = [
-    "btrack[napari]>=0.6.1",
     "napari-segment-blobs-and-things-with-membranes",
 ]}
 readme = "README.md"
@@ -142,7 +142,7 @@ select = [
     "W",
     "YTT",
 ]
-target-version = "py39"
+target-version = "py311"
 isort.known-first-party = [
     "epitools",
 ]
