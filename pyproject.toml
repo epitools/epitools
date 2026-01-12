@@ -35,10 +35,12 @@ dependencies = [
     "PartSeg",
     "magicgui",
     "matplotlib",
+    "napari-easytrack",
     "napari>=0.5.0",
     "networkx",
     "numpy",
     "pandas",
+    "pydantic<2",
     "scikit-image>=0.20",
     "scipy",
 ]
@@ -72,7 +74,6 @@ optional-dependencies = {dev = [
     "sphinxcontrib-video",
     "types-pytz",
 ], wf = [
-    "btrack[napari]>=0.6.1",
     "napari-segment-blobs-and-things-with-membranes",
 ]}
 readme = "README.md"

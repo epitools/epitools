@@ -51,6 +51,8 @@ contributions:
       display_name: Projection (2 channel with reference channel)
     - command: epitools.segmentation_widget
       display_name: Segmentation (local minima seeded watershed)
+    - command: napari-easytrack.preset_widget
+      display_name: Tracking (EasyTrack)
     - command: epitools.cell_statistics_widget
       display_name: Cell statistics
     - command: epitools.quality_metrics_widget

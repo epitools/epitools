@@ -35,7 +35,7 @@ THREE_DIMENSIONAL = 3
 def calculate_cell_statistics(
     image: napari.types.ImageData,
     labels: napari.types.LabelsData,
-    pixel_spacing: tuple[float],
+    pixel_spacing: tuple[float, ...],
     id_cells: list[int] | None = None,
 ) -> tuple[list[dict[str, npt.NDArray]], list[skimage.graph.RAG]]:
     """Calculate the region based properties of a timeseries of segmented images.
@@ -59,7 +59,7 @@ def calculate_cell_statistics(
         labels : napari.types.LabelsData
             Labelled input image, must be the same shape as ``image``.
             Labels with value 0 are ignored.
-        pixel_spacing : tuple[float]
+        pixel_spacing : tuple[float, ...]
             The pixel spacing in each dimension of the image.
         id_cells : list[int], optional
             The cell IDs to calculate statistics for. If not provided, statistics
