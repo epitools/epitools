@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17650102.svg)](https://doi.org/10.5281/zenodo.17650102)
 [![Licence](https://img.shields.io/pypi/l/epitools.svg?color=green)](https://raw.githubusercontent.com/epitools/epitools/main/LICENCE.md)
 [![PyPI](https://img.shields.io/pypi/v/epitools.svg?color=green)](https://pypi.org/project/epitools)
 [![Python Version](https://img.shields.io/pypi/pyversions/epitools.svg?color=green)](https://python.org)
