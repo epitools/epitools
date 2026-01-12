@@ -18,7 +18,7 @@ repos:
       - id: mypy
         additional_dependencies:
           - numpy
-          - typed-ast
+          - "typed-ast; python_version<'3.8'"
         exclude: docs/conf.py
         args: [--ignore-missing-imports]
   - repo: https://github.com/pre-commit/mirrors-prettier
