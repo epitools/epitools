@@ -59,7 +59,7 @@ def calculate_cell_statistics(
         labels : napari.types.LabelsData
             Labelled input image, must be the same shape as ``image``.
             Labels with value 0 are ignored.
-        pixel_spacing : tuple[float, float]
+        pixel_spacing : tuple[float, ...]
             The pixel spacing in each dimension of the image.
         id_cells : list[int], optional
             The cell IDs to calculate statistics for. If not provided, statistics
