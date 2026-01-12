@@ -40,6 +40,7 @@ dependencies = [
     "networkx",
     "numpy",
     "pandas",
+    "pydantic<2",
     "scikit-image>=0.20",
     "scipy",
 ]
