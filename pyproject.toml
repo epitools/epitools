@@ -210,6 +210,6 @@ legacy_tox_ini = """
         coverage report
 
     [tox]
-    envlist = py3{9,10}-{linux,macos,windows}
+    envlist = py3{9,10,11,12,13}-{linux,macos,windows}
     isolated_build=true
 """
