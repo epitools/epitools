@@ -4,8 +4,9 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
 
 permissions:
   contents: read
@@ -24,9 +25,13 @@ jobs:
           python-version: "3.x"
           cache: "pip"
           cache-dependency-path: "pyproject.toml"
+
+      - name: Install build dependencies
         run: |
-          # NOTE: put your own distribution build steps here.
           python -m pip install build
+
+      - name: Build package
+        run: |
           python -m build
 
       - name: Upload distributions
