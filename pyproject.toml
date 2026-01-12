@@ -23,6 +23,9 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
@@ -32,7 +35,7 @@ dependencies = [
     "PartSeg",
     "magicgui",
     "matplotlib",
-    "napari",
+    "napari>=0.5.0",
     "networkx",
     "numpy",
     "pandas",
@@ -175,6 +178,9 @@ legacy_tox_ini = """
     python =
         3.9: py39
         3.10: py310
+        3.11: py311
+        3.12: py312
+        3.13: py313
 
     [gh-actions:env]
     PLATFORM =
@@ -204,6 +210,6 @@ legacy_tox_ini = """
         coverage report
 
     [tox]
-    envlist = py3{9,10}-{linux,macos,windows}
+    envlist = py3{9,10,11,12,13}-{linux,macos,windows}
     isolated_build=true
 """
