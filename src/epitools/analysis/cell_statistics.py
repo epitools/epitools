@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 FOUR_DIMENSIONAL = 4
 THREE_DIMENSIONAL = 3
+TWO_DIMENSIONAL = 2
 
 
 def calculate_cell_statistics(
@@ -141,9 +142,9 @@ def _calculate_cell_statistics(
         # dimension), so both sources need to be handled here.
         pixel_spacing = tuple(pixel_spacing)
         if len(pixel_spacing) == 1:
-            pixel_spacing = pixel_spacing * 2
-        elif len(pixel_spacing) > 2:
-            pixel_spacing = pixel_spacing[-2:]
+            pixel_spacing = pixel_spacing * TWO_DIMENSIONAL
+        elif len(pixel_spacing) > TWO_DIMENSIONAL:
+            pixel_spacing = pixel_spacing[-TWO_DIMENSIONAL:]
 
         # TODO: fix the commented out properties
         # https://github.com/epitools/epitools/issues/98
