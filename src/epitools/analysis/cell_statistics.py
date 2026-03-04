@@ -126,6 +126,17 @@ def _calculate_cell_statistics(
         if isinstance(labels, np.ndarray) and labels.ndim == FOUR_DIMENSIONAL:
             labels = labels[:, 0]
 
+        # Frames are 2D (YX), so pixel_spacing must have exactly 2 elements.
+        # Normalise: duplicate a single isotropic value or take the last 2.
+        # Note: pixel_spacing can come from image.metadata["yx_spacing"] (already
+        # normalised by the reader) *or* from image.scale (which includes the time
+        # dimension), so both sources need to be handled here.
+        pixel_spacing = tuple(pixel_spacing)
+        if len(pixel_spacing) == 1:
+            pixel_spacing = pixel_spacing * 2
+        elif len(pixel_spacing) > 2:
+            pixel_spacing = pixel_spacing[-2:]
+
         # TODO: fix the commented out properties
         # https://github.com/epitools/epitools/issues/98
         # contents of `skimage.measure._regionprops.PROP_VALS`
