@@ -107,12 +107,20 @@ def _calculate_cell_statistics(
         (image.ndim == FOUR_DIMENSIONAL and image.shape[1] > 1)
         or (image.ndim == THREE_DIMENSIONAL and image.shape[0] > 1)
     ):
-        pixel_spacing = pixel_spacing[1:]
-
-        # # Ensure that pixel_spacing id a sequence of floats
-        # if pixel_spacing.shape != (image.ndim,):
-        #     # Transform to a sequence of floats
-        #     pixel_spacing = tuple(float(value) for value in pixel_spacing)
+        # Each frame has image.ndim - 1 dimensions (the first axis is iterated).
+        # Normalise pixel_spacing to that many elements so skimage accepts it
+        # regardless of whether it came from yx_spacing (2 elements) or from
+        # image.scale (all dimensions including T).
+        frame_ndim = image.ndim - 1
+        pixel_spacing = tuple(pixel_spacing)
+        if len(pixel_spacing) == 1:
+            # A scalar spacing is treated as isotropic (equal in all dimensions).
+            pixel_spacing = pixel_spacing * frame_ndim
+        elif len(pixel_spacing) > frame_ndim:
+            pixel_spacing = pixel_spacing[-frame_ndim:]
+        elif len(pixel_spacing) < frame_ndim:
+            # Pad on the left with 1.0 for any missing dimension (e.g. Z).
+            pixel_spacing = (1.0,) * (frame_ndim - len(pixel_spacing)) + pixel_spacing
 
         # Properties to check in 3D
         properties = [

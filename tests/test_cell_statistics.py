@@ -36,7 +36,7 @@ def test_add_cell_statistics_widget(
 )
 def test_calculate_cell_statistics_spacing_shapes(pixel_spacing):
     """Regression test: cell statistics must not raise when pixel_spacing has
-    1, 2, or more elements for a 2-D timeseries (TYX).
+    1, 2, or more elements for a 2-D timeseries (TYX, T=1, single-frame 2D branch).
 
     Previously a 1-element spacing caused::
 
@@ -53,3 +53,44 @@ def test_calculate_cell_statistics_spacing_shapes(pixel_spacing):
 
     assert len(cell_statistics) == 1
     assert len(graphs) == 1
+
+
+@pytest.mark.parametrize(
+    "image_shape, pixel_spacing",
+    [
+        # TYX with T>1 (3D branch, 2-D frames) – yx_spacing (2-elem)
+        ((3, 20, 20), np.array([1.0e-6, 1.0e-6])),
+        # TYX with T>1 (3D branch, 2-D frames) – 1-elem spacing
+        ((3, 20, 20), np.array([1.0e-6])),
+        # TYX with T>1 (3D branch, 2-D frames) – image.scale with T dim (3-elem)
+        ((3, 20, 20), (1.0, 1.0e-6, 1.0e-6)),
+        # TZYX with Z>1 (3D branch, 3-D frames) – yx_spacing (2-elem)
+        ((2, 3, 20, 20), np.array([1.0e-6, 1.0e-6])),
+        # TZYX with Z>1 (3D branch, 3-D frames) – 1-elem spacing
+        ((2, 3, 20, 20), np.array([1.0e-6])),
+        # TZYX with Z>1 (3D branch, 3-D frames) – image.scale with T+Z+Y+X (4-elem)
+        ((2, 3, 20, 20), (1.0, 1.0e-6, 1.0e-6, 1.0e-6)),
+    ],
+)
+def test_calculate_cell_statistics_3d_branch_spacing(image_shape, pixel_spacing):
+    """Regression test: cell statistics must not raise for multi-frame/multi-Z
+    images (3D branch) regardless of how many elements pixel_spacing has.
+
+    Previously ``pixel_spacing = pixel_spacing[1:]`` produced a 1-element array
+    when yx_spacing (2 elements) was passed, causing::
+
+        ValueError: spacing isn't a scalar nor a sequence of shape (N,), got [1.e-06].
+    """
+    np.random.seed(0)
+    image = np.random.randint(0, 255, image_shape, dtype=np.uint8)
+    labels = np.zeros(image_shape, dtype=int)
+    labels[..., 2:8, 2:8] = 1
+    labels[..., 12:18, 12:18] = 2
+
+    # Should not raise
+    cell_statistics, graphs = calculate_cell_statistics(image, labels, pixel_spacing)
+
+    n_frames = image_shape[0]
+    assert len(cell_statistics) == n_frames
+    assert len(graphs) == n_frames
+
