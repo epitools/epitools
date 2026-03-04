@@ -97,9 +97,10 @@ def reader_function(
     # The slice [-2:] is taken as this corresponds to ZYX[-2:]
     for layer in image_layers:
         layer_data, layer_kwargs, layer_type = layer
-        layer_kwargs["metadata"] = {
-            "yx_spacing": np.asarray(
-                image_stack.image.spacing[-2:],
-            ),
-        }
+        yx_spacing = np.asarray(image_stack.image.spacing[-2:])
+        # Ensure we always have exactly 2 elements (Y, X) for the spacing.
+        # PartSeg may store a single isotropic value; duplicate it if needed.
+        if yx_spacing.size == 1:
+            yx_spacing = np.array([yx_spacing[0], yx_spacing[0]])
+        layer_kwargs["metadata"] = {"yx_spacing": yx_spacing}
     return image_layers

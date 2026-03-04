@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 FOUR_DIMENSIONAL = 4
 THREE_DIMENSIONAL = 3
+TWO_DIMENSIONAL = 2
 
 
 def calculate_cell_statistics(
@@ -107,12 +108,20 @@ def _calculate_cell_statistics(
         (image.ndim == FOUR_DIMENSIONAL and image.shape[1] > 1)
         or (image.ndim == THREE_DIMENSIONAL and image.shape[0] > 1)
     ):
-        pixel_spacing = pixel_spacing[1:]
-
-        # # Ensure that pixel_spacing id a sequence of floats
-        # if pixel_spacing.shape != (image.ndim,):
-        #     # Transform to a sequence of floats
-        #     pixel_spacing = tuple(float(value) for value in pixel_spacing)
+        # Each frame has image.ndim - 1 dimensions (the first axis is iterated).
+        # Normalise pixel_spacing to that many elements so skimage accepts it
+        # regardless of whether it came from yx_spacing (2 elements) or from
+        # image.scale (all dimensions including T).
+        frame_ndim = image.ndim - 1
+        pixel_spacing = tuple(pixel_spacing)
+        if len(pixel_spacing) == 1:
+            # A scalar spacing is treated as isotropic (equal in all dimensions).
+            pixel_spacing = pixel_spacing * frame_ndim
+        elif len(pixel_spacing) > frame_ndim:
+            pixel_spacing = pixel_spacing[-frame_ndim:]
+        elif len(pixel_spacing) < frame_ndim:
+            # Pad on the left with 1.0 for any missing dimension (e.g. Z).
+            pixel_spacing = (1.0,) * (frame_ndim - len(pixel_spacing)) + pixel_spacing
 
         # Properties to check in 3D
         properties = [
@@ -125,6 +134,17 @@ def _calculate_cell_statistics(
             image = image[:, 0]
         if isinstance(labels, np.ndarray) and labels.ndim == FOUR_DIMENSIONAL:
             labels = labels[:, 0]
+
+        # Frames are 2D (YX), so pixel_spacing must have exactly 2 elements.
+        # Normalise: duplicate a single isotropic value or take the last 2.
+        # Note: pixel_spacing can come from image.metadata["yx_spacing"] (already
+        # normalised by the reader) *or* from image.scale (which includes the time
+        # dimension), so both sources need to be handled here.
+        pixel_spacing = tuple(pixel_spacing)
+        if len(pixel_spacing) == 1:
+            pixel_spacing = pixel_spacing * TWO_DIMENSIONAL
+        elif len(pixel_spacing) > TWO_DIMENSIONAL:
+            pixel_spacing = pixel_spacing[-TWO_DIMENSIONAL:]
 
         # TODO: fix the commented out properties
         # https://github.com/epitools/epitools/issues/98
