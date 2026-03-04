@@ -58,17 +58,17 @@ def test_calculate_cell_statistics_spacing_shapes(pixel_spacing):
 @pytest.mark.parametrize(
     "image_shape, pixel_spacing",
     [
-        # TYX with T>1 (3D branch, 2-D frames) – yx_spacing (2-elem)
+        # TYX with T>1 (3D branch, 2-D frames) - yx_spacing (2-elem)
         ((3, 20, 20), np.array([1.0e-6, 1.0e-6])),
-        # TYX with T>1 (3D branch, 2-D frames) – 1-elem spacing
+        # TYX with T>1 (3D branch, 2-D frames) - 1-elem spacing
         ((3, 20, 20), np.array([1.0e-6])),
-        # TYX with T>1 (3D branch, 2-D frames) – image.scale with T dim (3-elem)
+        # TYX with T>1 (3D branch, 2-D frames) - image.scale with T dim (3-elem)
         ((3, 20, 20), (1.0, 1.0e-6, 1.0e-6)),
-        # TZYX with Z>1 (3D branch, 3-D frames) – yx_spacing (2-elem)
+        # TZYX with Z>1 (3D branch, 3-D frames) - yx_spacing (2-elem)
         ((2, 3, 20, 20), np.array([1.0e-6, 1.0e-6])),
-        # TZYX with Z>1 (3D branch, 3-D frames) – 1-elem spacing
+        # TZYX with Z>1 (3D branch, 3-D frames) - 1-elem spacing
         ((2, 3, 20, 20), np.array([1.0e-6])),
-        # TZYX with Z>1 (3D branch, 3-D frames) – image.scale with T+Z+Y+X (4-elem)
+        # TZYX with Z>1 (3D branch, 3-D frames) - image.scale with T+Z+Y+X (4-elem)
         ((2, 3, 20, 20), (1.0, 1.0e-6, 1.0e-6, 1.0e-6)),
     ],
 )
@@ -93,4 +93,3 @@ def test_calculate_cell_statistics_3d_branch_spacing(image_shape, pixel_spacing)
     n_frames = image_shape[0]
     assert len(cell_statistics) == n_frames
     assert len(graphs) == n_frames
-

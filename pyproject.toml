@@ -77,7 +77,7 @@ optional-dependencies = {dev = [
     "napari-segment-blobs-and-things-with-membranes",
 ]}
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9, <3.14"
 urls = {Code = "https://github.com/epitools/epitools", Download = "https://pypi.org/project/epitools", Homepage = "https://github.com/epitools/epitools", Issues = "https://github.com/epitools/epitools/issues"}
 entry-points."napari.manifest".epitools = "epitools:napari.yaml"
 license.file = "LICENCE.md"
