@@ -252,12 +252,8 @@ def _calculate_graph_statistics(
 
         id_neighbours: list[list[int] | None] = []
         for index in indices:
-            new_id_neighbours = list(graph.neighbors(index))
-
-            if len(new_id_neighbours) == 0:
-                id_neighbours.append(None)
-            else:
-                id_neighbours.append(list(graph.neighbors(index)))
+            new_id_neighbours = [int(n) for n in graph.neighbors(index)]
+            id_neighbours.append(new_id_neighbours if new_id_neighbours else None)
 
         cell_statistics[frame]["id_neighbours"] = np.array(id_neighbours, dtype=object)
 
