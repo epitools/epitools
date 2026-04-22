@@ -1,14 +1,13 @@
-from pathlib import Path
-
-import tomllib
+import importlib.metadata
 
 
 def test_vertexmodel_dependency_is_optional():
-    pyproject_path = Path(__file__).resolve().parents[1] / "pyproject.toml"
-    pyproject_data = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
+    requirements = importlib.metadata.requires("epitools") or []
 
-    dependencies = pyproject_data["project"]["dependencies"]
-    optional_dependencies = pyproject_data["project"]["optional-dependencies"]
+    core_deps = [r for r in requirements if "extra ==" not in r]
+    vertexmodel_deps = [
+        r for r in requirements if 'extra == "vertexmodel"' in r
+    ]
 
-    assert "napari-pyVertexModel" not in dependencies
-    assert "napari-pyVertexModel" in optional_dependencies["vertexmodel"]
+    assert not any("napari-pyvertexmodel" in r.lower() for r in core_deps)
+    assert any("napari-pyvertexmodel" in r.lower() for r in vertexmodel_deps)
