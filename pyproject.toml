@@ -57,14 +57,22 @@ keywords = [
     "topology",
 ]
 name = "epitools"
-optional-dependencies = {dev = [
+readme = "README.md"
+requires-python = ">=3.9, <3.14"
+urls = {Code = "https://github.com/epitools/epitools", Download = "https://pypi.org/project/epitools", Homepage = "https://github.com/epitools/epitools", Issues = "https://github.com/epitools/epitools/issues"}
+entry-points."napari.manifest".epitools = "epitools:napari.yaml"
+license.file = "LICENCE.md"
+
+[project.optional-dependencies]
+dev = [
     "black",
     "mypy",
     "pre-commit",
     "pyqt5",
     "ruff",
     "tox",
-], docs = [
+]
+docs = [
     "myst-parser",
     "pydata-sphinx-theme",
     "pytz",
@@ -73,16 +81,13 @@ optional-dependencies = {dev = [
     "sphinx_autodoc_typehints",
     "sphinxcontrib-video",
     "types-pytz",
-], vertexmodel = [
+]
+vertexmodel = [
     "napari-pyVertexModel",
-], wf = [
+]
+wf = [
     "napari-segment-blobs-and-things-with-membranes",
-]}
-readme = "README.md"
-requires-python = ">=3.9, <3.14"
-urls = {Code = "https://github.com/epitools/epitools", Download = "https://pypi.org/project/epitools", Homepage = "https://github.com/epitools/epitools", Issues = "https://github.com/epitools/epitools/issues"}
-entry-points."napari.manifest".epitools = "epitools:napari.yaml"
-license.file = "LICENCE.md"
+]
 
 [tool.coverage]
 report = {skip_covered = true, sort = "cover"}
