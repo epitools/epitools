@@ -73,6 +73,8 @@ optional-dependencies = {dev = [
     "sphinx_autodoc_typehints",
     "sphinxcontrib-video",
     "types-pytz",
+], vertexmodel = [
+    "napari-pyVertexModel",
 ], wf = [
     "napari-segment-blobs-and-things-with-membranes",
 ]}

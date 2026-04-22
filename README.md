@@ -69,6 +69,13 @@ conda install -c conda-forge cvxopt
 
 which is required for [btrack](https://github.com/quantumjot/btrack).
 
+To install optional integration with `napari-pyVertexModel` without adding it to
+the core `epitools` dependencies:
+
+```sh
+python -m pip install epitools[vertexmodel]
+```
+
 ## Issues
 
 If you encounter any problems, please
