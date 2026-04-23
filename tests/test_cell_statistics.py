@@ -55,6 +55,31 @@ def test_calculate_cell_statistics_spacing_shapes(pixel_spacing):
     assert len(graphs) == 1
 
 
+def test_id_neighbours_contains_plain_ints():
+    """Regression test: id_neighbours must contain plain Python ints, not np.int64.
+
+    Previously neighbour IDs were stored as np.int64, causing CSV output like
+    '[np.int64(31), np.int64(552), ...]' instead of '[31, 552, ...]'.
+    """
+    np.random.seed(0)
+    image = np.random.randint(0, 255, (1, 20, 20), dtype=np.uint8)
+    labels = np.zeros((1, 20, 20), dtype=int)
+    # Place two adjacent cells so they are neighbours
+    labels[0, 2:12, 2:10] = 1
+    labels[0, 2:12, 10:18] = 2
+
+    cell_statistics, _ = calculate_cell_statistics(image, labels, np.array([1.0, 1.0]))
+
+    for frame_stats in cell_statistics:
+        neighbours = frame_stats["id_neighbours"]
+        for neighbour_list in neighbours:
+            if neighbour_list is not None:
+                for n in neighbour_list:
+                    assert type(n) is int, (
+                        f"Expected plain int, got {type(n).__name__!r} ({n!r})"
+                    )
+
+
 @pytest.mark.parametrize(
     "image_shape, pixel_spacing",
     [
