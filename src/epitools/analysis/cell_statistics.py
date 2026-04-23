@@ -41,13 +41,12 @@ def calculate_cell_statistics(
 ) -> tuple[list[dict[str, npt.NDArray]], list[skimage.graph.RAG]]:
     """Calculate the region based properties of a timeseries of segmented images.
 
-    Currently the following statistics are calculated for each frame of the timeseries:
-        - area
-        - perimeter
-        - number of neighbours
+    All scalar and tabular properties supported by ``skimage.measure.regionprops``
+    for the given image dimensionality are calculated for each frame, including
+    area, shape descriptors, intensity statistics, moments, and neighbour counts.
 
-    ``skimage.measure.regionprops_table`` is used to calculated the area
-    and perimeter.
+    ``skimage.measure.regionprops_table`` is used to calculate the region
+    properties.
 
     ``skimage.graph.RAG`` is used to create a graph of neighbouring cells
     at each frame, from which the number of neighbours of each cell is
@@ -73,7 +72,11 @@ def calculate_cell_statistics(
     Returns:
         list[dict[str, np.NDArray]]
             List of dictionaries, where each dictionary contains the cell statistics
-            for a single frame. The dictionary keys are: area; perimeter; neighbours.
+            for a single frame. The dictionary keys include region properties such
+            as area, shape descriptors, intensity statistics, moments, and neighbour
+            counts. 3-D frames include all properties supported by scikit-image for
+            volumetric data; 2-D frames additionally include orientation, perimeter
+            and eccentricity.
         list[skimage.graph.RAG]
             List of the network graphs constructed for each frame of the timeseries
 
@@ -123,10 +126,39 @@ def _calculate_cell_statistics(
             # Pad on the left with 1.0 for any missing dimension (e.g. Z).
             pixel_spacing = (1.0,) * (frame_ndim - len(pixel_spacing)) + pixel_spacing
 
-        # Properties to check in 3D
+        # Properties supported by skimage.measure.regionprops_table for 3D images.
+        # Note: eccentricity, orientation, perimeter, and perimeter_crofton are
+        # 2-D only and are therefore omitted here.
         properties = [
+            "area_bbox",
+            "area_convex",
+            "area_filled",
             "area",
+            "axis_major_length",
+            "axis_minor_length",
+            "bbox",
+            "centroid_local",
+            "centroid_weighted_local",
+            "centroid_weighted",
+            "centroid",
+            "equivalent_diameter_area",
+            "euler_number",
+            "extent",
+            "feret_diameter_max",
+            "inertia_tensor_eigvals",
+            "inertia_tensor",
+            "intensity_max",
+            "intensity_mean",
+            "intensity_min",
+            "intensity_std",
             "label",
+            "moments_central",
+            "moments_normalized",
+            "moments_weighted_central",
+            "moments_weighted_normalized",
+            "moments_weighted",
+            "moments",
+            "solidity",
         ]
     else:
         # remove z axis if necessary
@@ -146,9 +178,11 @@ def _calculate_cell_statistics(
         elif len(pixel_spacing) > TWO_DIMENSIONAL:
             pixel_spacing = pixel_spacing[-TWO_DIMENSIONAL:]
 
-        # TODO: fix the commented out properties
-        # https://github.com/epitools/epitools/issues/98
-        # contents of `skimage.measure._regionprops.PROP_VALS`
+        # Properties supported by skimage.measure.regionprops_table for 2-D images.
+        # Properties that return per-pixel arrays (coords, image, image_convex,
+        # image_filled, image_intensity, slice) and Hu moments (moments_hu,
+        # moments_weighted_hu) are excluded because they are not compatible with
+        # the tabular output format used for the CSV export.
         properties = [
             "area_bbox",
             "area_convex",
@@ -161,33 +195,27 @@ def _calculate_cell_statistics(
             "centroid_weighted_local",
             "centroid_weighted",
             "centroid",
-            # 'coords',
             "eccentricity",
             "equivalent_diameter_area",
             "euler_number",
             "extent",
             "feret_diameter_max",
-            # 'image_convex',
-            # 'image_filled',
-            # 'image_intensity',
-            # 'image',
             "inertia_tensor_eigvals",
             "inertia_tensor",
             "intensity_max",
             "intensity_mean",
             "intensity_min",
+            "intensity_std",
             "label",
             "moments_central",
             "moments_normalized",
             "moments_weighted_central",
-            # 'moments_weighted_hu',
             "moments_weighted_normalized",
             "moments_weighted",
             "moments",
             "orientation",
             "perimeter_crofton",
             "perimeter",
-            # 'slice',
             "solidity",
         ]
 
