@@ -5,6 +5,26 @@ requires = [
     "setuptools-scm",
 ]
 
+[dependency-groups]
+dev = [
+    "black",
+    "mypy",
+    "pre-commit",
+    "pyqt5",
+    "ruff",
+    "tox",
+]
+docs = [
+    "myst-parser",
+    "pydata-sphinx-theme",
+    "pytz",
+    "sphinx",
+    "sphinx-autobuild",
+    "sphinx_autodoc_typehints",
+    "sphinxcontrib-video",
+    "types-pytz",
+]
+
 [project]
 authors = [
     {email = "d.matthews@ucl.ac.uk", name = "Daniel R. Matthews"},
@@ -61,26 +81,6 @@ requires-python = ">=3.10, <3.14"
 urls = {Code = "https://github.com/epitools/epitools", Download = "https://pypi.org/project/epitools", Homepage = "https://github.com/epitools/epitools", Issues = "https://github.com/epitools/epitools/issues"}
 entry-points."napari.manifest".epitools = "epitools:napari.yaml"
 license.file = "LICENCE.md"
-
-[dependency-groups]
-dev = [
-    "black",
-    "mypy",
-    "pre-commit",
-    "pyqt5",
-    "ruff",
-    "tox",
-]
-docs = [
-    "myst-parser",
-    "pydata-sphinx-theme",
-    "pytz",
-    "sphinx",
-    "sphinx-autobuild",
-    "sphinx_autodoc_typehints",
-    "sphinxcontrib-video",
-    "types-pytz",
-]
 
 [project.optional-dependencies]
 vertexmodel = [
