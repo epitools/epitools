@@ -62,7 +62,7 @@ urls = {Code = "https://github.com/epitools/epitools", Download = "https://pypi.
 entry-points."napari.manifest".epitools = "epitools:napari.yaml"
 license.file = "LICENCE.md"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "black",
     "mypy",
@@ -81,6 +81,8 @@ docs = [
     "sphinxcontrib-video",
     "types-pytz",
 ]
+
+[project.optional-dependencies]
 vertexmodel = [
     "napari-pyVertexModel",
 ]
