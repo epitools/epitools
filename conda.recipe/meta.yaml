@@ -1,0 +1,58 @@
+{% set name = "epitools" %}
+{% set version = "0.1.2" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/epitools-{{ version }}.tar.gz
+  sha256: 3d6f4de3623690752ddff2ccf874213021f5711aa3f44032517b6492fa202abc
+
+build:
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv
+  number: 0
+
+requirements:
+  host:
+    - pip
+    - python >=3.10
+    - setuptools-scm
+  run:
+    - magicgui
+    - matplotlib-base
+    - napari >=0.5.0
+    - napari-easytrack
+    - networkx
+    - numpy
+    - pandas
+    - partseg
+    - pydantic <2
+    - python >=3.10
+    - scikit-image >=0.20
+    - scipy
+
+test:
+  imports:
+    - epitools
+    - epitools.main
+  commands:
+    - pip list
+    - pip check
+  requires:
+    - pip
+    - pyqt
+
+about:
+  home: https://github.com/epitools/epitools
+  summary: 'EpiTools: Image Processing Napari Plugin for epithelial tissues'
+  license: BSD-3-Clause
+  license_file: LICENCE.md
+
+extra:
+  recipe-maintainers:
+    - giuliapaci
+    - goanpeca
+    - jaimergp
+    - Pablo1990
