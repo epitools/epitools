@@ -93,3 +93,78 @@ def test_calculate_cell_statistics_3d_branch_spacing(image_shape, pixel_spacing)
     n_frames = image_shape[0]
     assert len(cell_statistics) == n_frames
     assert len(graphs) == n_frames
+
+
+# Properties expected in 2-D branch output (TYX with single Z slice).
+_EXPECTED_2D_PROPERTIES = {
+    "area",
+    "perimeter",
+    "eccentricity",
+    "orientation",
+    "intensity_mean",
+    "intensity_std",
+    "solidity",
+    "num_neighbours",
+    "id_neighbours",
+}
+
+# Properties expected in 3-D branch output (TZYX with Z > 1).
+_EXPECTED_3D_PROPERTIES = {
+    "area",
+    "area_convex",
+    "axis_major_length",
+    "axis_minor_length",
+    "equivalent_diameter_area",
+    "intensity_mean",
+    "intensity_std",
+    "solidity",
+    "num_neighbours",
+    "id_neighbours",
+}
+
+
+def test_calculate_cell_statistics_2d_properties():
+    """Cell statistics for a 2-D timeseries must include the full set of
+    regionprops (area, perimeter, eccentricity, intensity_std, …)
+    plus the graph-derived neighbour columns."""
+    np.random.seed(0)
+    image = np.random.randint(0, 255, (1, 20, 20), dtype=np.uint8)
+    labels = np.zeros((1, 20, 20), dtype=int)
+    labels[0, 2:8, 2:8] = 1
+    labels[0, 12:18, 12:18] = 2
+
+    cell_statistics, _ = calculate_cell_statistics(
+        image, labels, pixel_spacing=(1.0, 1.0)
+    )
+
+    keys = set(cell_statistics[0].keys())
+    assert _EXPECTED_2D_PROPERTIES.issubset(keys), (
+        f"Missing 2-D properties: {_EXPECTED_2D_PROPERTIES - keys}"
+    )
+
+
+def test_calculate_cell_statistics_3d_properties():
+    """Cell statistics for a 3-D timeseries (TZYX with Z > 1) must include
+    the full set of 3-D-compatible regionprops and neighbour columns, and
+    must not include 2-D-only properties such as eccentricity, perimeter,
+    or orientation."""
+    np.random.seed(0)
+    image_shape = (2, 3, 20, 20)
+    image = np.random.randint(0, 255, image_shape, dtype=np.uint8)
+    labels = np.zeros(image_shape, dtype=int)
+    labels[..., 2:8, 2:8] = 1
+    labels[..., 12:18, 12:18] = 2
+
+    cell_statistics, _ = calculate_cell_statistics(
+        image, labels, pixel_spacing=(1.0, 1.0, 1.0)
+    )
+
+    for frame_stats in cell_statistics:
+        keys = set(frame_stats.keys())
+        assert _EXPECTED_3D_PROPERTIES.issubset(keys), (
+            f"Missing 3-D properties: {_EXPECTED_3D_PROPERTIES - keys}"
+        )
+        # Properties only available in 2-D should NOT be present
+        assert "eccentricity" not in keys
+        assert "perimeter" not in keys
+        assert "orientation" not in keys
